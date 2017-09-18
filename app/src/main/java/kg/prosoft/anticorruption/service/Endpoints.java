@@ -21,5 +21,6 @@ public class Endpoints {
     public static final String PAGES = API_URL + "/pages";
     public static final String LOOKUPS = API_URL + "/lookups";
     public static final String VOCABULARIES = API_URL + "/vocabularies";
+    public static final String AUTHORITIES = API_URL + "/authorities";
     public static final String LOOKUP_DEPEND = API_URL + "/lookups/depend";
 }

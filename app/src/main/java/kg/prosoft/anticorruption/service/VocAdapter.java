@@ -26,14 +26,14 @@ import kg.prosoft.anticorruption.R;
 public class VocAdapter extends BaseAdapter {
 
     private Context mContext;
-    private List<Vocabulary> vocList;
+    private ArrayList<Vocabulary> vocList;
     private LayoutInflater inflater;
     private int vocSelected;
 
     public VocAdapter() {}
-    public VocAdapter(Context mContext, List<Vocabulary> mCategoriesList, int selected) {
+    public VocAdapter(Context mContext, ArrayList<Vocabulary> mList, int selected) {
         this.mContext = mContext;
-        this.vocList = mCategoriesList;
+        this.vocList = mList;
         vocSelected=selected;
     }
 
@@ -59,13 +59,14 @@ public class VocAdapter extends BaseAdapter {
 
     @Override
     public boolean isEnabled(int position) {
-        // A separator cannot be clicked !
-        return getItemViewType(position) != 1;
+        Vocabulary voc = vocList.get(position);
+        boolean hasChildren = voc.getHasChildren();
+        if(hasChildren) return voc.getParent() != 0;
+        else{return true;}
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final int type = getItemViewType(position);
 
         if (inflater == null)
             inflater = (LayoutInflater) mContext
@@ -74,20 +75,30 @@ public class VocAdapter extends BaseAdapter {
             convertView = inflater.inflate( R.layout.vocabulary_item, parent, false);
         }
 
-        if(type==0){
-            Vocabulary voc = vocList.get(position);
-            String title=voc.getValue();
-            int id=voc.getId();
-            ImageView arrow=(ImageView)convertView.findViewById(R.id.id_iv_arrow);
-            if(id==vocSelected){
-                arrow.setVisibility(View.VISIBLE);
+        Vocabulary voc = vocList.get(position);
+        String title=voc.getValue();
+        boolean hasChildren = voc.getHasChildren();
+        int id=voc.getId();
+        ImageView arrow=(ImageView)convertView.findViewById(R.id.id_iv_arrow);
+        if(id==vocSelected){
+            arrow.setVisibility(View.VISIBLE);
+        }
+        else{
+            arrow.setVisibility(View.GONE);
+        }
+
+        TextView tv_category_title=(TextView) convertView.findViewById(R.id.id_tv_category_title);
+        tv_category_title.setText(title);
+        if(hasChildren){
+            int par = voc.getParent();
+            if(par==0){
+                convertView.setBackgroundColor(Color.RED);
+                tv_category_title.setTextColor(Color.WHITE);
             }
             else{
-                arrow.setVisibility(View.GONE);
+                convertView.setBackgroundColor(Color.WHITE);
+                tv_category_title.setTextColor(Color.BLACK);
             }
-
-            TextView tv_category_title=(TextView) convertView.findViewById(R.id.id_tv_category_title);
-            tv_category_title.setText(title);
         }
 
         return convertView;

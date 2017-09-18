@@ -62,7 +62,6 @@ public class SectorDialog extends DialogFragment {
     protected void onAttachToContext(Context context) {
         try {
             mListener = (SectorDialogListener) context;
-            Log.e("ATTACH","worked");
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(context.toString()
@@ -74,23 +73,15 @@ public class SectorDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Activity activity=getActivity();
-        VocAdapter myAdapter=new VocAdapter();
-        final List<Vocabulary> vocList=new ArrayList<>();
-        HashMap<Integer,String> mMap;
         Bundle b = getArguments();
-        if(b.getSerializable("hashmap") != null) {
-            mMap = (HashMap<Integer, String>) b.getSerializable("hashmap");
-            int selected=b.getInt("selected");
-            for (Map.Entry<Integer, String> entry : mMap.entrySet())
-            {
-                vocList.add(new Vocabulary(entry.getKey(), entry.getValue()));
-            }
-            myAdapter  = new VocAdapter(activity, vocList, selected);
-        }
+        int selected=b.getInt("selected");
+        String title=b.getString("title");
+        final ArrayList<Vocabulary> vocList=b.getParcelableArrayList("list");
+        VocAdapter myAdapter  = new VocAdapter(activity, vocList, selected);
 
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle(R.string.select_sector)
+        builder.setTitle(title)
                 .setNegativeButton(R.string.close, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User cancelled the dialog
