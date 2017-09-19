@@ -1,11 +1,23 @@
 package kg.prosoft.anticorruption;
 
 import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.NetworkResponse;
@@ -20,6 +32,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,14 +42,16 @@ import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.SectorDialog;
 import kg.prosoft.anticorruption.service.Vocabulary;
 
-public class AddReportActivity extends BaseActivity implements SectorDialog.SectorDialogListener {
+public class AddReportActivity extends BaseActivity implements SectorDialog.SectorDialogListener, FrameMapFragment.ParentFrag {
 
     private ArrayList<Vocabulary> vocList;
-    private HashMap<Integer, String> titleMap, titleMapAuthority;
-    private HashMap<Integer, Vocabulary> parentMap,childMap, parentMapAuthority, childMapAuthority;
-    private HashMap<Integer, HashMap<Integer, Vocabulary>> parentChildMap, parentChildMapAuthority;
-    TextView tv_sector, tv_city, tv_authority, tv_type;
-    LinearLayout ll_sector;
+    private HashMap<Integer, String> titleMap;
+    private HashMap<Integer, Vocabulary> parentMap,childMap;
+    private HashMap<Integer, HashMap<Integer, Vocabulary>> parentChildMap;
+    TextView tv_sector, tv_city, tv_authority, tv_type, tv_lat, tv_lng;
+    LinearLayout ll_sector, ll_user;
+    CheckBox chb_anonym;
+    EditText et_name, et_email, et_contact;
     int selected_sector_id=0;
     int selected_city_id=0;
     int selected_authority_id=0;
@@ -46,6 +61,11 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     int DIALOG_AUTHORITY=2;
     int DIALOG_TYPE=3;
     int ACTIVE_DIALOG=0;
+    public double lat;
+    public double lng;
+    public RelativeLayout rl_map;
+    boolean initialStart=true;
+    int marker_city_id=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,19 +73,22 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         setContentView(R.layout.activity_add_report);
 
         parentMap=new HashMap<>();
-        parentMapAuthority=new HashMap<>();
         childMap= new HashMap<>();
-        childMapAuthority= new HashMap<>();
         titleMap= new HashMap<>();
-        titleMapAuthority= new HashMap<>();
         parentChildMap=new HashMap<>();
-        parentChildMapAuthority=new HashMap<>();
         requestVocabularies();
         tv_sector=(TextView)findViewById(R.id.id_tv_sector);
         tv_city=(TextView)findViewById(R.id.id_tv_city);
         tv_authority=(TextView)findViewById(R.id.id_tv_authority);
         tv_type=(TextView)findViewById(R.id.id_tv_type);
         ll_sector=(LinearLayout)findViewById(R.id.id_ll_sector);
+        ll_user=(LinearLayout)findViewById(R.id.id_ll_user);
+        chb_anonym=(CheckBox)findViewById(R.id.id_chb_anonym);
+        et_name=(EditText)findViewById(R.id.id_et_name);
+        et_email=(EditText)findViewById(R.id.id_et_email);
+        et_contact=(EditText)findViewById(R.id.id_et_contact);
+        tv_lat=(TextView)findViewById(R.id.id_tv_lat);
+        tv_lng=(TextView)findViewById(R.id.id_tv_lng);
     }
 
     public void sectorClick(View v){
@@ -121,6 +144,15 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         sdialog.show(getFragmentManager(),"typeDialog");
     }
 
+    public void anonymCheck(View v){
+        if(chb_anonym.isChecked()){
+            ll_user.setVisibility(View.GONE);
+        }
+        else{
+            ll_user.setVisibility(View.VISIBLE);
+        }
+    }
+
     // The dialog fragment receives a reference to this Activity through the
     // Fragment.onAttach() callback, which it uses to call the following methods
     // defined by the SectorDialog.SectorDialogListener interface
@@ -138,6 +170,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             String title=titleMap.get(id);
             selected_city_id=id;
             tv_city.setText(title);
+            showMapFrame();
         }
         else if(ACTIVE_DIALOG==DIALOG_AUTHORITY){
             Log.e("CLICK RECEIVE TO","authority");
@@ -257,47 +290,102 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         MyVolley.getInstance(appContext).addToRequestQueue(volReq);
     }
 
-    public void requestAuthorities(){
-        String uri = Endpoints.AUTHORITIES;
-        Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
+    public void showMapFrame(){
+        FrameMapFragment fmfragment=new FrameMapFragment();
+        Bundle bundle = new Bundle();
+        bundle.putDouble("lat", lat);
+        bundle.putDouble("lng", lng);
+        if(selected_city_id!=0){
+            bundle.putInt("city_id",selected_city_id);
+        }
+        fmfragment.setArguments(bundle);
+        putFragment(fmfragment);
+
+        rl_map=(RelativeLayout)findViewById(R.id.id_rl_add_map);
+        Button button = new Button(this);
+        button.getBackground().setAlpha(0);
+        button.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT));
+        rl_map.addView(button);
+
+        button.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onResponse(JSONArray jsonArray) {
-
-                Log.e(TAG, "response: " + jsonArray);
-                try{
-                    for(int s=0; s < jsonArray.length(); s++){
-                        JSONObject jsonObject = jsonArray.getJSONObject(s);
-                        int id=jsonObject.getInt("id");
-                        String value=jsonObject.getString("title");
-                        int parent=jsonObject.getInt("category_id");
-                        titleMap.put(id,value);
-                        if(parent==0){
-                            parentMap.put(id,new Vocabulary(id,"authority",value,parent,0,false));
-                        }
-                        else{
-                            childMap=parentChildMap.get(parent);
-                            if(childMap== null) {
-                                childMap=new HashMap<>();
-                            }
-                            childMap.put(id,new Vocabulary(id,"authority",value,parent,0,false));
-                            parentChildMap.put(parent,childMap);
-                        }
-                    }
-                    //helper.addVocabulary(vocList);
-                }catch(JSONException e){e.printStackTrace();}
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), SetLocationActivity.class);
+                intent.putExtra("lat",lat);
+                intent.putExtra("lng",lng);
+                intent.putExtra("city_id",selected_city_id);
+                intent.putExtra("previous_city_id",marker_city_id);
+                startActivityForResult(intent,240);
             }
-        };
+        });
+    }
 
-        Response.ErrorListener errListener=new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                NetworkResponse networkResponse = error.networkResponse;
-                Log.e(TAG, "Volley error: " + error.getMessage() + ", code: " + networkResponse);
+    protected void putFragment(FrameMapFragment frag){
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.id_fl_add_map, frag, "FrameMap");
+        //ft.addToBackStack(null);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.commit();
+    }
+
+    @Override
+    public void setParent()
+    {
+        FragmentManager fragmentManager = getFragmentManager();
+        FrameMapFragment nestFrag = (FrameMapFragment)fragmentManager.findFragmentByTag("FrameMap");
+        //Tag of your fragment which you should use when you add
+
+        if(nestFrag != null)
+        {
+            // your some other frag need to provide some data back based on views.
+            lat = nestFrag.mylat;
+            lng = nestFrag.mylng;
+            if(lat!=0.0){
+                //Log.e("mylat good",""+lat);
+                tv_lat.setText(Double.toString(lat));
+                tv_lng.setText(Double.toString(lng));
             }
-        };
+            else{
+                Log.e("mylat bad",""+lat);
+            }
+            // it can be a string, or int, or some custom java object.
+        }
+    }
 
-        JsonArrayRequest volReq = new JsonArrayRequest(Request.Method.GET, uri, null, listener,errListener);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==240 && resultCode==RESULT_OK){ //get map location
+            lat=data.getDoubleExtra("new_lat",0);
+            lng=data.getDoubleExtra("new_lng",0);
+            marker_city_id=data.getIntExtra("marked_city",0);
+            String new_lat_str=Double.toString(lat);
+            String new_lng_str=Double.toString(lng);
+            tv_lat.setText(new_lat_str);
+            tv_lng.setText(new_lng_str);
+            initialStart=false;
+            Log.e("RESULT", "lat:"+new_lat_str+" lng:"+new_lng_str);
+        }
+    }
 
-        MyVolley.getInstance(appContext).addToRequestQueue(volReq);
+    @Override
+    public void onResume(){
+        super.onResume();
+        if(initialStart){
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            showMapFrame();
+                        }
+                    },
+                    3000);
+        }
+        else{
+            showMapFrame();
+        }
+
     }
 }

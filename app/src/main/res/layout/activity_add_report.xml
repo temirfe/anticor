@@ -11,8 +11,8 @@
     android:layout_height="wrap_content"
     android:paddingBottom="20dp">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/id_til_name"
+        <android.support.design.widget.TextInputLayout
+        android:id="@+id/id_til_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -23,21 +23,21 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.0">
         <EditText
-            android:id="@+id/id_et_name"
+            android:id="@+id/id_et_title"
             android:imeOptions="flagNoExtractUi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPersonName"
+            android:inputType="text"
             android:hint="@string/title" />
-    </android.support.design.widget.TextInputLayout>
-    <android.support.design.widget.TextInputLayout
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
         android:id="@+id/id_til_note"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/id_til_name"
-        app:layout_constraintLeft_toLeftOf="@+id/id_til_name"
-        app:layout_constraintRight_toRightOf="@+id/id_til_name"
+        app:layout_constraintTop_toBottomOf="@+id/id_til_title"
+        app:layout_constraintLeft_toLeftOf="@+id/id_til_title"
+        app:layout_constraintRight_toRightOf="@+id/id_til_title"
         app:layout_constraintHorizontal_bias="0.0">
         <EditText
             android:id="@+id/id_et_note"
@@ -46,8 +46,8 @@
             android:ems="10"
             android:inputType="textMultiLine"
             android:hint="@string/report_description"/>
-    </android.support.design.widget.TextInputLayout>
-    <LinearLayout
+        </android.support.design.widget.TextInputLayout>
+        <LinearLayout
         android:layout_width="0dp"
         android:id="@+id/id_ll_sector"
         android:orientation="horizontal"
@@ -79,8 +79,8 @@
             android:contentDescription="@string/select_sector"
             android:src="@drawable/ic_arrow_drop_down_black_24dp"
             android:tint="@color/blue" />
-    </LinearLayout>
-    <LinearLayout
+        </LinearLayout>
+        <LinearLayout
         android:layout_width="0dp"
         android:id="@+id/id_ll_authority"
         android:orientation="horizontal"
@@ -112,7 +112,107 @@
             android:contentDescription="@string/select_sector"
             android:src="@drawable/ic_arrow_drop_down_black_24dp"
             android:tint="@color/blue" />
-    </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:id="@+id/id_ll_type"
+            android:orientation="horizontal"
+            android:background="@drawable/border"
+            android:onClick="typeClick"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="3dp"
+            android:gravity="center_vertical"
+            app:layout_constraintTop_toBottomOf="@+id/id_ll_authority"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="16dp">
+            <TextView
+                android:id="@+id/id_tv_type"
+                android:layout_width="0dp"
+                android:text="@string/select_type"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/select_type"
+                android:src="@drawable/ic_arrow_drop_down_black_24dp"
+                android:tint="@color/blue" />
+
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/id_chb_anonym"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wannabe_anonym"
+            android:onClick="anonymCheck"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@+id/id_ll_type"
+            android:layout_marginLeft="0dp"
+            app:layout_constraintLeft_toLeftOf="@+id/id_ll_type" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:id="@+id/id_ll_user"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/id_chb_anonym"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            >
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/id_til_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/id_et_name"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:hint="@string/name" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/id_til_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/id_et_email"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="textEmailAddress"
+                    android:hint="@string/prompt_email" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/id_til_contact"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/id_et_contact"
+                    android:imeOptions="flagNoExtractUi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:hint="@string/contact" />
+            </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
         <LinearLayout
             android:layout_width="0dp"
             android:id="@+id/id_ll_city"
@@ -127,7 +227,7 @@
             android:paddingStart="8dp"
             android:paddingEnd="3dp"
             android:gravity="center_vertical"
-            app:layout_constraintTop_toBottomOf="@+id/id_ll_authority"
+            app:layout_constraintTop_toBottomOf="@+id/id_ll_user"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginTop="16dp">
@@ -146,38 +246,47 @@
                 android:src="@drawable/ic_arrow_drop_down_black_24dp"
                 android:tint="@color/blue" />
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:id="@+id/id_ll_type"
-            android:orientation="horizontal"
-            android:background="@drawable/border"
-            android:onClick="typeClick"
+
+        <TextView
+            android:id="@+id/id_tv_set_location"
+            android:text="@string/set_location"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="3dp"
-            android:gravity="center_vertical"
+            android:layout_marginTop="20dp"
             app:layout_constraintTop_toBottomOf="@+id/id_ll_city"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="16dp">
-            <TextView
-                android:id="@+id/id_tv_type"
-                android:layout_width="0dp"
-                android:text="@string/select_type"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"/>
+            app:layout_constraintRight_toRightOf="parent"/>
+        <!--map frame-->
+        <RelativeLayout
+            android:layout_width="300dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="7dp"
+            android:id="@+id/id_rl_add_map"
+            app:layout_constraintTop_toBottomOf="@+id/id_tv_set_location"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+            <FrameLayout
+                android:id="@+id/id_fl_add_map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                >
+            </FrameLayout>
+        </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_tv_lat"
+            app:layout_constraintTop_toBottomOf="@+id/id_rl_add_map"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_tv_lng"
+            app:layout_constraintTop_toBottomOf="@+id/id_tv_lat"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/select_type"
-                android:src="@drawable/ic_arrow_drop_down_black_24dp"
-                android:tint="@color/blue" />
-        </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+    </android.support.constraint.ConstraintLayout>
 </ScrollView>

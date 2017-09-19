@@ -72,7 +72,7 @@
     <string name="authorization">Авторизация</string>
 
     <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
+    <string name="prompt_email">Электронная почта</string>
     <string name="prompt_username_or_email">Логин или Email</string>
     <string name="prompt_password">Пароль</string>
 
@@ -82,4 +82,13 @@
     <string name="select_authority">Выберите госорган или структуру</string>
     <string name="select_city">Выберите город или регион</string>
     <string name="select_type">Выберите тип обращения</string>
+    <string name="wannabe_anonym">Я хочу подать анонимное объявление</string>
+    <string name="contact">Ваши контакты</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="set_location">Укажите на карте</string>
+    <string name="done">Готово</string>
+    <string name="only_kg">Нужно указать только внутри Кыргызской Республики!</string>
+    <string name="grant_location_permission">Пожалуйста, дайте разрешение на ваше местоположения</string>
+    <string name="grant_location_permission_en">Please, give permission to locate your location</string>
+
 </resources>
