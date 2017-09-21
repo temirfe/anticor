@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -36,21 +38,27 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,7 +86,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     TextView tv_sector, tv_city, tv_authority, tv_type, tv_lat, tv_lng;
     LinearLayout ll_sector, ll_user,ll_add_photo,ll_images;
     CheckBox chb_anonym;
-    EditText et_name, et_email, et_contact;
+    EditText et_title, et_text, et_name, et_email, et_contact;
     int selected_sector_id=0;
     int selected_city_id=0;
     int selected_authority_id=0;
@@ -91,7 +99,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     public double lat;
     public double lng;
     public RelativeLayout rl_map;
-    boolean initialStart=true;
+    boolean initialStart=true, anonym=false;
     int marker_city_id=0;
 
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
@@ -118,6 +126,8 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         ll_sector=(LinearLayout)findViewById(R.id.id_ll_sector);
         ll_user=(LinearLayout)findViewById(R.id.id_ll_user);
         chb_anonym=(CheckBox)findViewById(R.id.id_chb_anonym);
+        et_title=(EditText)findViewById(R.id.id_et_title);
+        et_text=(EditText)findViewById(R.id.id_et_note);
         et_name=(EditText)findViewById(R.id.id_et_name);
         et_email=(EditText)findViewById(R.id.id_et_email);
         et_contact=(EditText)findViewById(R.id.id_et_contact);
@@ -189,12 +199,18 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         sdialog.show(getFragmentManager(),"typeDialog");
     }
 
+    public void submitReport(View v){
+        submitForm();
+    }
+
     public void anonymCheck(View v){
         if(chb_anonym.isChecked()){
             ll_user.setVisibility(View.GONE);
+            anonym=true;
         }
         else{
             ll_user.setVisibility(View.VISIBLE);
+            anonym=false;
         }
     }
 
@@ -538,6 +554,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             // it can be a string, or int, or some custom java object.
         }
     }
+    //** **//
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -631,5 +648,179 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             showMapFrame();
         }
 
+    }
+
+    public void submitForm(){
+        View focusView = null;
+        boolean allGood=true;
+        final String title = et_title.getText().toString();
+        final String description = et_text.getText().toString();
+        final String name = et_name.getText().toString();
+        final String email = et_email.getText().toString();
+        final String contact = et_contact.getText().toString();
+        final String latitude = tv_lat.getText().toString();
+        final String longitude = tv_lng.getText().toString();
+
+        if(title.trim().equals("")){
+            et_title.setError(getResources().getString(R.string.required));
+            focusView = et_title;
+            allGood=false;
+        }
+        if(description.trim().equals("")){
+            et_text.setError(getResources().getString(R.string.required));
+            focusView = et_text;
+            allGood=false;
+        }
+        if(!anonym){
+            if(contact.trim().equals("")){
+                et_contact.setError(getResources().getString(R.string.required));
+                focusView = et_contact;
+                allGood=false;
+            }
+            if(name.trim().equals("")){
+                et_name.setError(getResources().getString(R.string.required));
+                focusView = et_name;
+                allGood=false;
+            }
+            if(email.trim().equals("")){
+                et_email.setError(getResources().getString(R.string.required));
+                focusView = et_email;
+                allGood=false;
+            }
+        }
+        if(selected_authority_id==0){
+            Toast.makeText(this, getResources().getString(R.string.select_authority), Toast.LENGTH_SHORT).show();
+            allGood=false;
+        }
+        if(selected_sector_id==0){
+            Toast.makeText(this, getResources().getString(R.string.select_sector), Toast.LENGTH_SHORT).show();
+            allGood=false;
+        }
+        if(selected_city_id==0){
+            Toast.makeText(this, getResources().getString(R.string.select_city), Toast.LENGTH_SHORT).show();
+            allGood=false;
+        }
+        /*if(latitude.trim().equals("0.0")){
+            Toast.makeText(this, getResources().getString(R.string.set_location), Toast.LENGTH_SHORT).show();
+            allGood=false;
+        }*/
+
+        if(allGood){
+            //store personal details in session
+            session.createContactSession(name,email,contact);
+
+            final ProgressDialog progress = new ProgressDialog(this);
+            progress.setTitle(getResources().getString(R.string.sending));
+            progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+            progress.show();
+            String url=Endpoints.REPORTS;
+            Response.Listener<String> listener = new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    progress.dismiss();
+                    try {
+                        JSONObject obj = new JSONObject(response);
+                        //Log.d("My App", obj.toString());
+                        try{
+                            int id = obj.getInt("id");
+                            if(id!=0){
+                                Intent intent = new Intent(AddReportActivity.this, ReportViewActivity.class);
+                                intent.putExtra("id",id);
+                                intent.putExtra("from","form");
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+
+                        }catch(JSONException e){e.printStackTrace();}
+
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + response + "\"");
+                    }
+                }
+            };
+
+            Response.ErrorListener errorResp =new Response.ErrorListener()
+            {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // As of f605da3 the following should work
+                    NetworkResponse response = error.networkResponse;
+                    if (error instanceof ServerError && response != null) {
+                        try {
+                            String res = new String(response.data,
+                                    HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+                            Object json = new JSONTokener(res).nextValue();
+                            if (json instanceof JSONObject){
+                                JSONObject err = new JSONObject(res);
+                                //Log.i("RESPONSE err 1", err.toString());
+                            }
+                            else if (json instanceof JSONArray){
+                                JSONArray err = new JSONArray(res);
+                                //Log.i("RESPONSE err 1", err.toString());
+                            }
+                            progress.dismiss();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+                            builder.setMessage(R.string.app_error).setNegativeButton(R.string.close,null).create().show();
+                        } catch (UnsupportedEncodingException e1) {
+                            // Couldn't properly decode data to string
+                            e1.printStackTrace();
+                            //Log.i("RESPONSE err 2", "here");
+                        } catch (JSONException e2) {
+                            // returned data is not JSONObject?
+                            e2.printStackTrace();
+                            //Log.i("RESPONSE err 3", "here");
+                        }
+                    }
+                }
+            };
+
+            StringRequest req = new StringRequest(Request.Method.POST, url, listener, errorResp){
+                @Override
+                protected Map<String,String> getParams(){
+                    Map<String,String> params = new HashMap<String, String>();
+                    params.put("title",title);
+                    params.put("text",description);
+                    if(anonym){
+                        params.put("anonumous","1");
+                    }
+                    else{
+                        params.put("author",name);
+                        params.put("email",email);
+                        params.put("contact",contact);
+                    }
+                    params.put("lat",latitude);
+                    params.put("lon",longitude);
+                    params.put("authority_id",Integer.toString(selected_authority_id));
+                    params.put("city_id",Integer.toString(selected_city_id));
+                    params.put("category_id",Integer.toString(selected_sector_id));
+                    params.put("type_id",Integer.toString(selected_type_id));
+                    //if(user_id!=0){params.put("user_id",Integer.toString(user_id));}
+                    int im=1;
+                    for (String img : selectedImages)
+                    {
+                        params.put("images["+im+"]",img);
+                        im++;
+                    }
+                    //params.put("incident_mode","5"); //5 is android
+
+                    /*SharedPreferences pref = context.getSharedPreferences(FirebaseConfig.SHARED_PREF, 0);
+                    String phoneFirebaseId = pref.getString("regId", null);
+                    if(phoneFirebaseId!=null){
+                        params.put("regid",phoneFirebaseId);
+                    }*/
+
+                    //Log.e("FIRE ID", "Firebase reg id: " + phoneFirebaseId);
+
+                    return params;
+                }
+            };
+            req.setRetryPolicy(new DefaultRetryPolicy(
+                    0,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            MyVolley.getInstance(appContext).addToRequestQueue(req);
+        }
+        else{
+            if(focusView!=null){focusView.requestFocus();}}
     }
 }

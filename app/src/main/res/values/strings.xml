@@ -94,5 +94,6 @@
     <string name="camera">Камера</string>
     <string name="gallery">Галерея</string>
     <string name="upload_limit">Можно добавить не более 10 файлов!</string>
+    <string name="submit">Отправить</string>
 
 </resources>

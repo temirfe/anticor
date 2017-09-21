@@ -45,11 +45,15 @@ public class SessionManager {
     public static final String KEY_ADMIN_PHONE = "admin_phone";
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_CONTACT = "contact";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_EMAIL = "email";
 
     // All Shared Preferences Keys
     private static final String IS_LOGIN = "IsLoggedIn";
     public static final String dependChecked ="dependChecked";
     public static final String lookupDependChecked ="lookupDependChecked";
+
+    private static final String ContactSaved = "IsContactSaved";
 
     // Constructor
     public SessionManager(Context context) {
@@ -206,6 +210,21 @@ public class SessionManager {
 
         // Staring Login Activity
         _context.startActivity(i);
+    }
+
+    /**
+     * Create login session
+     * */
+    public void createContactSession(String name, String email, String contact){
+        editor.putBoolean(ContactSaved, true);
+
+        // Storing name in pref
+        editor.putString(KEY_NAME, name);
+        editor.putString(KEY_EMAIL, email);
+        editor.putString(KEY_CONTACT, contact);
+
+        // commit changes
+        editor.commit();
     }
 
     /**
