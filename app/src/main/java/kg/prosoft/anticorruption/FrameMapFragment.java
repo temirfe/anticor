@@ -27,6 +27,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import kg.prosoft.anticorruption.service.Cities;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -95,21 +97,11 @@ public class FrameMapFragment extends Fragment implements
                 LatLng myLocation = KG.getCenter();
 
                 int camZoom=5;
-                if(city_id>0){camZoom=13;}
-                switch(city_id){
-                    case 1: myLocation = new LatLng(42.8742589,74.6131682);//bishkek
-                        break;
-                    case 16: myLocation = new LatLng(40.5169,72.8056);//Osh
-                        break;
-                    case 17: myLocation = new LatLng(40.936590,72.983248);//jalalabad
-                        break;
-                    case 18: myLocation = new LatLng(42.4892,78.3976);//karakol
-                        break;
-                    case 19: myLocation = new LatLng(41.4282,75.9938);//naryn
-                        break;
-                    default:camZoom=5;
-                        break;
+                if(city_id>0){
+                    camZoom=10;
+                    myLocation= Cities.getCityCoord(city_id);
                 }
+
 
                 if(lat!=0.0 && lng!=0.0){
                     myLocation=new LatLng(lat, lng);

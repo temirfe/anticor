@@ -90,5 +90,9 @@
     <string name="only_kg">Нужно указать только внутри Кыргызской Республики!</string>
     <string name="grant_location_permission">Пожалуйста, дайте разрешение на ваше местоположения</string>
     <string name="grant_location_permission_en">Please, give permission to locate your location</string>
+    <string name="add_image">Добавить фото</string>
+    <string name="camera">Камера</string>
+    <string name="gallery">Галерея</string>
+    <string name="upload_limit">Можно добавить не более 10 файлов!</string>
 
 </resources>

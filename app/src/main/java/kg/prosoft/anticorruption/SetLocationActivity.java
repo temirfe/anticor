@@ -28,6 +28,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import kg.prosoft.anticorruption.service.Cities;
+
 public class SetLocationActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -160,19 +162,11 @@ public class SetLocationActivity extends AppCompatActivity implements OnMapReady
         mMap = googleMap;
         LatLng markerLoc = KG.getCenter();
         int camZoom=8;
-        if(city_id>0){camZoom=13;}
-        switch(city_id){
-            case 1: markerLoc = new LatLng(42.8742589,74.6131682);//bishkek
-                break;
-            case 16: markerLoc = new LatLng(40.5169,72.8056);//Osh
-                break;
-            case 17: markerLoc = new LatLng(40.936590,72.983248);//jalalabad
-                break;
-            case 18: markerLoc = new LatLng(42.4892,78.3976);//karakol
-                break;
-            case 19: markerLoc = new LatLng(41.4282,75.9938);//naryn
-                break;
+        if(city_id>0){
+            camZoom=10;
+            markerLoc= Cities.getCityCoord(city_id);
         }
+
         //Log.e(TAG,"CITY ID "+city_id);
 
         if(previous_city_id==city_id && lat!=0.0 && lng!=0.0){
