@@ -228,6 +228,18 @@ public class SessionManager {
     }
 
     /**
+     * Create login session
+     * */
+    public void saveNameEmail(String name, String email){
+        // Storing name in pref
+        editor.putString(KEY_NAME, name);
+        editor.putString(KEY_EMAIL, email);
+
+        // commit changes
+        editor.commit();
+    }
+
+    /**
      * Clear session details
      * */
     public void logoutUser(){
@@ -258,8 +270,11 @@ public class SessionManager {
     public String getAccessToken() {
         return pref.getString(ACCESS_TOKEN,"");
     }
-    public String getEmail() {
+    public String getUserEmail() {
         return pref.getString(KEY_USER_EMAIL,"");
+    }
+    public String getEmail() {
+        return pref.getString(KEY_EMAIL,"");
     }
     public void setContact(String contact) {
         editor.putString(KEY_CONTACT,contact);
@@ -267,8 +282,11 @@ public class SessionManager {
     }
     public String getContact() {return pref.getString(KEY_CONTACT,"");}
 
-    public String getName() {
+    public String getUserName() {
         return pref.getString(KEY_USER_NAME,"");
+    }
+    public String getName() {
+        return pref.getString(KEY_NAME,"");
     }
 
     public void setPhone(String phone) {

@@ -59,7 +59,13 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".SetLocationActivity" />
-        <activity android:name=".ReportViewActivity"></activity>
+        <activity android:name=".ReportViewActivity" />
+        <activity
+            android:name=".TabActivity"
+            android:label="@string/title_activity_tab"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".NewsViewActivity" />
+        <activity android:name=".AddCommentActivity"></activity>
     </application>
 
 </manifest>

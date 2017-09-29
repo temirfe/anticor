@@ -3,8 +3,6 @@ package kg.prosoft.anticorruption;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.SparseArray;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,7 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import kg.prosoft.anticorruption.service.Vocabulary;
+import com.google.android.gms.maps.MapsInitializer;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -130,6 +128,8 @@ public class MainActivity extends BaseActivity
             Intent intent= new Intent(MainActivity.this, MapsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
+            Intent intent= new Intent(MainActivity.this, TabActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_manage) {
 
