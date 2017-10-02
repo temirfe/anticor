@@ -65,7 +65,12 @@
             android:label="@string/title_activity_tab"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".NewsViewActivity" />
-        <activity android:name=".AddCommentActivity"></activity>
+        <activity android:name=".AddCommentActivity" />
+        <activity android:name=".AuthorityListActivity" />
+        <activity
+            android:name=".AuthorityViewActivity"
+            android:label="@string/title_activity_authority_view"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

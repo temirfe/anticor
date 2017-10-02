@@ -132,6 +132,8 @@ public class MainActivity extends BaseActivity
             startActivity(intent);
 
         } else if (id == R.id.nav_manage) {
+            Intent intent= new Intent(MainActivity.this, AuthorityListActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_share) {
 
