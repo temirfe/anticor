@@ -1,6 +1,7 @@
 package kg.prosoft.anticorruption.service;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
@@ -43,6 +44,13 @@ public class AuthorityAdapter extends BaseAdapter {
     }
 
     @Override
+    public boolean isEnabled(int position) {
+        Authority voc = authList.get(position);
+        if(voc.getParentId()==0) {return false;}
+        else{return true;}
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if (inflater == null)
@@ -52,15 +60,21 @@ public class AuthorityAdapter extends BaseAdapter {
 
         Authority authority = authList.get(position);
         String title=authority.getTitle();
-        final SpannableStringBuilder boldTitle = new SpannableStringBuilder(title);
-        boldTitle.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, title.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         TextView tv_title=(TextView) convertView.findViewById(R.id.id_tv_title);
-        tv_title.setText(boldTitle);
+        tv_title.setText(title);
         TextView tv_text=(TextView) convertView.findViewById(R.id.id_tv_text);
 
         convertView.setTag(authority.getId());
+        int par = authority.getParentId();
+        if(par==0){
+            convertView.setBackgroundColor(Color.GRAY);
+            tv_title.setTextColor(Color.WHITE);
+        }
+        else{
+            convertView.setBackgroundColor(Color.WHITE);
+            tv_title.setTextColor(Color.BLACK);
+        }
         return convertView;
     }
 }

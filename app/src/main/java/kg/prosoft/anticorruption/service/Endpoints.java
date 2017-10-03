@@ -18,6 +18,7 @@ public class Endpoints {
     public static final String PRODUCT_IMG = IMG + "/product/";
     public static final String BANNER_IMG = IMG + "/banner/";
     public static final String NEWS_IMG = IMG + "/news/";
+    public static final String AUTHORITY_IMG = IMG + "/authority/";
     public static final String BANNERS = API_URL + "/banners";
     public static final String PAGES = API_URL + "/pages";
     public static final String LOOKUPS = API_URL + "/lookups";
@@ -27,4 +28,6 @@ public class Endpoints {
     public static final String REPORTS = API_URL + "/reports";
     public static final String NEWS = API_URL + "/news";
     public static final String LOOKUP_DEPEND = API_URL + "/lookups/depend";
+    public static final String AUTHORITY_RATE = AUTHORITIES + "/rate";
+    public static final String AUTHORITY_USER_RATE = AUTHORITIES + "/userrate";
 }

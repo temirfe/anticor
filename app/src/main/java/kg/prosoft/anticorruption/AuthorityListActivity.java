@@ -32,7 +32,11 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import kg.prosoft.anticorruption.service.Authority;
 import kg.prosoft.anticorruption.service.AuthorityAdapter;
@@ -41,9 +45,12 @@ import kg.prosoft.anticorruption.service.MyVolley;
 
 public class AuthorityListActivity extends AppCompatActivity {
 
+    String TAG="AuthorityListActivity";
     ListView listView;
     AuthorityAdapter adapter;
     List<Authority> authList;
+    private LinkedHashMap<Integer, Authority> parentMap,childMap;
+    private HashMap<Integer, HashMap<Integer, Authority>> parentChildMap;
     Context context;
     Activity activity;
     ProgressBar pb;
@@ -69,6 +76,9 @@ public class AuthorityListActivity extends AppCompatActivity {
         authList = new ArrayList<>();
         adapter = new AuthorityAdapter(context,authList);
         listView.setAdapter(adapter);
+        parentMap=new LinkedHashMap<>();
+        childMap= new LinkedHashMap<>();
+        parentChildMap=new HashMap<>();
 
         populateList();
 
@@ -94,7 +104,7 @@ public class AuthorityListActivity extends AppCompatActivity {
             intent.putExtra("title",item.getTitle());
             intent.putExtra("text",item.getText());
             intent.putExtra("image",item.getImage());
-            intent.putExtra("cat_id",item.getParentId());
+            intent.putExtra("parent_id",item.getParentId());
             startActivity(intent);
         }
     };
@@ -119,8 +129,20 @@ public class AuthorityListActivity extends AppCompatActivity {
                             String image=jsonObject.getString("img");
                             int parent_id=jsonObject.getInt("category_id");
 
-                            Authority news = new Authority(id, title, text, image, parent_id);
-                            authList.add(news);
+                            Authority authority = new Authority(id, title, text, image, parent_id);
+                            //authList.add(authority);
+
+                            if(parent_id==0){
+                                parentMap.put(id,authority);
+                            }
+                            else{
+                                childMap=(LinkedHashMap<Integer, Authority>)parentChildMap.get(parent_id);
+                                if(childMap== null) {
+                                    childMap=new LinkedHashMap<>();
+                                }
+                                childMap.put(id,authority);
+                                parentChildMap.put(parent_id,childMap);
+                            }
                         }
                     }
                     else{
@@ -130,7 +152,7 @@ public class AuthorityListActivity extends AppCompatActivity {
 
 
                 }catch(JSONException e){e.printStackTrace();}
-
+                prepareAuthList();
                 adapter.notifyDataSetChanged();
                 pb.setVisibility(ProgressBar.GONE);
                 ll_reload.setVisibility(View.GONE);
@@ -148,5 +170,56 @@ public class AuthorityListActivity extends AppCompatActivity {
 
 
         MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+
+    public void prepareAuthList(){
+        HashMap<Integer,Authority> cMap;
+        TreeMap<Integer,Integer> parentTreeMap=new TreeMap<>();
+        TreeMap<Integer,Integer> childTreeMap=new TreeMap<>();
+        int i=1;
+        for (Map.Entry<Integer, Authority> entry : parentMap.entrySet())
+        {
+            Authority voc=entry.getValue();
+            int id=entry.getKey();
+            int order=0; //you can put order number here
+            order=(order*1000)+i;
+            parentTreeMap.put(order,id);
+            cMap=parentChildMap.get(id);
+            if(cMap!=null){
+                for (Map.Entry<Integer, Authority> childEntry : cMap.entrySet())
+                {
+                    Authority childVoc=childEntry.getValue();
+                    int childId=childEntry.getKey();
+                    int childOrder=0;
+                    childOrder=(childOrder*1000)+i;
+                    //Log.e("ChildId",childId+" order "+childOrder);
+                    childTreeMap.put(childOrder,childId);
+                    i++;
+                }
+            }
+            i++;
+        }
+        //Log.e("ParentTree",parentTreeMap.toString());
+        //Log.e("ChildTree",childTreeMap.toString());
+        for (Map.Entry<Integer, Integer> entry : parentTreeMap.entrySet())
+        {
+            int id=entry.getValue();
+            Authority voc=parentMap.get(id);
+            //Log.e("ParentVoc",voc.getValue());
+            authList.add(voc);
+            cMap=parentChildMap.get(id);
+            if(cMap!=null){
+                for (Map.Entry<Integer, Integer> childEntry : childTreeMap.entrySet())
+                {
+                    int cid=childEntry.getValue();
+                    //Log.e("CID",cid+"");
+                    Authority childVoc=cMap.get(cid);
+                    if(childVoc!=null){
+                        //Log.e("ChildVoc",childVoc.getValue());
+                        authList.add(childVoc);
+                    }
+                }
+            }
+        }
     }
 }
