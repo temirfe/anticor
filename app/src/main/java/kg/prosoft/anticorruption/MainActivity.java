@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity
             public void onClick(View view) {
                 /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();*/
-                Intent intent = new Intent(thisContext, AddReportActivity.class);
+                Intent intent = new Intent(MainActivity.this, AddReportActivity.class);
                 startActivity(intent);
             }
         });
@@ -85,7 +85,7 @@ public class MainActivity extends BaseActivity
     View.OnClickListener onClickName = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(thisContext, AccountActivity.class);
+            Intent intent = new Intent(MainActivity.this, AccountActivity.class);
             startActivity(intent);
         }
     };
@@ -93,7 +93,7 @@ public class MainActivity extends BaseActivity
     View.OnClickListener onClickLogin = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent loginIntent = new Intent(thisContext,LoginActivity.class);
+            Intent loginIntent = new Intent(MainActivity.this,LoginActivity.class);
             startActivity(loginIntent);
         }
     };
@@ -101,7 +101,7 @@ public class MainActivity extends BaseActivity
     View.OnClickListener onClickRegister = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent regIntent = new Intent(thisContext,RegisterActivity.class);
+            Intent regIntent = new Intent(MainActivity.this,RegisterActivity.class);
             startActivity(regIntent);
         }
     };

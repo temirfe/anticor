@@ -39,7 +39,7 @@ public class SessionManager {
     private static final String KEY_NOTIFICATIONS = "notifications";
     public static final String KEY_TEST= "test";
     public static final String KEY_CTG_DEPEND= "ctg_depend";
-    public static final String KEY_LOOKUP_DEPEND= "lookup_depend";
+    public static final String KEY_AUTHORITY_DEPEND= "authority_depend";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String KEY_PHONE = "phone";
     public static final String KEY_ADMIN_PHONE = "admin_phone";
@@ -51,7 +51,7 @@ public class SessionManager {
     // All Shared Preferences Keys
     private static final String IS_LOGIN = "IsLoggedIn";
     public static final String dependChecked ="dependChecked";
-    public static final String lookupDependChecked ="lookupDependChecked";
+    public static final String authorityDependChecked ="authorityDependChecked";
 
     private static final String ContactSaved = "IsContactSaved";
 
@@ -156,21 +156,23 @@ public class SessionManager {
     }
 
 
-    public void setLookupDepend(String text){
-        editor.putString(KEY_LOOKUP_DEPEND, text);
+    /**Authority depend**/
+    public void setAuthorityDepend(String text){
+        editor.putString(KEY_AUTHORITY_DEPEND, text);
         editor.commit();
     }
-    public String getLookupDepend() {
-        return pref.getString(KEY_LOOKUP_DEPEND,"");
+    public String getAuthorityDepend() {
+        return pref.getString(KEY_AUTHORITY_DEPEND,"");
     }
 
-    public boolean isLookupDependChecked(){
-        return pref.getBoolean(lookupDependChecked, false);
+    public boolean isAuthorityDependChecked(){
+        return pref.getBoolean(authorityDependChecked, false);
     }
-    public void setLookupDependChecked(boolean check){
-        editor.putBoolean(lookupDependChecked, check);
+    public void setAuthorityDependChecked(boolean check){
+        editor.putBoolean(authorityDependChecked, check);
         editor.commit();
     }
+
     /**
      * Create login session
      * */

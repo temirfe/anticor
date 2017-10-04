@@ -1,5 +1,6 @@
 package kg.prosoft.anticorruption;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -7,21 +8,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 
-import kg.prosoft.anticorruption.service.Endpoints;
 import kg.prosoft.anticorruption.service.MyDbHandler;
 import kg.prosoft.anticorruption.service.MyHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
@@ -31,8 +26,8 @@ public class BaseActivity extends AppCompatActivity {
 
     String TAG = "BASE ACTIVITY";
 
-    public Context thisContext;
-    public Context appContext;
+    public Activity activity;
+    public Context context;
     public SQLiteDatabase db;
     public MyDbHandler dbHandler;
     MyHelper helper;
@@ -42,14 +37,16 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        thisContext=this;
-        appContext=getApplicationContext();
+        activity=this;
+        context=getApplicationContext();
 
-        session = new SessionManager(appContext);
+        session = new SessionManager(context);
 
-        dbHandler = new MyDbHandler(appContext);
+        dbHandler = new MyDbHandler(context);
         db = dbHandler.getWritableDatabase();
-        helper = new MyHelper(thisContext, dbHandler, db, session);
+        helper = new MyHelper(activity, dbHandler, db, session);
+        helper.doVocabularyTask();
+        helper.doAuthorityTask();
     }
 
     @Override
@@ -63,9 +60,9 @@ public class BaseActivity extends AppCompatActivity {
             searchIcon.mutate();
             int color;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                color =thisContext.getResources().getColor(android.R.color.white, thisContext.getTheme());
+                color =activity.getResources().getColor(android.R.color.white, activity.getTheme());
             }else {
-                color =thisContext.getResources().getColor(android.R.color.white);
+                color =activity.getResources().getColor(android.R.color.white);
             }
             searchIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         }
@@ -121,9 +118,9 @@ public class BaseActivity extends AppCompatActivity {
         super.onDestroy();
         //session.clear();
         session.setDependChecked(false);
-        session.setLookupDependChecked(false);
+        session.setAuthorityDependChecked(false);
         if(db!=null && db.isOpen()){db.close();}
-        RequestQueue queue = MyVolley.getInstance(appContext).getRequestQueue();
-        queue.cancelAll(appContext);
+        RequestQueue queue = MyVolley.getInstance(context).getRequestQueue();
+        queue.cancelAll(context);
     }
 }

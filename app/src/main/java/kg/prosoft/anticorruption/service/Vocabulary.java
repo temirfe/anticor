@@ -8,9 +8,11 @@ import android.os.Parcelable;
  */
 
 public class Vocabulary implements Parcelable{
-    int voc_id,voc_order,voc_parent;
+    int row_id,voc_id,voc_order,voc_parent;
     String voc_key, voc_value;
     boolean voc_has_children;
+
+    public Vocabulary(){}
 
     public Vocabulary(int id, String key, String value, int parent, int order, boolean hasChildren){
         voc_id=id;
@@ -26,6 +28,12 @@ public class Vocabulary implements Parcelable{
     }
     public void setId(int id){
         voc_id = id;
+    }
+    public int getRowId(){
+        return row_id;
+    }
+    public void setRowId(int id){
+        row_id = id;
     }
 
     public String getKey(){

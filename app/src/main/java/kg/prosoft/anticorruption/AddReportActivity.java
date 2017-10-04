@@ -114,6 +114,8 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_report);
 
+        activity=this;
+
         parentMap=new HashMap<>();
         childMap= new HashMap<>();
         titleMap= new HashMap<>();
@@ -348,7 +350,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
 
         JsonArrayRequest volReq = new JsonArrayRequest(Request.Method.GET, uri, null, listener,errListener);
 
-        MyVolley.getInstance(appContext).addToRequestQueue(volReq);
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
     }
 
     //** image methods ** //
@@ -481,7 +483,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     public void isStoragePermissionGranted() {
         //http://stackoverflow.com/questions/3853472/creating-a-directory-in-sdcard-fails/38694026
         if (Build.VERSION.SDK_INT >= 23) {
-            if (ContextCompat.checkSelfPermission(appContext,android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if (ContextCompat.checkSelfPermission(context,android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -605,7 +607,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                 //Log.e(TAG,"clipData is null ");
                 //Log.e(TAG,"getData: "+data.getData().toString());
                 Uri selectedImage = data.getData();
-                Cursor cursor = appContext.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                Cursor cursor = context.getContentResolver().query(selectedImage, filePathColumn, null, null, null);
                 assert cursor != null;
                 cursor.moveToFirst();
                 int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
@@ -614,7 +616,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                 //Log.e(TAG,"filePath: "+filePath);
                 if(filePath==null){
                     try {
-                        InputStream input = appContext.getContentResolver().openInputStream(selectedImage);
+                        InputStream input = context.getContentResolver().openInputStream(selectedImage);
                         Bitmap mSelectedPhotoBmp = BitmapFactory.decodeStream(input);
                         //Log.e(TAG,"Bitmap: "+mSelectedPhotoBmp);
                         previewImage(mSelectedPhotoBmp);
@@ -759,7 +761,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                                 //Log.i("RESPONSE err 1", err.toString());
                             }
                             progress.dismiss();
-                            AlertDialog.Builder builder = new AlertDialog.Builder(thisContext);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                             builder.setMessage(R.string.app_error).setNegativeButton(R.string.close,null).create().show();
                         } catch (UnsupportedEncodingException e1) {
                             // Couldn't properly decode data to string
@@ -818,7 +820,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                     0,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            MyVolley.getInstance(appContext).addToRequestQueue(req);
+            MyVolley.getInstance(context).addToRequestQueue(req);
         }
         else{
             if(focusView!=null){focusView.requestFocus();}}
