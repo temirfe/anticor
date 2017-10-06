@@ -3,6 +3,7 @@ package kg.prosoft.anticorruption;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -24,13 +25,16 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import kg.prosoft.anticorruption.service.Endpoints;
 import kg.prosoft.anticorruption.service.GlideApp;
+import kg.prosoft.anticorruption.service.MyDbHandler;
 import kg.prosoft.anticorruption.service.MyVolley;
+import kg.prosoft.anticorruption.service.Vocabulary;
 
-public class NewsViewActivity extends AppCompatActivity {
+public class NewsViewActivity extends BaseActivity {
     TextView tv_title, tv_date, tv_text, tv_zero_comment,tv_category;
     ImageView iv_image;
     public LinearLayout ll_comments;
@@ -66,12 +70,13 @@ public class NewsViewActivity extends AppCompatActivity {
 
         tv_title.setText(title);
         tv_date.setText(date);
-
+        CharSequence html_text;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            tv_text.setText(Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY));
+            html_text=Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
         } else {
-            tv_text.setText(Html.fromHtml(text));
+            html_text=Html.fromHtml(text);
         }
+        tv_text.setText(trimTrailingWhitespace(html_text));
 
         if(!image.isEmpty()){
             GlideApp.with(this)
@@ -81,8 +86,24 @@ public class NewsViewActivity extends AppCompatActivity {
                     .into(iv_image);
         }
 
+        new VocabularyTask().execute();
+
         //although we have info from intent, we make a request to get comments
         requestNews(id);
+    }
+
+    public static CharSequence trimTrailingWhitespace(CharSequence source) {
+
+        if(source == null)
+            return "";
+
+        int i = source.length();
+
+        // loop back to the first non-whitespace character
+        while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
+        }
+
+        return source.subSequence(0, i+1);
     }
 
     View.OnClickListener onCtgClick = new View.OnClickListener() {
@@ -168,6 +189,30 @@ public class NewsViewActivity extends AppCompatActivity {
         intent.putExtra("model","news");
         intent.putExtra("id",id);
         startActivity(intent);
+    }
+
+    private class VocabularyTask extends AsyncTask<Void, Void, List<Vocabulary>> {
+        protected List<Vocabulary> doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "VocabularyTask dbhandler was null");}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "VocabularyTask db was null or not open");}
+
+            return dbHandler.getVocContents(db);
+        }
+        protected void onPostExecute(List<Vocabulary> theList) {
+            if(theList.size()>0){
+                for (Vocabulary voc : theList) {
+                    int vid=voc.getId();
+                    String value=voc.getValue();
+                    if(vid==cat_id){
+                        tv_category.setText(value);
+                    }
+                }
+                Log.e(TAG, "ctg has been taken from DB");
+            }
+            else{
+                Log.e("VocabularyTask", "no content in db");
+            }
+        }
     }
 
     @Override

@@ -939,7 +939,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                             int id = jsonObject.getInt("id");
                             String title=jsonObject.getString("title");
                             String image=jsonObject.getString("img");
-                            int parent_id=jsonObject.getInt("category_id");
+                            int parent_id=jsonObject.getInt("parent_id");
 
                             Authority authority = new Authority(id, title, image, parent_id);
                             helper.insertAuthority(authority);
