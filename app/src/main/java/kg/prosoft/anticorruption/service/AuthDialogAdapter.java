@@ -2,15 +2,11 @@ package kg.prosoft.anticorruption.service;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
-import android.widget.RatingBar;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -18,17 +14,19 @@ import java.util.List;
 import kg.prosoft.anticorruption.R;
 
 /**
- * Created by ProsoftPC on 10/2/2017.
+ * Created by ProsoftPC on 10/5/2017.
  */
 
-public class AuthorityAdapter extends BaseAdapter {
+public class AuthDialogAdapter extends BaseAdapter {
     private Context mContext;
     private List<Authority> authList;
     private LayoutInflater inflater;
+    private int selected_id=0;
 
-    public AuthorityAdapter(Context mContext, List<Authority> authList) {
+    public AuthDialogAdapter(Context mContext, List<Authority> authList, int selected) {
         this.mContext = mContext;
         this.authList = authList;
+        selected_id=selected;
     }
 
     @Override
@@ -59,38 +57,31 @@ public class AuthorityAdapter extends BaseAdapter {
         if (inflater == null)
             inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null)
-            convertView = inflater.inflate(R.layout.item_authority_row,null);
+            convertView = inflater.inflate(R.layout.vocabulary_item,null);
 
         Authority authority = authList.get(position);
         String title=authority.getTitle();
-        int comment_count=authority.getCommentCount();
-        int report_count=authority.getReportCount();
-        int rating=authority.getRating();
-        float f_rating=(float)rating/2;
 
-        LinearLayout ll_stats=(LinearLayout)convertView.findViewById(R.id.id_ll_stats);
-        TextView tv_title=(TextView) convertView.findViewById(R.id.id_tv_title);
-        TextView tv_comments=(TextView) convertView.findViewById(R.id.id_tv_comment_count);
-        TextView tv_reports=(TextView) convertView.findViewById(R.id.id_tv_report_count);
+        TextView tv_title=(TextView) convertView.findViewById(R.id.id_tv_category_title);
         tv_title.setText(title);
-        tv_comments.setText(String.valueOf(comment_count));
-        tv_reports.setText(String.valueOf(report_count));
-        RatingBar ratingBar=(RatingBar) convertView.findViewById(R.id.id_rating);
+        ImageView arrow=(ImageView)convertView.findViewById(R.id.id_iv_arrow);
+        int id=authority.getId();
+        if(id==selected_id){
+            arrow.setVisibility(View.VISIBLE);
+        }
+        else{
+            arrow.setVisibility(View.GONE);
+        }
 
         convertView.setTag(authority.getId());
         int par = authority.getParentId();
         if(par==0){
-            convertView.setBackgroundColor(Color.GRAY);
+            convertView.setBackgroundColor(Color.RED);
             tv_title.setTextColor(Color.WHITE);
-            ratingBar.setVisibility(View.GONE);
-            ll_stats.setVisibility(View.GONE);
         }
         else{
             convertView.setBackgroundColor(Color.WHITE);
             tv_title.setTextColor(Color.BLACK);
-            ratingBar.setVisibility(View.VISIBLE);
-            ll_stats.setVisibility(View.VISIBLE);
-            ratingBar.setRating(f_rating);
         }
         return convertView;
     }

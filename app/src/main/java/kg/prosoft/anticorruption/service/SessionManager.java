@@ -40,6 +40,8 @@ public class SessionManager {
     public static final String KEY_TEST= "test";
     public static final String KEY_CTG_DEPEND= "ctg_depend";
     public static final String KEY_AUTHORITY_DEPEND= "authority_depend";
+    public static final String KEY_VOCABULARY_DEPEND= "authority_depend";
+    public static final String KEY_NEWS_DEPEND= "news_depend";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String KEY_PHONE = "phone";
     public static final String KEY_ADMIN_PHONE = "admin_phone";
@@ -52,6 +54,7 @@ public class SessionManager {
     private static final String IS_LOGIN = "IsLoggedIn";
     public static final String dependChecked ="dependChecked";
     public static final String authorityDependChecked ="authorityDependChecked";
+    public static final String vocabularyDependChecked ="vocabularyDependChecked";
 
     private static final String ContactSaved = "IsContactSaved";
 
@@ -156,6 +159,14 @@ public class SessionManager {
     }
 
 
+    public void setNewsDepend(String text){
+        editor.putString(KEY_NEWS_DEPEND, text);
+        editor.commit();
+    }
+    public String getNewsDepend() {
+        return pref.getString(KEY_NEWS_DEPEND,"");
+    }
+
     /**Authority depend**/
     public void setAuthorityDepend(String text){
         editor.putString(KEY_AUTHORITY_DEPEND, text);
@@ -170,6 +181,23 @@ public class SessionManager {
     }
     public void setAuthorityDependChecked(boolean check){
         editor.putBoolean(authorityDependChecked, check);
+        editor.commit();
+    }
+
+    /**Vocabulary depend**/
+    public void setVocabularyDepend(String text){
+        editor.putString(KEY_VOCABULARY_DEPEND, text);
+        editor.commit();
+    }
+    public String getVocabularyDepend() {
+        return pref.getString(KEY_VOCABULARY_DEPEND,"");
+    }
+
+    public boolean isVocabularyDependChecked(){
+        return pref.getBoolean(vocabularyDependChecked, false);
+    }
+    public void setVocabularyDependChecked(boolean check){
+        editor.putBoolean(vocabularyDependChecked, check);
         editor.commit();
     }
 

@@ -88,6 +88,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
         String title=intent.getStringExtra("title");
         String text=intent.getStringExtra("text");
         String image=intent.getStringExtra("image");
+        rating=intent.getIntExtra("rating",0);
 
         tv_title.setText(title);
         tv_text.setText(text);
@@ -100,8 +101,12 @@ public class AuthorityViewActivity extends AppCompatActivity {
 
         ratingBar = (RatingBar) findViewById(R.id.id_rating);
         ratingBar.setOnTouchListener(showRatingDialog);
+        if(rating>0){
+            float f_rating=(float)rating/2;
+            ratingBar.setRating(f_rating);
+        }
 
-        //although we have info from intent, we make a request to get comments and rating
+        //although we have info from intent, we make a request to get comments
         requestAuthority(id);
         if(session.isLoggedIn()){
             requestUserRate();
@@ -114,10 +119,6 @@ public class AuthorityViewActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 try{
-                    rating=jsonObject.getInt("rating");
-                    Log.e("RATING",rating+"");
-                    rating=rating/2;
-                    ratingBar.setRating(rating);
                     if(jsonObject.has("comments")){
                         JSONArray comments = jsonObject.getJSONArray("comments");
                         for(int i=0; i < comments.length(); i++){

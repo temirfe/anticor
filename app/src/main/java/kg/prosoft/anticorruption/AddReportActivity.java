@@ -15,6 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -34,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +43,7 @@ import android.widget.Toast;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
@@ -63,14 +66,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
+import kg.prosoft.anticorruption.service.Authority;
 import kg.prosoft.anticorruption.service.Endpoints;
 import kg.prosoft.anticorruption.service.Item;
+import kg.prosoft.anticorruption.service.MyDbHandler;
 import kg.prosoft.anticorruption.service.MyImageHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.SectorDialog;
@@ -79,10 +85,13 @@ import kg.prosoft.anticorruption.service.Vocabulary;
 public class AddReportActivity extends BaseActivity implements SectorDialog.SectorDialogListener, FrameMapFragment.ParentFrag {
 
     private ArrayList<Vocabulary> vocList;
+    private ArrayList<Authority> authList;
     public ArrayList<String> selectedImages;
-    private HashMap<Integer, String> titleMap;
+    private HashMap<Integer, String> titleMap, titleMapAuth;
     private HashMap<Integer, Vocabulary> parentMap,childMap;
+    private LinkedHashMap<Integer, Authority> parentMapAuth,childMapAuth;
     private HashMap<Integer, HashMap<Integer, Vocabulary>> parentChildMap;
+    private HashMap<Integer, HashMap<Integer, Authority>> parentChildMapAuth;
     TextView tv_sector, tv_city, tv_authority, tv_type, tv_lat, tv_lng;
     LinearLayout ll_sector, ll_user,ll_add_photo,ll_images;
     CheckBox chb_anonym;
@@ -120,7 +129,17 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         childMap= new HashMap<>();
         titleMap= new HashMap<>();
         parentChildMap=new HashMap<>();
-        requestVocabularies();
+
+        parentMapAuth=new LinkedHashMap<>();
+        childMapAuth= new LinkedHashMap<>();
+        titleMapAuth= new HashMap<>();
+        parentChildMapAuth=new HashMap<>();
+
+        new AuthorityTask().execute();
+        new VocabularyTask().execute();
+        checkAuthDepend();
+        checkVocDepend();
+
         tv_sector=(TextView)findViewById(R.id.id_tv_sector);
         tv_city=(TextView)findViewById(R.id.id_tv_city);
         tv_authority=(TextView)findViewById(R.id.id_tv_authority);
@@ -162,11 +181,11 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     }
 
     public void authorityClick(View v){
-        prepareVocList("report_structure", true);
         Bundle args = new Bundle();
-        args.putParcelableArrayList("list",vocList);
+        args.putParcelableArrayList("list",authList);
         args.putInt("selected",selected_authority_id);
         args.putString("title",getResources().getString(R.string.select_authority));
+        args.putString("type","authority");
         ACTIVE_DIALOG=DIALOG_AUTHORITY;
 
         SectorDialog sdialog = new SectorDialog();
@@ -221,136 +240,27 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     // defined by the SectorDialog.SectorDialogListener interface
     @Override
     public void onDialogSelectClick(int id) {
-        Log.e("CLICK RECEIVE",id+"");
         if(ACTIVE_DIALOG==DIALOG_SECTOR){
             String sector=titleMap.get(id);
             selected_sector_id=id;
             tv_sector.setText(sector);
-            Log.e("CLICK RECEIVE TO","SECTOR");
         }
         else if(ACTIVE_DIALOG==DIALOG_CITY){
-            Log.e("CLICK RECEIVE TO","city");
             String title=titleMap.get(id);
             selected_city_id=id;
             tv_city.setText(title);
             showMapFrame();
         }
         else if(ACTIVE_DIALOG==DIALOG_AUTHORITY){
-            Log.e("CLICK RECEIVE TO","authority");
-            String title=titleMap.get(id);
+            String title=titleMapAuth.get(id);
             selected_authority_id=id;
             tv_authority.setText(title);
         }
         else if(ACTIVE_DIALOG==DIALOG_TYPE){
-            Log.e("CLICK RECEIVE TO","type");
             String title=titleMap.get(id);
             selected_type_id=id;
             tv_type.setText(title);
         }
-    }
-
-    public void prepareVocList(String type, boolean hasChildren){
-        vocList=new ArrayList<>();
-        HashMap<Integer,Vocabulary> cMap;
-        TreeMap<Integer,Integer> parentTreeMap=new TreeMap<>();
-        TreeMap<Integer,Integer> childTreeMap=new TreeMap<>();
-        int i=1;
-        for (Map.Entry<Integer, Vocabulary> entry : parentMap.entrySet())
-        {
-            Vocabulary voc=entry.getValue();
-            if(type.equals(voc.getKey())){
-                int id=entry.getKey();
-                int order=voc.getOrder();
-                order=(order*1000)+i;
-                parentTreeMap.put(order,id);
-                cMap=parentChildMap.get(id);
-                if(cMap!=null){
-                    for (Map.Entry<Integer, Vocabulary> childEntry : cMap.entrySet())
-                    {
-                        Vocabulary childVoc=childEntry.getValue();
-                        if(type.equals(childVoc.getKey())){
-                            int childId=childEntry.getKey();
-                            int childOrder=childVoc.getOrder();
-                            childOrder=(childOrder*1000)+i;
-                            //Log.e("ChildId",childId+" order "+childOrder);
-                            childTreeMap.put(childOrder,childId);
-                            i++;
-                        }
-                    }
-                }
-                i++;
-            }
-        }
-        //Log.e("ParentTree",parentTreeMap.toString());
-        //Log.e("ChildTree",childTreeMap.toString());
-        for (Map.Entry<Integer, Integer> entry : parentTreeMap.entrySet())
-        {
-            int id=entry.getValue();
-            Vocabulary voc=parentMap.get(id);
-            if(hasChildren){voc.setHasChildren(true);}
-            //Log.e("ParentVoc",voc.getValue());
-            vocList.add(voc);
-            cMap=parentChildMap.get(id);
-            if(cMap!=null){
-                for (Map.Entry<Integer, Integer> childEntry : childTreeMap.entrySet())
-                {
-                    int cid=childEntry.getValue();
-                    //Log.e("CID",cid+"");
-                    Vocabulary childVoc=cMap.get(cid);
-                    if(childVoc!=null){
-                        //Log.e("ChildVoc",childVoc.getValue());
-                        if(hasChildren){childVoc.setHasChildren(true);}
-                        vocList.add(childVoc);
-                    }
-                }
-            }
-        }
-    }
-
-    public void requestVocabularies(){
-        String uri = Endpoints.VOCABULARIES;
-        Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray jsonArray) {
-
-                Log.e(TAG, "response: " + jsonArray);
-                try{
-                    for(int s=0; s < jsonArray.length(); s++){
-                        JSONObject jsonObject = jsonArray.getJSONObject(s);
-                        int id=jsonObject.getInt("id");
-                        String key=jsonObject.getString("key");
-                        String value=jsonObject.getString("value");
-                        int parent=jsonObject.getInt("parent");
-                        int order=jsonObject.getInt("ordered_id");
-                        titleMap.put(id,value);
-                        if(parent==0){
-                            parentMap.put(id,new Vocabulary(id,key,value,parent,order,false));
-                        }
-                        else{
-                            childMap=parentChildMap.get(parent);
-                            if(childMap== null) {
-                                childMap=new HashMap<>();
-                            }
-                            childMap.put(id,new Vocabulary(id,key,value,parent,order,false));
-                            parentChildMap.put(parent,childMap);
-                        }
-                    }
-                    //helper.addVocabulary(vocList);
-                }catch(JSONException e){e.printStackTrace();}
-            }
-        };
-
-        Response.ErrorListener errListener=new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                NetworkResponse networkResponse = error.networkResponse;
-                Log.e(TAG, "Volley error: " + error.getMessage() + ", code: " + networkResponse);
-            }
-        };
-
-        JsonArrayRequest volReq = new JsonArrayRequest(Request.Method.GET, uri, null, listener,errListener);
-
-        MyVolley.getInstance(context).addToRequestQueue(volReq);
     }
 
     //** image methods ** //
@@ -824,5 +734,344 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         }
         else{
             if(focusView!=null){focusView.requestFocus();}}
+    }
+
+    /** Vocabulary **/
+    public void checkVocDepend(){
+        String uri = Endpoints.VOC_DEPEND;
+        StringRequest volReq = new StringRequest(Request.Method.GET, uri,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String depend=session.getVocabularyDepend();
+                        response=response.replace("\"","");
+                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        if(!response.equals(depend)){
+                            //new maxId is different, that mean category table has been altered. send new request.
+                            requestVocabularies();
+                            session.setVocabularyDepend(response);
+                        }
+                        else{ Log.e(TAG, "voc depend matches");}
+                        session.setVocabularyDependChecked(true);
+                    }
+                }, null);
+
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+    public void requestVocabularies(){
+        String uri = Endpoints.VOCABULARIES;
+        Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray jsonArray) {
+
+                Log.e(TAG, "response: " + jsonArray);
+                try{
+                    helper.doClearVocTask();
+                    for(int s=0; s < jsonArray.length(); s++){
+                        JSONObject jsonObject = jsonArray.getJSONObject(s);
+                        int id=jsonObject.getInt("id");
+                        String key=jsonObject.getString("key");
+                        String value=jsonObject.getString("value");
+                        int parent=jsonObject.getInt("parent");
+                        int order=jsonObject.getInt("ordered_id");
+                        Vocabulary voc =new Vocabulary(id,key,value,parent,order,false);
+                        helper.addVocabulary(voc);
+                        titleMap.put(id,value);
+                        if(parent==0){
+                            parentMap.put(id,voc);
+                        }
+                        else{
+                            childMap=parentChildMap.get(parent);
+                            if(childMap== null) {
+                                childMap=new HashMap<>();
+                            }
+                            childMap.put(id,voc);
+                            parentChildMap.put(parent,childMap);
+                        }
+                    }
+                    //helper.addVocabulary(vocList);
+                }catch(JSONException e){e.printStackTrace();}
+            }
+        };
+
+        Response.ErrorListener errListener=new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                Log.e(TAG, "Volley error: " + error.getMessage() + ", code: " + networkResponse);
+            }
+        };
+
+        JsonArrayRequest volReq = new JsonArrayRequest(Request.Method.GET, uri, null, listener,errListener);
+
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+
+    public void prepareVocList(String type, boolean hasChildren){
+        vocList=new ArrayList<>();
+        HashMap<Integer,Vocabulary> cMap;
+        TreeMap<Integer,Integer> parentTreeMap=new TreeMap<>();
+        TreeMap<Integer,Integer> childTreeMap=new TreeMap<>();
+        int i=1;
+        for (Map.Entry<Integer, Vocabulary> entry : parentMap.entrySet())
+        {
+            Vocabulary voc=entry.getValue();
+            if(type.equals(voc.getKey())){
+                int id=entry.getKey();
+                int order=voc.getOrder();
+                order=(order*1000)+i;
+                parentTreeMap.put(order,id);
+                cMap=parentChildMap.get(id);
+                if(cMap!=null){
+                    for (Map.Entry<Integer, Vocabulary> childEntry : cMap.entrySet())
+                    {
+                        Vocabulary childVoc=childEntry.getValue();
+                        if(type.equals(childVoc.getKey())){
+                            int childId=childEntry.getKey();
+                            int childOrder=childVoc.getOrder();
+                            childOrder=(childOrder*1000)+i;
+                            //Log.e("ChildId",childId+" order "+childOrder);
+                            childTreeMap.put(childOrder,childId);
+                            i++;
+                        }
+                    }
+                }
+                i++;
+            }
+        }
+        //Log.e("ParentTree",parentTreeMap.toString());
+        //Log.e("ChildTree",childTreeMap.toString());
+        for (Map.Entry<Integer, Integer> entry : parentTreeMap.entrySet())
+        {
+            int id=entry.getValue();
+            Vocabulary voc=parentMap.get(id);
+            if(hasChildren){voc.setHasChildren(true);}
+            //Log.e("ParentVoc",voc.getValue());
+            vocList.add(voc);
+            cMap=parentChildMap.get(id);
+            if(cMap!=null){
+                for (Map.Entry<Integer, Integer> childEntry : childTreeMap.entrySet())
+                {
+                    int cid=childEntry.getValue();
+                    //Log.e("CID",cid+"");
+                    Vocabulary childVoc=cMap.get(cid);
+                    if(childVoc!=null){
+                        //Log.e("ChildVoc",childVoc.getValue());
+                        if(hasChildren){childVoc.setHasChildren(true);}
+                        vocList.add(childVoc);
+                    }
+                }
+            }
+        }
+    }
+
+    private class VocabularyTask extends AsyncTask<Void, Void, List<Vocabulary>> {
+        protected List<Vocabulary> doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "VocabularyTask dbhandler was null");}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "VocabularyTask db was null or not open");}
+
+            return dbHandler.getVocContents(db);
+        }
+        protected void onPostExecute(List<Vocabulary> theList) {
+            if(theList.size()>0){
+                for (Vocabulary voc : theList) {
+                    int id=voc.getId();
+                    String value=voc.getValue();
+                    int parent=voc.getParent();
+                    titleMap.put(id,value);
+                    if(parent==0){
+                        parentMap.put(id,voc);
+                    }
+                    else{
+                        childMap=parentChildMap.get(parent);
+                        if(childMap== null) {
+                            childMap=new HashMap<>();
+                        }
+                        childMap.put(id,voc);
+                        parentChildMap.put(parent,childMap);
+                    }
+                }
+                Log.e(TAG, "data has been taken from DB");
+            }
+            else{
+                Log.e("AuthorityTask", "no content in db, requesting server");
+                requestVocabularies(); //requesting server
+            }
+        }
+    }
+
+
+    /** Authority **/
+    public void checkAuthDepend(){
+        String uri = Endpoints.AUTH_DEPEND;
+        StringRequest volReq = new StringRequest(Request.Method.GET, uri,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String depend=session.getAuthorityDepend();
+                        response=response.replace("\"","");
+                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        if(!response.equals(depend)){
+                            //new maxId is different, that mean category table has been altered. send new request.
+                            requestAuthority();
+                            session.setAuthorityDepend(response);
+                        }
+                        else{ Log.e(TAG, "auth depend matches");}
+                        session.setAuthorityDependChecked(true);
+                    }
+                }, null);
+
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+    public void requestAuthority(){
+        String uri = Endpoints.AUTHORITIES;
+
+        Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try{
+                    Log.i("RESPONSE", "keldi");
+                    int leng=response.length();
+                    if(leng>0){
+                        helper.doClearAuthTask();
+                        for(int i=0; i < leng; i++){
+                            JSONObject jsonObject = response.getJSONObject(i);
+                            int id = jsonObject.getInt("id");
+                            String title=jsonObject.getString("title");
+                            String image=jsonObject.getString("img");
+                            int parent_id=jsonObject.getInt("category_id");
+
+                            Authority authority = new Authority(id, title, image, parent_id);
+                            helper.insertAuthority(authority);
+                            //authList.add(authority);
+                            titleMapAuth.put(id,title);
+                            if(parent_id==0){
+                                parentMapAuth.put(id,authority);
+                            }
+                            else{
+                                childMapAuth=(LinkedHashMap<Integer, Authority>)parentChildMapAuth.get(parent_id);
+                                if(childMapAuth== null) {
+                                    childMapAuth=new LinkedHashMap<>();
+                                }
+                                childMapAuth.put(id,authority);
+                                parentChildMapAuth.put(parent_id,childMapAuth);
+                            }
+                        }
+                    }
+                    else{
+                        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                        builder.setMessage(R.string.no_result).setNegativeButton(R.string.close,null).create().show();
+                    }
+
+                }catch(JSONException e){e.printStackTrace();}
+                prepareAuthList();
+            }
+        };
+        Response.ErrorListener errorListener =new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                Log.e(TAG, "Volley error: " + error.getMessage() + ", code: " + networkResponse);
+            }
+        };
+
+        JsonArrayRequest volReq = new JsonArrayRequest(Request.Method.GET, uri, null, listener,errorListener);
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+
+    public void prepareAuthList(){
+        authList=new ArrayList<>();
+        HashMap<Integer,Authority> cMap;
+        TreeMap<Integer,Integer> parentTreeMap=new TreeMap<>();
+        TreeMap<Integer,Integer> childTreeMap=new TreeMap<>();
+        int i=1;
+        for (Map.Entry<Integer, Authority> entry : parentMapAuth.entrySet())
+        {
+            int id=entry.getKey();
+            int order=0; //you can put order number here
+            order=(order*1000)+i;
+            parentTreeMap.put(order,id);
+            cMap=parentChildMapAuth.get(id);
+            if(cMap!=null){
+                for (Map.Entry<Integer, Authority> childEntry : cMap.entrySet())
+                {
+                    int childId=childEntry.getKey();
+                    int childOrder=0;
+                    childOrder=(childOrder*1000)+i;
+                    //Log.e("ChildId",childId+" order "+childOrder);
+                    childTreeMap.put(childOrder,childId);
+                    i++;
+                }
+            }
+            i++;
+        }
+        //Log.e("ParentTree",parentTreeMap.toString());
+        //Log.e("ChildTree",childTreeMap.toString());
+        for (Map.Entry<Integer, Integer> entry : parentTreeMap.entrySet())
+        {
+            int id=entry.getValue();
+            Authority voc=parentMapAuth.get(id);
+            //Log.e("ParentVoc",voc.getValue());
+            authList.add(voc);
+            cMap=parentChildMapAuth.get(id);
+            if(cMap!=null){
+                for (Map.Entry<Integer, Integer> childEntry : childTreeMap.entrySet())
+                {
+                    int cid=childEntry.getValue();
+                    //Log.e("CID",cid+"");
+                    Authority childVoc=cMap.get(cid);
+                    if(childVoc!=null){
+                        //Log.e("ChildVoc",childVoc.getValue());
+                        authList.add(childVoc);
+                    }
+                }
+            }
+        }
+    }
+
+    private class AuthorityTask extends AsyncTask<Void, Void, List<Authority>> {
+        protected List<Authority> doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "AuthorityTask dbhandler was null");}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "AuthorityTask db was null or not open");}
+
+            return dbHandler.getAuthContents(db);
+        }
+        protected void onPostExecute(List<Authority> theList) {
+            if(theList.size()>0){
+                for (Authority authority : theList) {
+                    int id=authority.getId();
+                    int parent_id=authority.getParentId();
+                    String title=authority.getTitle();
+                    titleMapAuth.put(id,title);
+                    if(parent_id==0){
+                        parentMapAuth.put(id,authority);
+                    }
+                    else{
+                        childMapAuth=(LinkedHashMap<Integer, Authority>)parentChildMapAuth.get(parent_id);
+                        if(childMapAuth== null) {
+                            childMapAuth=new LinkedHashMap<>();
+                        }
+                        childMapAuth.put(id,authority);
+                        parentChildMapAuth.put(parent_id,childMapAuth);
+                    }
+                }
+                prepareAuthList();
+                Log.e(TAG, "data has been taken from DB");
+            }
+            else{
+                Log.e("AuthorityTask", "no content in db, requesting server");
+                requestAuthority(); //requesting server
+            }
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //session.clear();
+        if(db!=null && db.isOpen()){db.close();}
+        RequestQueue queue = MyVolley.getInstance(context).getRequestQueue();
+        queue.cancelAll(context);
     }
 }

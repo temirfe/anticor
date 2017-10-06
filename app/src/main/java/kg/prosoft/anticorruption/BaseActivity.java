@@ -45,8 +45,20 @@ public class BaseActivity extends AppCompatActivity {
         dbHandler = new MyDbHandler(context);
         db = dbHandler.getWritableDatabase();
         helper = new MyHelper(activity, dbHandler, db, session);
-        helper.doVocabularyTask();
-        helper.doAuthorityTask();
+
+        if(!session.isVocabularyDependChecked()){
+            helper.checkVocDepend();
+        }
+        else{
+            Log.e(TAG,"VocDepend was checked");
+        }
+
+        if(!session.isAuthorityDependChecked()){
+            helper.checkAuthDepend();
+        }
+        else{
+            Log.e(TAG,"AuthDepend was checked");
+        }
     }
 
     @Override

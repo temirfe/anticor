@@ -31,10 +31,11 @@ import kg.prosoft.anticorruption.service.GlideApp;
 import kg.prosoft.anticorruption.service.MyVolley;
 
 public class NewsViewActivity extends AppCompatActivity {
-    TextView tv_title, tv_date, tv_text, tv_zero_comment;
+    TextView tv_title, tv_date, tv_text, tv_zero_comment,tv_category;
     ImageView iv_image;
     public LinearLayout ll_comments;
-    int id;
+    int id, cat_id;
+    String TAG ="NewsViewAc";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,8 @@ public class NewsViewActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
+        tv_category=(TextView)findViewById(R.id.id_tv_category);
+        tv_category.setOnClickListener(onCtgClick);
         tv_title=(TextView)findViewById(R.id.id_tv_title);
         tv_date=(TextView)findViewById(R.id.id_tv_date);
         tv_text=(TextView)findViewById(R.id.id_tv_text);
@@ -54,9 +57,9 @@ public class NewsViewActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         id=intent.getIntExtra("id",0);
-        int cat_id=intent.getIntExtra("cat_id",0);
+        cat_id=intent.getIntExtra("cat_id",0);
         String title=intent.getStringExtra("title");
-        String description=intent.getStringExtra("desc");
+        //String description=intent.getStringExtra("desc");
         String text=intent.getStringExtra("text");
         String date=intent.getStringExtra("date");
         String image=intent.getStringExtra("image");
@@ -72,13 +75,22 @@ public class NewsViewActivity extends AppCompatActivity {
 
         if(!image.isEmpty()){
             GlideApp.with(this)
-                    .load(Endpoints.NEWS_IMG+"/"+image)        // optional
+                    .load(Endpoints.NEWS_IMG+id+"/"+image)
+                    .placeholder(R.drawable.placeholder) // optional
+                    .dontAnimate()
                     .into(iv_image);
         }
 
         //although we have info from intent, we make a request to get comments
         requestNews(id);
     }
+
+    View.OnClickListener onCtgClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Log.e("CTG",cat_id+"");
+        }
+    };
 
     public void requestNews(final int id){
         String uri = Endpoints.NEWS+"/"+id;
@@ -98,6 +110,9 @@ public class NewsViewActivity extends AppCompatActivity {
                         }
                         if(comments.length()==0){tv_zero_comment.setVisibility(View.VISIBLE);}
                     }
+
+                    JSONObject ctgObj = jsonObject.getJSONObject("category");
+                    tv_category.setText(ctgObj.getString("value"));
 
                 }catch(JSONException e){e.printStackTrace();}
             }

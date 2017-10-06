@@ -11,10 +11,11 @@ import java.util.Locale;
  */
 
 public class News {
-    private int id, category_id;
+    private int id, category_id, views, row_id;
     private String title,description,text,date,image;
 
-    public News(int id, String title, String description, String text, String date, String image, int category_id) {
+    public News() {}
+    public News(int id, String title, String description, String text, String date, String image, int category_id, int views) {
         this.id = id;
         this.title = title;
         this.text = text;
@@ -22,25 +23,35 @@ public class News {
         this.description=description;
         this.image=image;
         this.category_id=category_id;
+        this.views=views;
     }
 
-    public int getId() {
-        return id;
-    }
-    public String getTitle() {
-        return title;
-    }
+    public void setRowId(int in) {row_id=in;}
+    public int getRowId() {return row_id;}
 
+    public void setId(int in) {id=in;}
+    public int getId() {return id;}
+
+    public void setTitle(String s) {title=s;}
+    public String getTitle() {return title;}
+
+    public void setText(String s) {text=s;}
     public String getText() {
         text=text.trim();
         return text;
     }
+
+    public void setImage(String s) {image=s;}
     public String getImage() {
         return image;
     }
+
+    public void setCategoryId(int in) {category_id=in;}
     public int getCategoryId() {
         return category_id;
     }
+
+    public void setDescription(String s) {description=s;}
     public String getDescription() {
         if (description.length() > 155) {
             description = description.substring(0, 155) + "...";
@@ -49,6 +60,8 @@ public class News {
         return description;
     }
 
+    public void setDate(String s) {date=s;}
+    public String getRawDate(){return date;}
     public String getDate() {
         //long timeNow = System.currentTimeMillis();
         //long timeThen;
@@ -81,4 +94,7 @@ public class News {
         }*/
         return "getDate() error";
     }
+
+    public void setViews(int in) {views=in;}
+    public int getViews() {return views;}
 }

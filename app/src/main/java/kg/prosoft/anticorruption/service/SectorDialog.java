@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,13 +73,20 @@ public class SectorDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Activity activity=getActivity();
-        Bundle b = getArguments();
-        int selected=b.getInt("selected");
+        final Activity activity=getActivity();
+        final Bundle b = getArguments();
+        final int selected=b.getInt("selected");
         String title=b.getString("title");
-        final ArrayList<Vocabulary> vocList=b.getParcelableArrayList("list");
-        VocAdapter myAdapter  = new VocAdapter(activity, vocList, selected);
-
+        final String type=b.getString("type");
+        BaseAdapter myAdapter;
+        if(type!=null && type.equals("authority")){
+            ArrayList<Authority> authList=b.getParcelableArrayList("list");
+            myAdapter  = new AuthDialogAdapter(activity, authList, selected);
+        }
+        else{
+            ArrayList<Vocabulary> vocList=b.getParcelableArrayList("list");
+            myAdapter  = new VocAdapter(activity, vocList, selected);
+        }
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(title)
@@ -88,10 +96,19 @@ public class SectorDialog extends DialogFragment {
                     }
                 }).setAdapter(myAdapter, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        int id;
+                        if(type!=null && type.equals("authority")){
+                            ArrayList<Authority> authList=b.getParcelableArrayList("list");
+                            Authority auth=authList.get(which);
+                            id= auth.getId();
+                        }
+                        else{
+                            ArrayList<Vocabulary> vocList=b.getParcelableArrayList("list");
+                            Vocabulary voc=vocList.get(which);
+                            id= voc.getId();
+                        }
                         // The 'which' argument contains the index position
                         // of the selected item
-                        Vocabulary voc=vocList.get(which);
-                        int id= voc.getId();
                         Log.e("DIALOG",which+" "+id);
                         mListener.onDialogSelectClick(id);
                     }

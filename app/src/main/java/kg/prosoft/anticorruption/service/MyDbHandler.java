@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MyDbHandler extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 12;
     public static final String DATABASE_NAME = "anticor.db";
     public static final String KEY_ID=MyDbContract.DbEntry._ID;
 
@@ -32,6 +32,19 @@ public class MyDbHandler extends SQLiteOpenHelper {
     public static final String COLUMN_AUTH_TEXT=MyDbContract.DbEntry.COLUMN_AUTH_TEXT;
     public static final String COLUMN_AUTH_IMAGE=MyDbContract.DbEntry.COLUMN_AUTH_IMAGE;
     public static final String COLUMN_AUTH_PID=MyDbContract.DbEntry.COLUMN_AUTH_PARENT_ID;
+    public static final String COLUMN_AUTH_RATING=MyDbContract.DbEntry.COLUMN_AUTH_RATING;
+    public static final String COLUMN_AUTH_COMMENTS=MyDbContract.DbEntry.COLUMN_AUTH_COMMENTS;
+    public static final String COLUMN_AUTH_REPORTS=MyDbContract.DbEntry.COLUMN_AUTH_REPORTS;
+
+    public static final String TABLE_NEWS=MyDbContract.DbEntry.TABLE_NEWS;
+    public static final String COLUMN_NEWS_ID=MyDbContract.DbEntry.COLUMN_NEWS_ID;
+    public static final String COLUMN_NEWS_TITLE=MyDbContract.DbEntry.COLUMN_NEWS_TITLE;
+    public static final String COLUMN_NEWS_TEXT=MyDbContract.DbEntry.COLUMN_NEWS_TEXT;
+    public static final String COLUMN_NEWS_DESC=MyDbContract.DbEntry.COLUMN_NEWS_DESC;
+    public static final String COLUMN_NEWS_DATE=MyDbContract.DbEntry.COLUMN_NEWS_DATE;
+    public static final String COLUMN_NEWS_IMG=MyDbContract.DbEntry.COLUMN_NEWS_IMG;
+    public static final String COLUMN_NEWS_CTG=MyDbContract.DbEntry.COLUMN_NEWS_CTG;
+    public static final String COLUMN_NEWS_VIEWS=MyDbContract.DbEntry.COLUMN_NEWS_VIEWS;
 
     public MyDbHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -53,7 +66,22 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 COLUMN_AUTH_TITLE + " TEXT," +
                 COLUMN_AUTH_TEXT + " TEXT," +
                 COLUMN_AUTH_IMAGE + " TEXT," +
-                COLUMN_AUTH_PID + " INTEGER" +
+                COLUMN_AUTH_PID + " INTEGER," +
+                COLUMN_AUTH_RATING + " INTEGER," +
+                COLUMN_AUTH_COMMENTS + " INTEGER," +
+                COLUMN_AUTH_REPORTS + " INTEGER" +
+                ")");
+
+        db.execSQL("CREATE TABLE " + TABLE_NEWS + " (" +
+                MyDbContract.DbEntry._ID + " INTEGER PRIMARY KEY," +
+                COLUMN_NEWS_ID + " INTEGER," +
+                COLUMN_NEWS_TITLE + " TEXT," +
+                COLUMN_NEWS_TEXT + " TEXT," +
+                COLUMN_NEWS_IMG + " TEXT," +
+                COLUMN_NEWS_DESC + " TEXT," +
+                COLUMN_NEWS_DATE + " TEXT," +
+                COLUMN_NEWS_CTG + " INTEGER," +
+                COLUMN_NEWS_VIEWS + " INTEGER" +
                 ")");
     }
 
@@ -62,6 +90,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
         // to simply to discard the data and start over
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VOC);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_AUTH);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEWS);
         onCreate(db);
     }
 
@@ -159,6 +188,9 @@ public class MyDbHandler extends SQLiteOpenHelper {
         values.put(COLUMN_AUTH_TEXT, auth.getText());
         values.put(COLUMN_AUTH_IMAGE, auth.getImage());
         values.put(COLUMN_AUTH_PID, auth.getParentId());
+        values.put(COLUMN_AUTH_RATING, auth.getRating());
+        values.put(COLUMN_AUTH_COMMENTS, auth.getCommentCount());
+        values.put(COLUMN_AUTH_REPORTS, auth.getReportCount());
 
         // Inserting Row
         db.insert(TABLE_AUTH, null, values);
@@ -184,11 +216,68 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 auth.setText(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_AUTH_TEXT)));
                 auth.setImage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_AUTH_IMAGE)));
                 auth.setParentId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_AUTH_PID)));
+                auth.setRating(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_AUTH_RATING)));
+                auth.setCommentCount(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_AUTH_COMMENTS)));
+                auth.setReportCount(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_AUTH_REPORTS)));
                 // Adding contact to list
                 authList.add(auth);
             } while (cursor.moveToNext());
         }
         return authList;
+    }
+
+
+    /**News**/
+    public void clearNews(SQLiteDatabase db) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NEWS, null,null);
+        //db.close();
+    }
+
+    public void addNewsItem(News news,SQLiteDatabase db) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NEWS_ID, news.getId());
+        values.put(COLUMN_NEWS_TITLE, news.getTitle());
+        values.put(COLUMN_NEWS_TEXT, news.getText());
+        values.put(COLUMN_NEWS_DESC, news.getDescription());
+        values.put(COLUMN_NEWS_DATE, news.getRawDate());
+        values.put(COLUMN_NEWS_IMG, news.getImage());
+        values.put(COLUMN_NEWS_CTG, news.getCategoryId());
+        values.put(COLUMN_NEWS_VIEWS, news.getViews());
+
+        // Inserting Row
+        db.insert(TABLE_NEWS, null, values);
+        //db.close(); // Closing database connection
+    }
+
+    public ArrayList<News> getNewsContents(SQLiteDatabase db) {
+        ArrayList<News> mList = new ArrayList<>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM "+TABLE_NEWS;
+
+        //SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                News news = new News();
+                news.setRowId(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ID))));
+                news.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NEWS_ID)));
+                news.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NEWS_TITLE)));
+                news.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NEWS_DESC)));
+                news.setText(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NEWS_TEXT)));
+                news.setDate(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NEWS_DATE)));
+                news.setImage(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NEWS_IMG)));
+                news.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NEWS_CTG)));
+                news.setViews(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NEWS_VIEWS)));
+                // Adding contact to list
+                mList.add(news);
+            } while (cursor.moveToNext());
+        }
+        return mList;
     }
 }
 

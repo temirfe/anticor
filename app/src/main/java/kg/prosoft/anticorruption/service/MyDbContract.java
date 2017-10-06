@@ -24,5 +24,18 @@ public class MyDbContract {
         public static final String COLUMN_AUTH_TEXT = "auth_text";
         public static final String COLUMN_AUTH_IMAGE = "auth_image";
         public static final String COLUMN_AUTH_PARENT_ID = "auth_parent_id";
+        public static final String COLUMN_AUTH_RATING = "auth_rating";
+        public static final String COLUMN_AUTH_COMMENTS = "auth_comments";
+        public static final String COLUMN_AUTH_REPORTS = "auth_reports";
+
+        public static final String TABLE_NEWS = "news";
+        public static final String COLUMN_NEWS_ID = "news_id";
+        public static final String COLUMN_NEWS_TITLE = "news_title";
+        public static final String COLUMN_NEWS_DESC = "news_desc";
+        public static final String COLUMN_NEWS_TEXT = "news_text";
+        public static final String COLUMN_NEWS_IMG = "news_img";
+        public static final String COLUMN_NEWS_VIEWS = "news_views";
+        public static final String COLUMN_NEWS_CTG = "news_ctg";
+        public static final String COLUMN_NEWS_DATE = "news_date";
     }
 }

@@ -54,14 +54,29 @@ public class MyHelper {
         this.session = session;
     }
 
+    public void checkVocDepend(){
+        String uri = Endpoints.VOC_DEPEND;
+        StringRequest volReq = new StringRequest(Request.Method.GET, uri,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String depend=session.getVocabularyDepend();
+                        response=response.replace("\"","");
+                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        if(!response.equals(depend)){
+                            //new maxId is different, that mean category table has been altered. send new request.
+                            requestVocabularies();
+                            session.setVocabularyDepend(response);
+                        }
+                        else{ Log.e(TAG, "voc depend matches");}
+                        session.setVocabularyDependChecked(true);
+                    }
+                }, null);
+
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
     public void addVocabulary(Vocabulary voc){
         new AddVocTask().execute(voc);
-    }
-    public void addVocabularyList(SparseArray<Vocabulary> vocs){
-        doClearVocTask();//delete previous ones and add new ones
-        for(int i=0; i<vocs.size();i++){
-            new AddVocTask().execute(vocs.get(i));
-        }
     }
 
     private class AddVocTask extends AsyncTask<Vocabulary, Void, Void> {
@@ -70,32 +85,6 @@ public class MyHelper {
             if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
             dbHandler.addVocItem(params[0], db);
             return null;
-        }
-    }
-
-    public void doVocabularyTask(){
-        new VocabularyTask().execute();
-    }
-
-    private class VocabularyTask extends AsyncTask<Void, Void, List<Vocabulary>> {
-        protected List<Vocabulary> doInBackground(Void... params) {
-            if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "VocabularyTask dbhandler was null");}
-            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "VocabularyTask db was null or not open");}
-
-            return dbHandler.getVocContents(db);
-        }
-        protected void onPostExecute(List<Vocabulary> vocList) {
-            if(vocList.size()>0){
-                for (Vocabulary voc : vocList) {
-                    String log = "rowId: "+voc.getRowId()+", Id: " + voc.getId() + ", key: " + voc.getKey()+ ", value: " + voc.getValue();
-                    // Writing Contacts to log
-                    //Log.e("Contents: ", log);
-                }
-            }
-            else{
-                Log.e("VocabularyTask", "no content aa");
-                requestVocabularies();
-            }
         }
     }
 
@@ -176,9 +165,9 @@ public class MyHelper {
     }
 
     //Authority
-    public void getAuthDepend(){
-        String uri = Endpoints.DEPEND;
-        StringRequest volReqe = new StringRequest(Request.Method.GET, uri,
+    public void checkAuthDepend(){
+        String uri = Endpoints.AUTH_DEPEND;
+        StringRequest volReq = new StringRequest(Request.Method.GET, uri,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -193,52 +182,11 @@ public class MyHelper {
                         session.setAuthorityDependChecked(true);
                     }
                 }, null);
-        Response.Listener<JSONArray> list = new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray jsonArray) {
-                Log.e(TAG, "response: " + jsonArray);
-                try{
-                    for(int i=0; i < jsonArray.length(); i++){
-                        JSONObject productObj = jsonArray.getJSONObject(i);
-                        String name=productObj.getString("table_name");
-                        String update=productObj.getString("last_update");
-                    }
-                }catch(JSONException e){e.printStackTrace();}
-            }
-        };
-        JsonArrayRequest volReq = new JsonArrayRequest(Request.Method.GET, uri, null, list,null);
+
         MyVolley.getInstance(context).addToRequestQueue(volReq);
-
-
     }
 
-    public void doAuthorityTask(){
-        new AuthorityTask().execute();
-    }
-
-    private class AuthorityTask extends AsyncTask<Void, Void, List<Authority>> {
-        protected List<Authority> doInBackground(Void... params) {
-            if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "AuthorityTask dbhandler was null");}
-            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "AuthorityTask db was null or not open");}
-
-            return dbHandler.getAuthContents(db);
-        }
-        protected void onPostExecute(List<Authority> theList) {
-            if(theList.size()>0){
-                for (Authority voc : theList) {
-                    String log = "rowId: "+voc.getRowId()+", Id: " + voc.getId() + ", title: " + voc.getTitle();
-                    // Writing Contacts to log
-                    //Log.e("Contents: ", log);
-                }
-            }
-            else{
-                Log.e("AuthorityTask", "no content aa");
-                requestAuthority();
-            }
-        }
-    }
-
-    public void addAuthority(Authority voc){
+    public void insertAuthority(Authority voc){
         new AddAuthTask().execute(voc);
     }
 
@@ -265,10 +213,13 @@ public class MyHelper {
                         String title=jsonObject.getString("title");
                         String text=jsonObject.getString("text");
                         String image=jsonObject.getString("img");
-                        int parent_id=jsonObject.getInt("category_id");
+                        int parent_id=jsonObject.getInt("parent_id");
+                        int rating=jsonObject.getInt("rating");
+                        int comments=jsonObject.getInt("comments");
+                        int reports=jsonObject.getInt("reports");
 
-                        Authority authority = new Authority(id, title, text, image, parent_id);
-                        addAuthority(authority);
+                        Authority authority = new Authority(id, title, text, image, parent_id,rating,comments,reports);
+                        insertAuthority(authority);
                     }
                     //helper.addVocabulary(vocList);
                 }catch(JSONException e){e.printStackTrace();}
@@ -298,6 +249,42 @@ public class MyHelper {
             if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
 
             dbHandler.clearAuthority(db);
+
+            return null;
+        }
+    }
+
+    /** News **/
+    public void insertNews(News obj){
+        new AddNewsTask().execute(obj);
+    }
+
+    public void addNewsList(ArrayList<News> list){
+        doClearNewsTask();//delete previous ones and add new ones
+        for(int i=0; i<list.size();i++){
+            new AddNewsTask().execute(list.get(i));
+        }
+    }
+
+    private class AddNewsTask extends AsyncTask<News, Void, Void> {
+        protected Void doInBackground(News... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context);}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
+            dbHandler.addNewsItem(params[0], db);
+            return null;
+        }
+    }
+
+    public void doClearNewsTask(){
+        new ClearNewsTask().execute();
+    }
+
+    private class ClearNewsTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context);}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
+
+            dbHandler.clearNews(db);
 
             return null;
         }

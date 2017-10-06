@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="3dp"
@@ -16,5 +17,53 @@
         android:id="@+id/id_tv_title"
         android:textColor="@color/black"
         android:layout_alignParentTop="true" />
+    <RatingBar
+        android:id="@+id/id_rating"
+        style="?android:attr/ratingBarStyleSmall"
+        android:theme="@style/MyRatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:layout_below="@+id/id_tv_title"
+        android:layout_marginTop="5dp" />
+
+    <LinearLayout
+        android:id="@+id/id_ll_stats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignBottom="@+id/id_rating"
+        android:layout_toEndOf="@+id/id_rating"
+        >
+        <ImageView
+            android:id="@+id/id_iv_comment"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:layout_marginLeft="16dp"
+            android:tint="@color/gray"
+            android:src="@drawable/ic_chat_bubble_black_24dp"
+            android:contentDescription="@string/comments"/>
+        <TextView
+            android:id="@+id/id_tv_comment_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_marginLeft="3dp"/>
+
+        <ImageView
+            android:id="@+id/id_iv_report"
+            android:layout_width="17dp"
+            android:layout_height="17dp"
+            android:layout_marginLeft="16dp"
+            android:tint="@color/gray"
+            android:src="@drawable/ic_announcement_black_24dp"
+            android:contentDescription="@string/reports" />
+        <TextView
+            android:id="@+id/id_tv_report_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_marginLeft="3dp" />
+    </LinearLayout>
 
 </RelativeLayout>

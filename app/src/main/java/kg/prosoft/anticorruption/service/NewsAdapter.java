@@ -1,12 +1,16 @@
 package kg.prosoft.anticorruption.service;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.v4.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -21,7 +25,6 @@ public class NewsAdapter extends BaseAdapter {
     private Context mContext;
     private List<News> newsList;
     private LayoutInflater inflater;
-    int range=0;
 
     public NewsAdapter(Context mContext, List<News> newsList) {
         this.mContext = mContext;
@@ -53,16 +56,29 @@ public class NewsAdapter extends BaseAdapter {
 
         News news = newsList.get(position);
         String title=news.getTitle();
-        final SpannableStringBuilder boldTitle = new SpannableStringBuilder(title);
+        /*final SpannableStringBuilder boldTitle = new SpannableStringBuilder(title);
         boldTitle.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, title.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);*/
 
         TextView tv_title=(TextView) convertView.findViewById(R.id.id_tv_title);
-        tv_title.setText(boldTitle);
+        tv_title.setText(title);
         TextView tv_text=(TextView) convertView.findViewById(R.id.id_tv_text);
         tv_text.setText(news.getDescription());
         TextView dateTv=(TextView) convertView.findViewById(R.id.textView_date);
         dateTv.setText(news.getDate());
+        ImageView iv_thumb=(ImageView)convertView.findViewById(R.id.id_iv_thumb);
+        String img=news.getImage();
+        if(!img.isEmpty()){
+            GlideApp.with(mContext)
+                    .load(Endpoints.NEWS_IMG+news.getId()+"/"+img)
+                    .placeholder(R.drawable.placeholder) // optional
+                    .dontAnimate()
+                    .into(iv_thumb);
+        }
+        else{
+            GlideApp.with(mContext).clear(iv_thumb);
+            iv_thumb.setImageDrawable(null);
+        }
 
         convertView.setTag(news.getId());
 

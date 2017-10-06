@@ -6,7 +6,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -28,6 +30,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,12 +38,16 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import kg.prosoft.anticorruption.service.Endpoints;
+import kg.prosoft.anticorruption.service.MyDbHandler;
+import kg.prosoft.anticorruption.service.MyHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.News;
 import kg.prosoft.anticorruption.service.NewsAdapter;
+import kg.prosoft.anticorruption.service.SessionManager;
 
 
 /**
@@ -49,7 +56,7 @@ import kg.prosoft.anticorruption.service.NewsAdapter;
 public class NewsFragment extends Fragment {
     ListView listView;
     NewsAdapter adapter;
-    List<News> newsList;
+    ArrayList<News> newsList;
     Context context;
     Activity activity;
     private int page=1;
@@ -62,10 +69,15 @@ public class NewsFragment extends Fragment {
     LinearLayout ll_reload;
     //ImageView iv_thumb;
 
+    SessionManager session;
+    public SQLiteDatabase db;
+    public MyDbHandler dbHandler;
+    MyHelper helper;
+    String TAG="NewsFrag";
+
     public NewsFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -74,6 +86,11 @@ public class NewsFragment extends Fragment {
         View layout=inflater.inflate(R.layout.fragment_news, container, false);
         activity=getActivity();
         context=activity.getApplicationContext();
+        session = new SessionManager(context);
+        dbHandler = new MyDbHandler(context);
+        db = dbHandler.getWritableDatabase();
+        helper = new MyHelper(activity, dbHandler, db, session);
+
         listView = (ListView) layout.findViewById(R.id.id_lv_news);
         listView.setOnScrollListener(onScrollDo);
         ll_reload=(LinearLayout)layout.findViewById(R.id.id_ll_reload);
@@ -87,7 +104,7 @@ public class NewsFragment extends Fragment {
         adapter = new NewsAdapter(context,newsList);
         listView.setAdapter(adapter);
 
-        populateList(page, null,false);
+        new NewsTask().execute();
 
         listView.setOnItemClickListener(itemClickListener);
 
@@ -96,7 +113,7 @@ public class NewsFragment extends Fragment {
 
     View.OnClickListener reloadClickListener = new View.OnClickListener(){
         public void onClick(View v){
-            populateList(page, null,false);
+            populateList(page, null,false, false);
             pb.setVisibility(ProgressBar.VISIBLE);
             ll_reload.setVisibility(View.GONE);
         }
@@ -149,7 +166,7 @@ public class NewsFragment extends Fragment {
                 if(current_page<total_pages){
                     //Log.i("Threshold reached", "loading next. current:"+current_page+" total:"+total_pages);
                     int next_page=current_page+1;
-                    populateList(next_page, uriB, false);
+                    populateList(next_page, uriB, false, false);
                 }
             }
 
@@ -167,8 +184,7 @@ public class NewsFragment extends Fragment {
         }
     };
 
-    public void populateList(int page,Uri.Builder urlB, final boolean applyNewFilter){
-
+    public void populateList(final int page,Uri.Builder urlB, final boolean applyNewFilter, final boolean newlist){
         if(applyNewFilter){
             progress = new ProgressDialog(getActivity());
             progress.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
@@ -195,7 +211,7 @@ public class NewsFragment extends Fragment {
                 try{
                     Log.i("RESPONSE", "keldi");
                     if(progress!=null){progress.dismiss();}
-                    if(applyNewFilter){newsList.clear();}
+                    if(applyNewFilter || newlist){newsList.clear();}
                     int leng=response.length();
                     if(leng>0){
                         for(int i=0; i < leng; i++){
@@ -207,9 +223,14 @@ public class NewsFragment extends Fragment {
                             String date=jsonObject.getString("date");
                             String image=jsonObject.getString("img");
                             int category_id=jsonObject.getInt("category_id");
+                            int views=jsonObject.getInt("views");
 
-                            News news = new News(id, title, description, text, date, image, category_id);
+                            News news = new News(id, title, description, text, date, image, category_id,views);
                             newsList.add(news);
+                        }
+                        if(page==1){
+                            helper.doClearNewsTask();
+                            helper.addNewsList(newsList);
                         }
                     }
                     else{
@@ -220,7 +241,7 @@ public class NewsFragment extends Fragment {
 
                 }catch(JSONException e){e.printStackTrace();}
 
-                if(applyNewFilter){
+                if(applyNewFilter || newlist){
                     adapter = new NewsAdapter(context,newsList);
                     listView.setAdapter(adapter);
                 }
@@ -257,6 +278,51 @@ public class NewsFragment extends Fragment {
             }
         };
 
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+
+    private class NewsTask extends AsyncTask<Void, Void, ArrayList<News>> {
+        protected ArrayList<News> doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "NewsTask dbhandler was null");}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "AuthorityTask db was null or not open");}
+
+            return dbHandler.getNewsContents(db);
+        }
+        protected void onPostExecute(ArrayList<News> theList) {
+            if(theList.size()>0){
+                pb.setVisibility(ProgressBar.INVISIBLE);
+                for (News news : theList) {
+                    newsList.add(news);
+                }
+                adapter.notifyDataSetChanged();
+                Log.e(TAG, "data has been taken from DB");
+                checkNewsDepend(); //also check if data has been altered on server side
+            }
+            else{
+                Log.e("NewsTask", "no content in db, requesting server");
+                populateList(1,null,false, true); //requesting server
+            }
+            //will load new data from server anyway
+        }
+    }
+
+    public void checkNewsDepend(){
+        String uri = Endpoints.NEWS_DEPEND;
+        StringRequest volReq = new StringRequest(Request.Method.GET, uri,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String depend=session.getNewsDepend();
+                        response=response.replace("\"","");
+                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        if(!response.equals(depend)){
+                            //new maxId is different, that mean category table has been altered. send new request.
+                            populateList(1,null,false, true); //requesting server
+                            session.setNewsDepend(response);
+                        }
+                        else{ Log.e(TAG, "depend matches");}
+                    }
+                }, null);
 
         MyVolley.getInstance(context).addToRequestQueue(volReq);
     }
