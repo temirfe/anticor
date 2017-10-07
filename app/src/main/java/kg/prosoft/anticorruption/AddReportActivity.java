@@ -895,7 +895,6 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             }
             else{
                 Log.e("VocTask", "no content in db, requesting server");
-                session.setVocabularyDepend("0");
                 requestVocabularies(); //requesting server
             }
         }
@@ -1066,7 +1065,6 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             }
             else{
                 Log.e("AuthorityTask", "no content in db, requesting server");
-                //session.setAuthorityDepend("0");
                 requestAuthority(); //requesting server
             }
         }
