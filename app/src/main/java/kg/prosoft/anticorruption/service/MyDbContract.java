@@ -37,5 +37,19 @@ public class MyDbContract {
         public static final String COLUMN_NEWS_VIEWS = "news_views";
         public static final String COLUMN_NEWS_CTG = "news_ctg";
         public static final String COLUMN_NEWS_DATE = "news_date";
+
+        public static final String TABLE_REPORT = "report";
+        public static final String COLUMN_REPORT_ID = "report_id";
+        public static final String COLUMN_REPORT_USER_ID = "report_user_id";
+        public static final String COLUMN_REPORT_AUTHORITY_ID = "report_authority_id";
+        public static final String COLUMN_REPORT_CATEGORY_ID = "report_category_id";
+        public static final String COLUMN_REPORT_TYPE_ID = "report_type_id";
+        public static final String COLUMN_REPORT_CITY_ID = "report_city_id";
+        public static final String COLUMN_REPORT_LAT = "report_lat";
+        public static final String COLUMN_REPORT_LNG = "report_lng";
+        public static final String COLUMN_REPORT_TITLE = "report_title";
+        public static final String COLUMN_REPORT_DESC = "report_desc";
+        public static final String COLUMN_REPORT_TEXT = "report_text";
+        public static final String COLUMN_REPORT_DATE = "report_date";
     }
 }

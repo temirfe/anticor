@@ -62,7 +62,7 @@ public class MyHelper {
                     public void onResponse(String response) {
                         String depend=session.getVocabularyDepend();
                         response=response.replace("\"","");
-                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        Log.e(TAG, "voc depend: "+depend+" response: "+response);
                         if(!response.equals(depend)){
                             //new maxId is different, that mean category table has been altered. send new request.
                             requestVocabularies();
@@ -93,7 +93,7 @@ public class MyHelper {
         Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
-                Log.e(TAG, "response: " + jsonArray);
+                Log.e(TAG, "voc response: " + jsonArray);
                 try{
                     doClearVocTask();
                     for(int s=0; s < jsonArray.length(); s++){
@@ -173,7 +173,7 @@ public class MyHelper {
                     public void onResponse(String response) {
                         String depend=session.getAuthorityDepend();
                         response=response.replace("\"","");
-                        Log.e(TAG, "depend: "+depend+" response:"+response);
+                        Log.e(TAG, "auth depend: "+depend+" response:"+response);
                         if(!response.equals(depend)){
                             //new maxId is different, that mean category table has been altered. send new request.
                             requestAuthority();
@@ -204,7 +204,7 @@ public class MyHelper {
         Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
-                Log.e(TAG, "response: " + jsonArray);
+                Log.e(TAG, "auth response: " + jsonArray);
                 try{
                     doClearAuthTask();
                     for(int s=0; s < jsonArray.length(); s++){
@@ -255,10 +255,6 @@ public class MyHelper {
     }
 
     /** News **/
-    public void insertNews(News obj){
-        new AddNewsTask().execute(obj);
-    }
-
     public void addNewsList(ArrayList<News> list){
         doClearNewsTask();//delete previous ones and add new ones
         for(int i=0; i<list.size();i++){
@@ -285,6 +281,38 @@ public class MyHelper {
             if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
 
             dbHandler.clearNews(db);
+
+            return null;
+        }
+    }
+
+    /** Report **/
+    public void addReportList(ArrayList<Report> list){
+        doClearReportTask();//delete previous ones and add new ones
+        for(int i=0; i<list.size();i++){
+            new AddReportTask().execute(list.get(i));
+        }
+    }
+
+    private class AddReportTask extends AsyncTask<Report, Void, Void> {
+        protected Void doInBackground(Report... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context);}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
+            dbHandler.addReportItem(params[0], db);
+            return null;
+        }
+    }
+
+    public void doClearReportTask(){
+        new ClearReportTask().execute();
+    }
+
+    private class ClearReportTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context);}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
+
+            dbHandler.clearReport(db);
 
             return null;
         }

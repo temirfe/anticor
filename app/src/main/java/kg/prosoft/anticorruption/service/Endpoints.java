@@ -27,6 +27,7 @@ public class Endpoints {
     public static final String AUTH_DEPEND = API_URL + "/authorities/depend";
     public static final String COMMENTS = API_URL + "/comments";
     public static final String REPORTS = API_URL + "/reports";
+    public static final String REPORT_DEPEND = API_URL + "/reports/depend";
     public static final String NEWS = API_URL + "/news";
     public static final String NEWS_DEPEND = API_URL + "/news/depend";
     public static final String AUTHORITY_RATE = AUTHORITIES + "/rate";

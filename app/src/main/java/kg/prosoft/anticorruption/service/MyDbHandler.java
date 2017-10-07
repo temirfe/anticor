@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MyDbHandler extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 12;
+    public static final int DATABASE_VERSION = 15;
     public static final String DATABASE_NAME = "anticor.db";
     public static final String KEY_ID=MyDbContract.DbEntry._ID;
 
@@ -45,6 +45,20 @@ public class MyDbHandler extends SQLiteOpenHelper {
     public static final String COLUMN_NEWS_IMG=MyDbContract.DbEntry.COLUMN_NEWS_IMG;
     public static final String COLUMN_NEWS_CTG=MyDbContract.DbEntry.COLUMN_NEWS_CTG;
     public static final String COLUMN_NEWS_VIEWS=MyDbContract.DbEntry.COLUMN_NEWS_VIEWS;
+
+    public static final String TABLE_REPORT=MyDbContract.DbEntry.TABLE_REPORT;
+    public static final String COLUMN_REPORT_ID=MyDbContract.DbEntry.COLUMN_REPORT_ID;
+    public static final String COLUMN_REPORT_TITLE=MyDbContract.DbEntry.COLUMN_REPORT_TITLE;
+    public static final String COLUMN_REPORT_TEXT=MyDbContract.DbEntry.COLUMN_REPORT_TEXT;
+    public static final String COLUMN_REPORT_DESC=MyDbContract.DbEntry.COLUMN_REPORT_DESC;
+    public static final String COLUMN_REPORT_DATE=MyDbContract.DbEntry.COLUMN_REPORT_DATE;
+    public static final String COLUMN_REPORT_AUTHORITY_ID=MyDbContract.DbEntry.COLUMN_REPORT_AUTHORITY_ID;
+    public static final String COLUMN_REPORT_CATEGORY_ID=MyDbContract.DbEntry.COLUMN_REPORT_CATEGORY_ID;
+    public static final String COLUMN_REPORT_CITY_ID=MyDbContract.DbEntry.COLUMN_REPORT_CITY_ID;
+    public static final String COLUMN_REPORT_TYPE_ID=MyDbContract.DbEntry.COLUMN_REPORT_TYPE_ID;
+    public static final String COLUMN_REPORT_USER_ID=MyDbContract.DbEntry.COLUMN_REPORT_USER_ID;
+    public static final String COLUMN_REPORT_LAT=MyDbContract.DbEntry.COLUMN_REPORT_LAT;
+    public static final String COLUMN_REPORT_LNG=MyDbContract.DbEntry.COLUMN_REPORT_LNG;
 
     public MyDbHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -83,6 +97,22 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 COLUMN_NEWS_CTG + " INTEGER," +
                 COLUMN_NEWS_VIEWS + " INTEGER" +
                 ")");
+
+        db.execSQL("CREATE TABLE " + TABLE_REPORT + " (" +
+                MyDbContract.DbEntry._ID + " INTEGER PRIMARY KEY," +
+                COLUMN_REPORT_ID + " INTEGER," +
+                COLUMN_REPORT_TITLE + " TEXT," +
+                COLUMN_REPORT_TEXT + " TEXT," +
+                COLUMN_REPORT_DESC + " TEXT," +
+                COLUMN_REPORT_DATE + " TEXT," +
+                COLUMN_REPORT_CATEGORY_ID + " INTEGER," +
+                COLUMN_REPORT_AUTHORITY_ID + " INTEGER," +
+                COLUMN_REPORT_CITY_ID + " INTEGER," +
+                COLUMN_REPORT_TYPE_ID + " INTEGER," +
+                COLUMN_REPORT_USER_ID + " INTEGER," +
+                COLUMN_REPORT_LAT + " REAL," +
+                COLUMN_REPORT_LNG + " REAL" +
+                ")");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -91,6 +121,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_VOC);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_AUTH);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEWS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REPORT);
         onCreate(db);
     }
 
@@ -226,7 +257,6 @@ public class MyDbHandler extends SQLiteOpenHelper {
         return authList;
     }
 
-
     /**News**/
     public void clearNews(SQLiteDatabase db) {
         //SQLiteDatabase db = this.getWritableDatabase();
@@ -275,6 +305,67 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 news.setViews(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NEWS_VIEWS)));
                 // Adding contact to list
                 mList.add(news);
+            } while (cursor.moveToNext());
+        }
+        return mList;
+    }
+
+    /**Report**/
+    public void clearReport(SQLiteDatabase db) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_REPORT, null,null);
+        //db.close();
+    }
+
+    public void addReportItem(Report report,SQLiteDatabase db) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_REPORT_ID, report.getId());
+        values.put(COLUMN_REPORT_TITLE, report.getTitle());
+        values.put(COLUMN_REPORT_TEXT, report.getText());
+        values.put(COLUMN_REPORT_DESC, report.getDescription());
+        values.put(COLUMN_REPORT_DATE, report.getRawDate());
+        values.put(COLUMN_REPORT_USER_ID, report.getUserId());
+        values.put(COLUMN_REPORT_CATEGORY_ID, report.getCategoryId());
+        values.put(COLUMN_REPORT_AUTHORITY_ID, report.getAuthorityId());
+        values.put(COLUMN_REPORT_TYPE_ID, report.getAuthorityId());
+        values.put(COLUMN_REPORT_CITY_ID, report.getCityId());
+        values.put(COLUMN_REPORT_LAT, report.getLat());
+        values.put(COLUMN_REPORT_LNG, report.getLng());
+
+        // Inserting Row
+        db.insert(TABLE_REPORT, null, values);
+        //db.close(); // Closing database connection
+    }
+
+    public ArrayList<Report> getReportContents(SQLiteDatabase db) {
+        ArrayList<Report> mList = new ArrayList<>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM "+TABLE_REPORT;
+
+        //SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Report report = new Report();
+                report.setRowId(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ID))));
+                report.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_ID)));
+                report.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_REPORT_TITLE)));
+                report.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_REPORT_DESC)));
+                report.setText(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_REPORT_TEXT)));
+                report.setDate(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_REPORT_DATE)));
+                report.setAuthorityId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_AUTHORITY_ID)));
+                report.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_CATEGORY_ID)));
+                report.setTypeId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_TYPE_ID)));
+                report.setCityId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_CITY_ID)));
+                report.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_USER_ID)));
+                report.setLat(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_REPORT_LAT)));
+                report.setLng(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_REPORT_LNG)));
+                // Adding contact to list
+                mList.add(report);
             } while (cursor.moveToNext());
         }
         return mList;

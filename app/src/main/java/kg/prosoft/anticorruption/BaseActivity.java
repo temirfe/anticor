@@ -52,7 +52,6 @@ public class BaseActivity extends AppCompatActivity {
         else{
             Log.e(TAG,"VocDepend was checked");
         }
-
         if(!session.isAuthorityDependChecked()){
             helper.checkAuthDepend();
         }

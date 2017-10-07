@@ -284,7 +284,7 @@ public class NewsFragment extends Fragment {
     private class NewsTask extends AsyncTask<Void, Void, ArrayList<News>> {
         protected ArrayList<News> doInBackground(Void... params) {
             if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "NewsTask dbhandler was null");}
-            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "AuthorityTask db was null or not open");}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "NewsTask db was null or not open");}
 
             return dbHandler.getNewsContents(db);
         }
@@ -295,7 +295,7 @@ public class NewsFragment extends Fragment {
                     newsList.add(news);
                 }
                 adapter.notifyDataSetChanged();
-                Log.e(TAG, "data has been taken from DB");
+                Log.e(TAG, "news data has been taken from DB");
                 checkNewsDepend(); //also check if data has been altered on server side
             }
             else{

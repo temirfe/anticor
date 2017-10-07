@@ -745,7 +745,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                     public void onResponse(String response) {
                         String depend=session.getVocabularyDepend();
                         response=response.replace("\"","");
-                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        Log.e(TAG, "voc depend: "+depend+" response: "+response);
                         if(!response.equals(depend)){
                             //new maxId is different, that mean category table has been altered. send new request.
                             requestVocabularies();
@@ -764,7 +764,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             @Override
             public void onResponse(JSONArray jsonArray) {
 
-                Log.e(TAG, "response: " + jsonArray);
+                Log.e(TAG, "reqVoc response: " + jsonArray);
                 try{
                     helper.doClearVocTask();
                     for(int s=0; s < jsonArray.length(); s++){
@@ -891,10 +891,11 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                         parentChildMap.put(parent,childMap);
                     }
                 }
-                Log.e(TAG, "data has been taken from DB");
+                Log.e(TAG, "voc data has been taken from DB");
             }
             else{
-                Log.e("AuthorityTask", "no content in db, requesting server");
+                Log.e("VocTask", "no content in db, requesting server");
+                session.setVocabularyDepend("0");
                 requestVocabularies(); //requesting server
             }
         }
@@ -910,7 +911,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                     public void onResponse(String response) {
                         String depend=session.getAuthorityDepend();
                         response=response.replace("\"","");
-                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        Log.e(TAG, "auth depend: "+depend+" response: "+response);
                         if(!response.equals(depend)){
                             //new maxId is different, that mean category table has been altered. send new request.
                             requestAuthority();
@@ -930,7 +931,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             @Override
             public void onResponse(JSONArray response) {
                 try{
-                    Log.i("RESPONSE", "keldi");
+                    Log.i("AUTH RESPONSE", "keldi");
                     int leng=response.length();
                     if(leng>0){
                         helper.doClearAuthTask();
@@ -938,22 +939,27 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                             JSONObject jsonObject = response.getJSONObject(i);
                             int id = jsonObject.getInt("id");
                             String title=jsonObject.getString("title");
+                            String text=jsonObject.getString("text");
                             String image=jsonObject.getString("img");
                             int parent_id=jsonObject.getInt("parent_id");
+                            int rating=jsonObject.getInt("rating");
+                            int comments=jsonObject.getInt("comments");
+                            int reports=jsonObject.getInt("reports");
 
-                            Authority authority = new Authority(id, title, image, parent_id);
-                            helper.insertAuthority(authority);
+                            Authority authForDialog = new Authority(id, title, image, parent_id);
+                            Authority authForDb = new Authority(id, title, text, image, parent_id,rating,comments,reports);
+                            helper.insertAuthority(authForDb);
                             //authList.add(authority);
                             titleMapAuth.put(id,title);
                             if(parent_id==0){
-                                parentMapAuth.put(id,authority);
+                                parentMapAuth.put(id,authForDialog);
                             }
                             else{
                                 childMapAuth=(LinkedHashMap<Integer, Authority>)parentChildMapAuth.get(parent_id);
                                 if(childMapAuth== null) {
                                     childMapAuth=new LinkedHashMap<>();
                                 }
-                                childMapAuth.put(id,authority);
+                                childMapAuth.put(id,authForDialog);
                                 parentChildMapAuth.put(parent_id,childMapAuth);
                             }
                         }
@@ -1056,10 +1062,11 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                     }
                 }
                 prepareAuthList();
-                Log.e(TAG, "data has been taken from DB");
+                Log.e(TAG, "auth data has been taken from DB");
             }
             else{
                 Log.e("AuthorityTask", "no content in db, requesting server");
+                //session.setAuthorityDepend("0");
                 requestAuthority(); //requesting server
             }
         }

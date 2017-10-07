@@ -6,7 +6,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -27,6 +29,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,9 +40,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kg.prosoft.anticorruption.service.Endpoints;
+import kg.prosoft.anticorruption.service.MyDbHandler;
+import kg.prosoft.anticorruption.service.MyHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.Report;
 import kg.prosoft.anticorruption.service.ReportAdapter;
+import kg.prosoft.anticorruption.service.SessionManager;
 
 
 /**
@@ -49,7 +55,7 @@ public class ListReportsFragment extends Fragment {
 
     ListView listView;
     ReportAdapter adapter;
-    List<Report> reportList;
+    ArrayList<Report> reportList;
     Context context;
     Activity activity;
     private int page=1;
@@ -60,6 +66,12 @@ public class ListReportsFragment extends Fragment {
     ProgressDialog progress;
     Button btn_reload;
     LinearLayout ll_reload;
+
+    SessionManager session;
+    public SQLiteDatabase db;
+    public MyDbHandler dbHandler;
+    MyHelper helper;
+    String TAG="ReportFrag";
 
     public ListReportsFragment() {
         // Required empty public constructor
@@ -73,6 +85,11 @@ public class ListReportsFragment extends Fragment {
         View layout=inflater.inflate(R.layout.fragment_list_reports, container, false);
         activity=getActivity();
         context=activity.getApplicationContext();
+        session = new SessionManager(context);
+        dbHandler = new MyDbHandler(context);
+        db = dbHandler.getWritableDatabase();
+        helper = new MyHelper(activity, dbHandler, db, session);
+
         listView = (ListView) layout.findViewById(R.id.id_lv_reports);
         listView.setOnScrollListener(onScrollDo);
         ll_reload=(LinearLayout)layout.findViewById(R.id.id_ll_reload);
@@ -86,17 +103,17 @@ public class ListReportsFragment extends Fragment {
         adapter = new ReportAdapter(context,reportList);
         listView.setAdapter(adapter);
 
-        populateList(page, null,false);
+        new ReportTask().execute();
+        //populateList(page, null,false);
 
         listView.setOnItemClickListener(itemClickListener);
 
         return layout;
     }
 
-
     View.OnClickListener reloadClickListener = new View.OnClickListener(){
         public void onClick(View v){
-            populateList(page, null,false);
+            populateList(page, null,false, false);
             pb.setVisibility(ProgressBar.VISIBLE);
             ll_reload.setVisibility(View.GONE);
         }
@@ -148,7 +165,7 @@ public class ListReportsFragment extends Fragment {
                 if(current_page<total_pages){
                     //Log.i("Threshold reached", "loading next. current:"+current_page+" total:"+total_pages);
                     int next_page=current_page+1;
-                    populateList(next_page, uriB, false);
+                    populateList(next_page, uriB, false, false);
                 }
             }
 
@@ -166,7 +183,7 @@ public class ListReportsFragment extends Fragment {
         }
     };
 
-    public void populateList(int page,Uri.Builder urlB, final boolean applyNewFilter){
+    public void populateList(final int page,Uri.Builder urlB, final boolean applyNewFilter, final boolean newlist){
 
         if(applyNewFilter){
             progress = new ProgressDialog(getActivity());
@@ -194,7 +211,7 @@ public class ListReportsFragment extends Fragment {
                 try{
                     Log.i("RESPONSE", "reports keldi");
                     if(progress!=null){progress.dismiss();}
-                    if(applyNewFilter){reportList.clear();}
+                    if(applyNewFilter || newlist){reportList.clear();}
                     int leng=response.length();
                     if(leng>0){
                         for(int i=0; i < leng; i++){
@@ -210,6 +227,10 @@ public class ListReportsFragment extends Fragment {
                             Report report = new Report(id, title, text, date, lat, lng);
                             reportList.add(report);
                         }
+                        if(page==1){
+                            helper.doClearReportTask();
+                            helper.addReportList(reportList);
+                        }
                     }
                     else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -219,7 +240,7 @@ public class ListReportsFragment extends Fragment {
 
                 }catch(JSONException e){e.printStackTrace();}
 
-                if(applyNewFilter){
+                if(applyNewFilter || newlist){
                     adapter = new ReportAdapter(context,reportList);
                     listView.setAdapter(adapter);
                 }
@@ -256,6 +277,52 @@ public class ListReportsFragment extends Fragment {
             }
         };
 
+
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+
+    private class ReportTask extends AsyncTask<Void, Void, ArrayList<Report>> {
+        protected ArrayList<Report> doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "ReportTask dbhandler was null");}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase(); Log.e(TAG, "ReportTask db was null or not open");}
+
+            return dbHandler.getReportContents(db);
+        }
+        protected void onPostExecute(ArrayList<Report> theList) {
+            if(theList.size()>0){
+                pb.setVisibility(ProgressBar.INVISIBLE);
+                for (Report report : theList) {
+                    reportList.add(report);
+                }
+                adapter.notifyDataSetChanged();
+                Log.e(TAG, "report data has been taken from DB");
+                checkReportDepend(); //also check if data has been altered on server side
+            }
+            else{
+                Log.e("ReportTask", "no content in db, requesting server");
+                populateList(1,null,false, true); //requesting server
+            }
+            //will load new data from server anyway
+        }
+    }
+
+    public void checkReportDepend(){
+        String uri = Endpoints.REPORT_DEPEND;
+        StringRequest volReq = new StringRequest(Request.Method.GET, uri,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String depend=session.getReportDepend();
+                        response=response.replace("\"","");
+                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        if(!response.equals(depend)){
+                            //new maxId is different, that mean category table has been altered. send new request.
+                            populateList(1,null,false, true); //requesting server
+                            session.setReportDepend(response);
+                        }
+                        else{ Log.e(TAG, "depend matches");}
+                    }
+                }, null);
 
         MyVolley.getInstance(context).addToRequestQueue(volReq);
     }

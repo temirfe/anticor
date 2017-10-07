@@ -126,7 +126,7 @@ public class MapReportsFragment extends Fragment implements
                 });
         mClusterManager.getMarkerCollection().setOnInfoWindowAdapter(new CustomInfoWindowAdapter(activity.getLayoutInflater()));
 
-        populateMap(null);
+        populateMap();
     }
 
     @Override
@@ -144,15 +144,10 @@ public class MapReportsFragment extends Fragment implements
         startActivity(intent);
     }
 
-    public void populateMap(Uri.Builder urlB){
+    public void populateMap(){
+        uriB = new Uri.Builder();
+        uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath("api").appendPath("reports");
 
-        uriB=urlB;
-        //Log.i("CTG is","asd "+ctg);
-
-        if(uriB==null){
-            uriB = new Uri.Builder();
-            uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath("api").appendPath("reports");
-        }
         if(user_id!=0)//when MainActivity launched by AccountActivity bc of "show my incidents"
         {
             uriB.appendQueryParameter("user_id", ""+user_id);

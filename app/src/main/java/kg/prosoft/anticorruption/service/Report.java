@@ -14,13 +14,11 @@ import java.util.Locale;
  */
 
 public class Report {
-    private int id,user_id, authority_id, category_id,type_id, city_id;
+    private int id,user_id, authority_id, category_id,type_id, city_id, row_id;
     private double lat, lng;
-    private String title;
-    private String text;
-    private String date;
-    private int verified;
+    private String title,text,description,date;
 
+    public Report() {}
     public Report(int id, String title, String text, String date, double lat, double lng) {
         this.id = id;
         this.title = title;
@@ -30,39 +28,47 @@ public class Report {
         this.lng=lng;
     }
 
+    public void setRowId(int in) {row_id=in;}
+
+    public void setId(int in) {id=in;}
     public int getId() {
         return id;
     }
+
     public void setUserId(int id) { this.user_id=id;}
     public int getUserId() {return id;}
+
     public void setAuthorityId(int id) { this.authority_id=id;}
     public int getAuthorityId() {return authority_id;}
+
     public void setCategoryId(int id) { this.category_id=id;}
     public int getCategoryId() {return category_id;}
+
     public void setTypeId(int id) { this.type_id=id;}
     public int getTypeId() {return type_id;}
+
     public void setCityId(int id) { this.city_id=id;}
     public int getCityId() {return city_id;}
 
+    public void setLat(double d) {lat=d;}
     public double getLat() {return lat;}
+
+    public void setLng(double d) {lng=d;}
     public double getLng() {return lng;}
 
-    public void setUser_id(int id) {
-        this.user_id=id;
-    }
-    public int getUser_id() {
-        return user_id;
-    }
+    public void setTitle(String s) {title=s;}
     public String getTitle() {
         return title;
     }
-    public int getVerified() { return verified;}
 
+    public void setText(String s) {text=s;}
     public String getText() {
         return text;
     }
+
+    public void setDescription(String s) {description=s;}
     public String getDescription() {
-        String description=text;
+        description=text;
         if (description.length() > 125) {
             description = description.substring(0, 125) + "...";
         }
@@ -71,6 +77,7 @@ public class Report {
         return description;
     }
 
+    public void setDate(String s) {date=s;}
     public String getDate() {
         //long timeNow = System.currentTimeMillis();
         //long timeThen;
@@ -104,4 +111,5 @@ public class Report {
         }*/
         return "getDate() error";
     }
+    public String getRawDate(){return date;}
 }
