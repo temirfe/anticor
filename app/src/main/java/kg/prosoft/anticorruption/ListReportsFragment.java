@@ -37,7 +37,7 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 import kg.prosoft.anticorruption.service.Endpoints;
 import kg.prosoft.anticorruption.service.MyDbHandler;
@@ -104,7 +104,6 @@ public class ListReportsFragment extends Fragment {
         listView.setAdapter(adapter);
 
         new ReportTask().execute();
-        //populateList(page, null,false);
 
         listView.setOnItemClickListener(itemClickListener);
 
@@ -132,6 +131,7 @@ public class ListReportsFragment extends Fragment {
             intent.putExtra("date",item.getDate());
             intent.putExtra("lat",item.getLat());
             intent.putExtra("lng",item.getLng());
+            intent.putExtra("city",item.getCityTitle());
             startActivity(intent);
         }
     };
@@ -220,11 +220,13 @@ public class ListReportsFragment extends Fragment {
                             String title=jsonObject.getString("title");
                             String text=jsonObject.getString("text");
                             String date=jsonObject.getString("date");
+                            String city=jsonObject.getString("city_title");
                             int category_id=jsonObject.getInt("category_id");
                             double lat=jsonObject.getDouble("lat");
                             double lng=jsonObject.getDouble("lon");
 
                             Report report = new Report(id, title, text, date, lat, lng);
+                            report.setCityTitle(city);
                             reportList.add(report);
                         }
                         if(page==1){

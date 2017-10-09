@@ -14,10 +14,11 @@
     <color name="gray5">#555</color>
     <color name="green">#5fba7d</color>
     <color name="red">#D25E4F</color>
-    <color name="blue">#3af</color>
+    <color name="sky">#ddeee4</color>
     <color name="lightBlue">#99d4ff</color>
     <color name="lightBlue2">#66bfff</color>
-    <color name="sky">#ddeee4</color>
+    <color name="blue">#3af</color>
+    <color name="darkBlue">#004f88</color>
 
     <color name="lightRed">#e08f85</color>
     <color name="lightGreen2">#9ad4ad</color>

@@ -3,6 +3,7 @@ package kg.prosoft.anticorruption.service;
 import android.content.Context;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +64,8 @@ public class ReportAdapter extends BaseAdapter {
         tv_text.setText(report.getDescription());
         TextView dateTv=(TextView) convertView.findViewById(R.id.textView_date);
         dateTv.setText(report.getDate());
+        TextView tv_city=(TextView) convertView.findViewById(R.id.id_tv_city);
+        tv_city.setText(report.getCityTitle());
 
         convertView.setTag(report.getId());
 

@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MyDbHandler extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 15;
+    public static final int DATABASE_VERSION = 17;
     public static final String DATABASE_NAME = "anticor.db";
     public static final String KEY_ID=MyDbContract.DbEntry._ID;
 
@@ -55,6 +55,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
     public static final String COLUMN_REPORT_AUTHORITY_ID=MyDbContract.DbEntry.COLUMN_REPORT_AUTHORITY_ID;
     public static final String COLUMN_REPORT_CATEGORY_ID=MyDbContract.DbEntry.COLUMN_REPORT_CATEGORY_ID;
     public static final String COLUMN_REPORT_CITY_ID=MyDbContract.DbEntry.COLUMN_REPORT_CITY_ID;
+    public static final String COLUMN_REPORT_CITY_TITLE=MyDbContract.DbEntry.COLUMN_REPORT_CITY_TITLE;
     public static final String COLUMN_REPORT_TYPE_ID=MyDbContract.DbEntry.COLUMN_REPORT_TYPE_ID;
     public static final String COLUMN_REPORT_USER_ID=MyDbContract.DbEntry.COLUMN_REPORT_USER_ID;
     public static final String COLUMN_REPORT_LAT=MyDbContract.DbEntry.COLUMN_REPORT_LAT;
@@ -108,6 +109,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 COLUMN_REPORT_CATEGORY_ID + " INTEGER," +
                 COLUMN_REPORT_AUTHORITY_ID + " INTEGER," +
                 COLUMN_REPORT_CITY_ID + " INTEGER," +
+                COLUMN_REPORT_CITY_TITLE + " TEXT," +
                 COLUMN_REPORT_TYPE_ID + " INTEGER," +
                 COLUMN_REPORT_USER_ID + " INTEGER," +
                 COLUMN_REPORT_LAT + " REAL," +
@@ -331,6 +333,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
         values.put(COLUMN_REPORT_AUTHORITY_ID, report.getAuthorityId());
         values.put(COLUMN_REPORT_TYPE_ID, report.getAuthorityId());
         values.put(COLUMN_REPORT_CITY_ID, report.getCityId());
+        values.put(COLUMN_REPORT_CITY_TITLE, report.getCityTitle());
         values.put(COLUMN_REPORT_LAT, report.getLat());
         values.put(COLUMN_REPORT_LNG, report.getLng());
 
@@ -361,6 +364,7 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 report.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_CATEGORY_ID)));
                 report.setTypeId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_TYPE_ID)));
                 report.setCityId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_CITY_ID)));
+                report.setCityTitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_REPORT_CITY_TITLE)));
                 report.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_REPORT_USER_ID)));
                 report.setLat(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_REPORT_LAT)));
                 report.setLng(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_REPORT_LNG)));

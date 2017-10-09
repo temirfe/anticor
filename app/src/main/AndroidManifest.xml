@@ -68,7 +68,8 @@
         <activity android:name=".AddCommentActivity" />
         <activity android:name=".AuthorityListActivity" />
         <activity android:name=".AuthorityViewActivity" />
-        <activity android:name=".NewsListActivity"></activity>
+        <activity android:name=".NewsListActivity" />
+        <activity android:name=".GalleryActivity"></activity>
     </application>
 
 </manifest>

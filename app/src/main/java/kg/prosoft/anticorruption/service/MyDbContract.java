@@ -45,6 +45,7 @@ public class MyDbContract {
         public static final String COLUMN_REPORT_CATEGORY_ID = "report_category_id";
         public static final String COLUMN_REPORT_TYPE_ID = "report_type_id";
         public static final String COLUMN_REPORT_CITY_ID = "report_city_id";
+        public static final String COLUMN_REPORT_CITY_TITLE = "report_city_title";
         public static final String COLUMN_REPORT_LAT = "report_lat";
         public static final String COLUMN_REPORT_LNG = "report_lng";
         public static final String COLUMN_REPORT_TITLE = "report_title";

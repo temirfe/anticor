@@ -16,7 +16,7 @@ import java.util.Locale;
 public class Report {
     private int id,user_id, authority_id, category_id,type_id, city_id, row_id;
     private double lat, lng;
-    private String title,text,description,date;
+    private String title,text,description,date,city_title;
 
     public Report() {}
     public Report(int id, String title, String text, String date, double lat, double lng) {
@@ -76,6 +76,9 @@ public class Report {
 
         return description;
     }
+
+    public void setCityTitle(String s) {city_title=s;}
+    public String getCityTitle() {return city_title;}
 
     public void setDate(String s) {date=s;}
     public String getDate() {

@@ -193,8 +193,9 @@ public class AddCommentActivity extends AppCompatActivity {
                 params.put("text",comment);
                 //if(user_id!=0){params.put("user_id",Integer.toString(user_id));}
                 String to_id="x";
-                if(model.equals("report")){to_id="category_id";}
+                if(model.equals("report")){to_id="report_id";}
                 else if(model.equals("news")){to_id="news_id";}
+                else if(model.equals("authority")){to_id="category_id";}
                 params.put(to_id,Integer.toString(id));
 
                 return params;

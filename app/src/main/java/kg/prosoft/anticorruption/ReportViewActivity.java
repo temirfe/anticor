@@ -1,7 +1,9 @@
 package kg.prosoft.anticorruption;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -31,7 +33,9 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 import kg.prosoft.anticorruption.service.Endpoints;
@@ -39,12 +43,14 @@ import kg.prosoft.anticorruption.service.GlideApp;
 import kg.prosoft.anticorruption.service.MyVolley;
 
 public class ReportViewActivity extends AppCompatActivity {
-    TextView tv_title, tv_date, tv_text, tv_zero_comment;
+    TextView tv_title, tv_date, tv_text, tv_zero_comment, tv_city,tv_category,tv_authority,tv_type;
     public double lat,lng;
-    //ImageView iv_image;
     public RelativeLayout rl_map;
-    public LinearLayout ll_comments;
-    int id;
+    public LinearLayout ll_comments,ll_thumb_holder;
+    int id,cat_id, authority_id,city_id,type_id;
+    ArrayList<String> imageList = new ArrayList<>();
+    Activity activity;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,27 +61,34 @@ public class ReportViewActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+        activity=this;
+        context=getApplicationContext();
 
         tv_title=(TextView)findViewById(R.id.id_tv_title);
         tv_date=(TextView)findViewById(R.id.id_tv_date);
         tv_text=(TextView)findViewById(R.id.id_tv_text);
+        tv_city=(TextView)findViewById(R.id.id_tv_city);
         tv_zero_comment=(TextView)findViewById(R.id.id_tv_comments_zero);
+        tv_category=(TextView)findViewById(R.id.id_tv_category);
+        tv_authority=(TextView)findViewById(R.id.id_tv_authority);
+        tv_type=(TextView)findViewById(R.id.id_tv_type);
         //iv_image=(ImageView)findViewById(R.id.id_iv_img);
         ll_comments=(LinearLayout) findViewById(R.id.id_ll_comments);
+        ll_thumb_holder=(LinearLayout) findViewById(R.id.id_ll_thumb_holder);
         rl_map=(RelativeLayout)findViewById(R.id.id_rl_map);
 
         Intent intent = getIntent();
         id=intent.getIntExtra("id",0);
-        int cat_id=intent.getIntExtra("cat_id",0);
         String title=intent.getStringExtra("title");
-        String description=intent.getStringExtra("desc");
         String text=intent.getStringExtra("text");
         String date=intent.getStringExtra("date");
+        String city_title=intent.getStringExtra("city");
         lat=intent.getDoubleExtra("lat",0);
         lng=intent.getDoubleExtra("lng",0);
 
         tv_title.setText(title);
         tv_date.setText(date);
+        tv_city.setText(city_title);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             tv_text.setText(Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY));
@@ -121,11 +134,59 @@ public class ReportViewActivity extends AppCompatActivity {
                         }
                         if(comments.length()==0){tv_zero_comment.setVisibility(View.VISIBLE);}
                     }
+                    if(jsonObject.has("authority")){
+                        JSONObject authObj = jsonObject.getJSONObject("authority");
+                        authority_id=authObj.getInt("id");
+                        String auth_title=authObj.getString("title");
+                        if(auth_title.length()==0){
+                            tv_authority.setText(auth_title);
+                            tv_authority.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    if(jsonObject.has("department")){
+                        JSONObject myObj = jsonObject.getJSONObject("department");
+                        cat_id=myObj.getInt("id");
+                        String cat_title=myObj.getString("value");
+                        if(cat_title.length()==0){
+                            tv_category.setText(cat_title);
+                            tv_category.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    if(jsonObject.has("type")){
+                        JSONObject myObj = jsonObject.getJSONObject("type");
+                        type_id=myObj.getInt("id");
+                        String type_title=myObj.getString("value");
+                        if(type_title.length()==0){
+                            tv_type.setText(type_title);
+                            tv_type.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    if(jsonObject.has("city")){
+                        JSONObject myObj = jsonObject.getJSONObject("city");
+                        city_id=myObj.getInt("id");
+                    }
+                    if(jsonObject.has("images")){
+                        JSONArray images = jsonObject.getJSONArray("images");
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(100, 100);
+                        lp.setMargins(0, 0, 10, 10);
+                        for(int i=0; i < images.length(); i++){
+                            String img = images.getString(i);
+                            ImageView imageViewPreview = new ImageView(activity);
+                            imageViewPreview.setLayoutParams(lp);
 
+                            GlideApp.with(context)
+                                    .load(Endpoints.REPORT_IMG+id+"/thumbs/"+img)
+                                    .centerCrop()
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                    .into(imageViewPreview);
 
-                    JSONObject authority = jsonObject.getJSONObject("authority");
-                    String authority_title=authority.getString("title");
-                    Log.e("AUTH",authority_title);
+                            imageViewPreview.setOnClickListener(thumbClick);
+                            imageViewPreview.setTag(i);
+                            ll_thumb_holder.addView(imageViewPreview);
+                            imageList.add(Endpoints.REPORT_IMG+id+"/"+img);
+                        }
+                    }
+
                     /*int verified=jsonObject.getInt("incident_verified");
                     int active=jsonObject.getInt("incident_active");
                     if(active==0){
@@ -144,6 +205,17 @@ public class ReportViewActivity extends AppCompatActivity {
 
         MyVolley.getInstance(this).addToRequestQueue(volReq);
     }
+
+
+    View.OnClickListener thumbClick = new View.OnClickListener(){
+        public void onClick(View v){
+            int tag =(Integer) v.getTag();
+            Intent intent = new Intent(activity, GalleryActivity.class);
+            intent.putStringArrayListExtra("imglist", imageList);
+            intent.putExtra("pos",tag);
+            startActivity(intent);
+        }
+    };
 
     public void showCommentItem(String name, String comment, String cdate){
         TextView nameTv=new TextView(this);
@@ -225,6 +297,22 @@ public class ReportViewActivity extends AppCompatActivity {
         intent.putExtra("model","report");
         intent.putExtra("id",id);
         startActivity(intent);
+    }
+
+    public void authClicked(View v){
+        Log.e("RepView","auth_id "+authority_id);
+    }
+
+    public void typeClicked(View v){
+        Log.e("RepView","type_id "+type_id);
+    }
+
+    public void ctgClicked(View v){
+        Log.e("RepView","cat_id "+cat_id);
+    }
+
+    public void cityClicked(View v){
+        Log.e("RepView","city_id "+city_id);
     }
 
     @Override
