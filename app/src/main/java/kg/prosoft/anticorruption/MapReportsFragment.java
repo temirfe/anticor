@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -22,13 +21,9 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
@@ -57,6 +52,7 @@ public class MapReportsFragment extends Fragment implements
     Uri.Builder uriB;
     public int user_id;
     SparseArray<Report> reportSparse;
+    Bundle bundle;
     private ClusterManager<ReportMapItem> mClusterManager;
 
     public MapReportsFragment() {
@@ -71,6 +67,7 @@ public class MapReportsFragment extends Fragment implements
         View rootView=  inflater.inflate(R.layout.fragment_map_reports, container, false);
         activity=getActivity();
         context=activity.getApplicationContext();
+        bundle=getArguments();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         //mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_list_markers);
@@ -87,7 +84,6 @@ public class MapReportsFragment extends Fragment implements
         mMapView.getMapAsync(this);
 
         reportSparse=new SparseArray<>();
-
         return rootView;
     }
 
@@ -126,13 +122,19 @@ public class MapReportsFragment extends Fragment implements
                 });
         mClusterManager.getMarkerCollection().setOnInfoWindowAdapter(new CustomInfoWindowAdapter(activity.getLayoutInflater()));
 
-        populateMap();
+        boolean populate=false;
+        if(bundle!=null){
+            populate=bundle.getBoolean("populate");
+        }
+        if(populate){
+            populateMap(null);
+        }
     }
 
     @Override
     public void onClusterItemInfoWindowClick(ReportMapItem myItem) {
         int report_id=myItem.getReportId();
-        Log.e("ClusterInfo",report_id+"");
+        //Log.e("ClusterInfo",report_id+"");
         Report report = reportSparse.get(report_id);
         Intent intent = new Intent(activity, ReportViewActivity.class);
         intent.putExtra("id",report_id);
@@ -141,12 +143,16 @@ public class MapReportsFragment extends Fragment implements
         intent.putExtra("date",report.getDate());
         intent.putExtra("lat",report.getLat());
         intent.putExtra("lng",report.getLng());
+        intent.putExtra("city",report.getCityTitle());
         startActivity(intent);
     }
 
-    public void populateMap(){
-        uriB = new Uri.Builder();
-        uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath("api").appendPath("reports");
+    public void populateMap(Uri.Builder urlB){
+        uriB=urlB;
+        if(uriB==null){
+            uriB = new Uri.Builder();
+            uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("reports");
+        }
 
         if(user_id!=0)//when MainActivity launched by AccountActivity bc of "show my incidents"
         {
@@ -155,12 +161,16 @@ public class MapReportsFragment extends Fragment implements
         //Log.i("MAP USER ID", ""+user_id);
 
         String uri = uriB.build().toString();
+        //Log.e("MapFrag uri",uri);
 
         Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 try{
+                    Log.e("MapFrag response",response.toString());
                     mMap.clear();
+                    reportSparse.clear();
+                    mClusterManager.clearItems();
                     int leng=response.length();
                     if(leng>0){
                         for(int i=0; i < leng; i++){
@@ -172,7 +182,10 @@ public class MapReportsFragment extends Fragment implements
                             //int category_id=jsonObject.getInt("category_id");
                             double lat=jsonObject.getDouble("lat");
                             double lng=jsonObject.getDouble("lon");
-                            reportSparse.put(id,new Report(id,title,text,date,lat,lng));
+                            String city=jsonObject.getString("city_title");
+                            Report report=new Report(id,title,text,date,lat,lng);
+                            report.setCityTitle(city);
+                            reportSparse.put(id,report);
                             mClusterManager.addItem(new ReportMapItem(lat, lng, title,id));
 
                             /*myMarker=mMap.addMarker(
@@ -185,11 +198,6 @@ public class MapReportsFragment extends Fragment implements
                         }
                         mClusterManager.cluster();
                     }
-                    else{
-                        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                        builder.setMessage(R.string.no_result).setNegativeButton(R.string.close,null).create().show();
-                    }
-
 
                 }catch(JSONException e){e.printStackTrace();}
             }

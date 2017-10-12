@@ -7,13 +7,13 @@
     <string name="navigation_drawer_close">Закрыть меню</string>
 
     <string name="action_settings">Настройки</string>
+    <string name="action_filter">Фильтр</string>
 
     <string name="home">Главная страница</string>
     <string name="action_empty">Очистить</string>
     <string name="description">Описание</string>
     <string name="categories">Категории</string>
-    <string name="clearBasketTitle">Очистить корзину</string>
-    <string name="clearBasketText">Вы действительно хотитие удалить все товары из корзины?</string>
+    <string name="clear">Очистить</string>
     <string name="checkout">Продолжить</string>
     <string name="no">Нет</string>
     <string name="yes">Да</string>
@@ -93,6 +93,7 @@
     <string name="title_activity_tab">TabActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="news">Новости</string>
+    <string name="all_news">Все новости</string>
     <string name="map">Карта</string>
     <string name="reports">Обращения</string>
     <string name="error_happened">Произошла ошибка</string>
@@ -110,10 +111,15 @@
     <string name="authority">Госорган</string>
     <string name="category">Сектор коррупции</string>
     <string name="type_header">Тип обращения</string>
+    <string name="filter">Фильтр</string>
+    <string name="apply">Применить</string>
+    <string name="reset">Сбросить</string>
+    <string name="anonymous">Аноним</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_authority_view">AuthorityViewActivity</string>
     <string name="title_activity_drop">DropActivity</string>
+    <string name="title_activity_spin">SpinActivity</string>
 
 </resources>

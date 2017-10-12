@@ -7,6 +7,7 @@ package kg.prosoft.anticorruption.service;
 public class Endpoints {
     public static final String SCHEME = "http";
     public static final String AUTHORITY = "anticorruption.cf";
+    public static final String API = "api";
 
     public static final String BASE_URL = "http://anticorruption.cf";
     public static final String API_URL = BASE_URL +"/api";

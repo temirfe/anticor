@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:layout_gravity="right"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/id_tv_filter_menu"
+        android:text="@string/action_filter"
+        android:textColor="@color/white"
+        android:textAllCaps="true"
+        android:clickable="true"
+        android:gravity="center"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:background="?android:attr/actionBarItemBackground"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"/>
+
+    <TextView
+        android:id="@+id/actionbar_notifcation_textview"
+        android:layout_width="9dp"
+        android:layout_height="9dp"
+        android:layout_alignTop="@id/id_tv_filter_menu"
+        android:layout_alignRight="@id/id_tv_filter_menu"
+        android:layout_marginTop="13dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/badge_circle" />
+
+</RelativeLayout>

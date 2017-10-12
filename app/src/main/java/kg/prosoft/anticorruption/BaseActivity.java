@@ -8,14 +8,20 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
+
+import org.w3c.dom.Text;
 
 import kg.prosoft.anticorruption.service.MyDbHandler;
 import kg.prosoft.anticorruption.service.MyHelper;
@@ -84,8 +90,6 @@ public class BaseActivity extends AppCompatActivity {
         SearchView searchView = null;
         if (searchItem != null) {
             searchView = (SearchView) searchItem.getActionView();
-        }
-        if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(BaseActivity.this.getComponentName()));
             searchView.setQueryHint(getResources().getString(R.string.search));
         }
@@ -99,12 +103,12 @@ public class BaseActivity extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        Log.e(TAG,"menu item "+id);
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        }/*
+        }
+        /*
         if (id == R.id.action_search) {
             Log.e(TAG,"search clicked");
             return true;

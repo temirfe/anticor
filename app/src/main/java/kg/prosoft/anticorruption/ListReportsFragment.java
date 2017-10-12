@@ -72,11 +72,15 @@ public class ListReportsFragment extends Fragment {
     public MyDbHandler dbHandler;
     MyHelper helper;
     String TAG="ReportFrag";
+    private OnCompleteListener mListener;
+    Bundle bundle;
 
     public ListReportsFragment() {
         // Required empty public constructor
     }
-
+    public static interface OnCompleteListener {
+        public abstract void onComplete();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,6 +89,7 @@ public class ListReportsFragment extends Fragment {
         View layout=inflater.inflate(R.layout.fragment_list_reports, container, false);
         activity=getActivity();
         context=activity.getApplicationContext();
+        bundle=getArguments();
         session = new SessionManager(context);
         dbHandler = new MyDbHandler(context);
         db = dbHandler.getWritableDatabase();
@@ -103,11 +108,36 @@ public class ListReportsFragment extends Fragment {
         adapter = new ReportAdapter(context,reportList);
         listView.setAdapter(adapter);
 
-        new ReportTask().execute();
+        boolean populate=false;
+        if(bundle!=null){
+            populate=bundle.getBoolean("populate");
+        }
+        if(populate){
+            new ReportTask().execute();
+        }
 
         listView.setOnItemClickListener(itemClickListener);
-
+        mListener.onComplete();
         return layout;
+    }
+
+    public void onAttach(Activity actv) {
+        super.onAttach(actv);
+        try {
+            this.mListener = (OnCompleteListener)actv;
+        }
+        catch (final ClassCastException e) {
+            throw new ClassCastException(actv.toString() + " must implement OnCompleteListener");
+        }
+    }
+    public void onAttach(Context cntx) {
+        super.onAttach(cntx);
+        try {
+            this.mListener = (OnCompleteListener)cntx;
+        }
+        catch (final ClassCastException e) {
+            throw new ClassCastException(cntx.toString() + " must implement OnCompleteListener");
+        }
     }
 
     View.OnClickListener reloadClickListener = new View.OnClickListener(){
@@ -186,7 +216,7 @@ public class ListReportsFragment extends Fragment {
     public void populateList(final int page,Uri.Builder urlB, final boolean applyNewFilter, final boolean newlist){
 
         if(applyNewFilter){
-            progress = new ProgressDialog(getActivity());
+            progress = new ProgressDialog(activity);
             progress.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
             progress.setMessage(getResources().getString(R.string.loading));
             progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
@@ -197,7 +227,7 @@ public class ListReportsFragment extends Fragment {
 
         if(uriB==null){
             uriB = new Uri.Builder();
-            uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath("api").appendPath("reports");
+            uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("reports");
         }
         Uri.Builder otherBuilder = Uri.parse(uriB.build().toString()).buildUpon();
 
@@ -221,7 +251,7 @@ public class ListReportsFragment extends Fragment {
                             String text=jsonObject.getString("text");
                             String date=jsonObject.getString("date");
                             String city=jsonObject.getString("city_title");
-                            int category_id=jsonObject.getInt("category_id");
+                            //int category_id=jsonObject.getInt("category_id");
                             double lat=jsonObject.getDouble("lat");
                             double lng=jsonObject.getDouble("lon");
 
@@ -229,7 +259,7 @@ public class ListReportsFragment extends Fragment {
                             report.setCityTitle(city);
                             reportList.add(report);
                         }
-                        if(page==1){
+                        if(page==1 && newlist){
                             helper.doClearReportTask();
                             helper.addReportList(reportList);
                         }
@@ -257,6 +287,7 @@ public class ListReportsFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 pb.setVisibility(ProgressBar.INVISIBLE);
+                progress.dismiss();
                 ll_reload.setVisibility(View.VISIBLE);
             }
         };

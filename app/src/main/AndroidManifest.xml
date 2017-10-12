@@ -68,8 +68,13 @@
         <activity android:name=".AddCommentActivity" />
         <activity android:name=".AuthorityListActivity" />
         <activity android:name=".AuthorityViewActivity" />
-        <activity android:name=".NewsListActivity" />
-        <activity android:name=".GalleryActivity"></activity>
+        <activity
+            android:name=".NewsListActivity"
+            android:label="@string/news"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".GalleryActivity" />
+        <activity android:name=".FilterActivity" android:label="@string/filter" />
     </application>
 
 </manifest>

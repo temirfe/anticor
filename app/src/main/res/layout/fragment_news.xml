@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="48dp"
     tools:context="kg.prosoft.anticorruption.NewsFragment">
     <ProgressBar
         android:id="@+id/progressBar1"
@@ -12,12 +11,21 @@
         android:background="@android:color/transparent"
         />
     <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/id_lv_news" />
+    </LinearLayout>
+    <LinearLayout
         android:id="@+id/id_ll_reload"
         android:visibility="gone"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:gravity="center"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,14 +42,5 @@
             android:id="@+id/id_btn_reload"
             android:layout_marginTop="20dp"
             />
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/id_lv_news" />
     </LinearLayout>
 </FrameLayout>

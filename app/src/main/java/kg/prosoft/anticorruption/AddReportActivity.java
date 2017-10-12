@@ -93,7 +93,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     private HashMap<Integer, HashMap<Integer, Vocabulary>> parentChildMap;
     private HashMap<Integer, HashMap<Integer, Authority>> parentChildMapAuth;
     TextView tv_sector, tv_city, tv_authority, tv_type, tv_lat, tv_lng;
-    LinearLayout ll_sector, ll_user,ll_add_photo,ll_images;
+    LinearLayout ll_user,ll_add_photo,ll_images;
     CheckBox chb_anonym;
     EditText et_title, et_text, et_name, et_email, et_contact;
     int selected_sector_id=0;
@@ -144,7 +144,6 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         tv_city=(TextView)findViewById(R.id.id_tv_city);
         tv_authority=(TextView)findViewById(R.id.id_tv_authority);
         tv_type=(TextView)findViewById(R.id.id_tv_type);
-        ll_sector=(LinearLayout)findViewById(R.id.id_ll_sector);
         ll_user=(LinearLayout)findViewById(R.id.id_ll_user);
         chb_anonym=(CheckBox)findViewById(R.id.id_chb_anonym);
         et_title=(EditText)findViewById(R.id.id_et_title);

@@ -228,7 +228,7 @@ public class NewsFragment extends Fragment {
                             News news = new News(id, title, description, text, date, image, category_id,views);
                             newsList.add(news);
                         }
-                        if(page==1){
+                        if(page==1 && newlist){
                             helper.doClearNewsTask();
                             helper.addNewsList(newsList);
                         }
@@ -256,6 +256,7 @@ public class NewsFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 pb.setVisibility(ProgressBar.INVISIBLE);
+                if(progress!=null){progress.dismiss();}
                 ll_reload.setVisibility(View.VISIBLE);
             }
         };

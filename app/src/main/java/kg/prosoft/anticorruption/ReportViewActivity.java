@@ -43,7 +43,7 @@ import kg.prosoft.anticorruption.service.GlideApp;
 import kg.prosoft.anticorruption.service.MyVolley;
 
 public class ReportViewActivity extends AppCompatActivity {
-    TextView tv_title, tv_date, tv_text, tv_zero_comment, tv_city,tv_category,tv_authority,tv_type;
+    TextView tv_author, tv_title, tv_date, tv_text, tv_zero_comment, tv_city,tv_category,tv_authority,tv_type;
     public double lat,lng;
     public RelativeLayout rl_map;
     public LinearLayout ll_comments,ll_thumb_holder;
@@ -64,6 +64,7 @@ public class ReportViewActivity extends AppCompatActivity {
         activity=this;
         context=getApplicationContext();
 
+        tv_author=(TextView)findViewById(R.id.id_tv_author);
         tv_title=(TextView)findViewById(R.id.id_tv_title);
         tv_date=(TextView)findViewById(R.id.id_tv_date);
         tv_text=(TextView)findViewById(R.id.id_tv_text);
@@ -134,31 +135,41 @@ public class ReportViewActivity extends AppCompatActivity {
                         }
                         if(comments.length()==0){tv_zero_comment.setVisibility(View.VISIBLE);}
                     }
+                    if(jsonObject.has("author")){
+                        int anonymous=0;
+                        String author=jsonObject.getString("author");
+                        if(jsonObject.has("anonymous")){
+                            anonymous=jsonObject.getInt("anonymous");
+                        }
+                        if(anonymous==1 || author.length()==0){
+                            author=getResources().getString(R.string.anonymous);
+                        }
+                        author=author+":";
+                        tv_author.setVisibility(View.VISIBLE);
+                        tv_author.setText(author);
+                    }
                     if(jsonObject.has("authority")){
                         JSONObject authObj = jsonObject.getJSONObject("authority");
                         authority_id=authObj.getInt("id");
                         String auth_title=authObj.getString("title");
-                        if(auth_title.length()==0){
+                        if(auth_title.length()!=0){
                             tv_authority.setText(auth_title);
-                            tv_authority.setVisibility(View.VISIBLE);
                         }
                     }
                     if(jsonObject.has("department")){
                         JSONObject myObj = jsonObject.getJSONObject("department");
                         cat_id=myObj.getInt("id");
                         String cat_title=myObj.getString("value");
-                        if(cat_title.length()==0){
+                        if(cat_title.length()!=0){
                             tv_category.setText(cat_title);
-                            tv_category.setVisibility(View.VISIBLE);
                         }
                     }
                     if(jsonObject.has("type")){
                         JSONObject myObj = jsonObject.getJSONObject("type");
                         type_id=myObj.getInt("id");
                         String type_title=myObj.getString("value");
-                        if(type_title.length()==0){
+                        if(type_title.length()!=0){
                             tv_type.setText(type_title);
-                            tv_type.setVisibility(View.VISIBLE);
                         }
                     }
                     if(jsonObject.has("city")){
@@ -300,19 +311,27 @@ public class ReportViewActivity extends AppCompatActivity {
     }
 
     public void authClicked(View v){
-        Log.e("RepView","auth_id "+authority_id);
+        openReportView("authority_id",authority_id);
     }
 
     public void typeClicked(View v){
-        Log.e("RepView","type_id "+type_id);
+        openReportView("type_id",type_id);
     }
 
     public void ctgClicked(View v){
-        Log.e("RepView","cat_id "+cat_id);
+        openReportView("sector_id",cat_id);
     }
 
     public void cityClicked(View v){
-        Log.e("RepView","city_id "+city_id);
+        openReportView("city_id",city_id);
+    }
+
+    public void openReportView(String key, int value){
+        Intent intent=new Intent(ReportViewActivity.this,MainActivity.class);
+        intent.putExtra(key,value);
+        intent.putExtra("showReport",true);
+        intent.putExtra("empty",false);
+        startActivity(intent);
     }
 
     @Override
