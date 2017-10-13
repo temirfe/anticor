@@ -38,6 +38,7 @@ public class BaseActivity extends AppCompatActivity {
     public MyDbHandler dbHandler;
     MyHelper helper;
     SessionManager session;
+    SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,12 +86,11 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchManager searchManager = (SearchManager) BaseActivity.this.getSystemService(Context.SEARCH_SERVICE);
+        //SearchManager searchManager = (SearchManager) BaseActivity.this.getSystemService(Context.SEARCH_SERVICE);
 
-        SearchView searchView = null;
         if (searchItem != null) {
             searchView = (SearchView) searchItem.getActionView();
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(BaseActivity.this.getComponentName()));
+            //searchView.setSearchableInfo(searchManager.getSearchableInfo(BaseActivity.this.getComponentName()));
             searchView.setQueryHint(getResources().getString(R.string.search));
         }
 
@@ -108,24 +108,7 @@ public class BaseActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-        /*
-        if (id == R.id.action_search) {
-            Log.e(TAG,"search clicked");
-            return true;
-        }*/
-        /*
-        if (id == R.id.action_cart) {
-            Log.e(TAG,"cart menu clicked");
-            return true;
-        }*/
-
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

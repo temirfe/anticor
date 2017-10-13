@@ -93,9 +93,18 @@ public class LoginActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.login_progress);
         TextView tv_register = (TextView)findViewById(R.id.id_tv_register);
         tv_register.setOnClickListener(onClickGoToRegister);
+        TextView tv_forgot = (TextView)findViewById(R.id.id_tv_forgot);
+        tv_forgot.setOnClickListener(onClickForgot);
     }
 
     View.OnClickListener onClickGoToRegister = new View.OnClickListener(){
+        public void onClick(View v) {
+            Intent regint=new Intent(context, RegisterActivity.class);
+            startActivity(regint);
+        }
+    };
+
+    View.OnClickListener onClickForgot = new View.OnClickListener(){
         public void onClick(View v) {
             Intent regint=new Intent(context, RegisterActivity.class);
             startActivity(regint);

@@ -1,29 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/menu_1" android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_main"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="@string/home" />
+        <item
+            android:id="@+id/nav_news"
+            android:icon="@drawable/ic_art_track_black_24dp"
+            android:title="@string/news" />
+        <item
+            android:id="@+id/nav_research"
+            android:icon="@drawable/ic_assessment_black_24dp"
+            android:title="@string/research_and_report" />
+        <item
+            android:id="@+id/nav_fight"
+            android:icon="@drawable/ic_colorize_black_24dp"
+            android:title="@string/corruption_fight" />
+    </group>
+
+    <group android:id="@+id/menu_2" android:checkableBehavior="single">
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:title="ShowReportFrag" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="NewsListActivity" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="TabActivity" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Authorities" />
     </group>
+
+
+
 
     <item android:title="Communicate">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/nav_share2"
                 android:icon="@drawable/ic_menu_share"
                 android:title="Share" />
             <item

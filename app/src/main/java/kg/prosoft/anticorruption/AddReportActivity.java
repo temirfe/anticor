@@ -117,11 +117,13 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     private static final String IMAGE_DIRECTORY_NAME = "Camera";
     private Uri fileUri; // file url to store image/video
     String TAG ="AddReportActivity";
+    Bundle savedIS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_report);
+        savedIS=savedInstanceState;
 
         activity=this;
 
@@ -402,15 +404,17 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
 
     //**map methods **//
     public void showMapFrame(){
-        FrameMapFragment fmfragment=new FrameMapFragment();
-        Bundle bundle = new Bundle();
-        bundle.putDouble("lat", lat);
-        bundle.putDouble("lng", lng);
-        if(selected_city_id!=0){
-            bundle.putInt("city_id",selected_city_id);
+        if(savedIS==null){
+            FrameMapFragment fmfragment=new FrameMapFragment();
+            Bundle bundle = new Bundle();
+            bundle.putDouble("lat", lat);
+            bundle.putDouble("lng", lng);
+            if(selected_city_id!=0){
+                bundle.putInt("city_id",selected_city_id);
+            }
+            fmfragment.setArguments(bundle);
+            putFragment(fmfragment);
         }
-        fmfragment.setArguments(bundle);
-        putFragment(fmfragment);
 
         rl_map=(RelativeLayout)findViewById(R.id.id_rl_add_map);
         Button button = new Button(this);

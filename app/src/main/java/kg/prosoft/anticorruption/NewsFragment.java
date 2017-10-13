@@ -4,6 +4,7 @@ package kg.prosoft.anticorruption;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -204,12 +205,13 @@ public class NewsFragment extends Fragment {
         otherBuilder.appendQueryParameter("page", Integer.toString(page));
 
         String uri = otherBuilder.build().toString();
+        Log.e(TAG, "uri: "+uri);
 
         Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 try{
-                    Log.i("RESPONSE", "keldi");
+                    Log.e("RESPONSE", "keldi");
                     if(progress!=null){progress.dismiss();}
                     if(applyNewFilter || newlist){newsList.clear();}
                     int leng=response.length();
