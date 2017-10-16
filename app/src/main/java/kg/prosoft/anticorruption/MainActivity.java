@@ -10,6 +10,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -51,7 +52,7 @@ import kg.prosoft.anticorruption.service.ReportsTabAdapter;
 import kg.prosoft.anticorruption.service.Vocabulary;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ListReportsFragment.OnCompleteListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ListReportsFragment.OnCompleteListener{
 
     private String TAG = MainActivity.class.getSimpleName();
     LinearLayout ll_logo;
@@ -61,6 +62,7 @@ public class MainActivity extends BaseActivity
     Button btn_register;
     public ListReportsFragment listFrag;
     public MapReportsFragment mapFrag;
+    public DocMenuFragment docMenuFrag;
     String filter_query;
     int filter_authority_id,filter_sector_id, filter_type_id, filter_city_id;
     static int FILTER_FLAG=123;
@@ -78,7 +80,8 @@ public class MainActivity extends BaseActivity
     private HashMap<String, Integer> idMap;
     FloatingActionButton fab;
     int news_ctg_id=0;
-    int ACTIVE_FRAME=0, NEWS_FRAME=1;
+    int ACTIVE_FRAME=0, NEWS_FRAME=1, RESEARCH_FRAME=2;
+    private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,7 +181,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-
     AdapterView.OnItemSelectedListener onSpinSelect = new AdapterView.OnItemSelectedListener(){
         public void onItemSelected(AdapterView<?> parent, View view,
                                    int pos, long id) {
@@ -247,22 +249,19 @@ public class MainActivity extends BaseActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        /*if (id == R.id.nav_camera) {
             showReportFrag();
-        } else if (id == R.id.nav_gallery) {
-            Intent intent= new Intent(MainActivity.this, NewsListActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_slideshow) {
-            Intent intent= new Intent(MainActivity.this, TabActivity.class);
-            startActivity(intent);
-
         } else if (id == R.id.nav_manage) {
             Intent intent= new Intent(MainActivity.this, AuthorityListActivity.class);
             startActivity(intent);
 
-        } else if (id == R.id.nav_share) {
+        } else*/ if (id == R.id.nav_news) {
             showNewsFrag();
 
+        } else if (id == R.id.nav_research ){
+            showResearchFrag();
+        } else if (id == R.id.nav_share) {
+            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
@@ -272,6 +271,13 @@ public class MainActivity extends BaseActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    // Call to update the share intent
+    private void setShareIntent(Intent shareIntent) {
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
     }
 
     public void showNewsFrag(){
@@ -284,12 +290,25 @@ public class MainActivity extends BaseActivity
         fragCont.setVisibility(View.VISIBLE);
         spinner.setVisibility(View.VISIBLE);
         fab.setVisibility(View.GONE);
-        if (savedIS != null) {
+        /*if (savedIS != null) {
             Log.e(TAG, "savedIS returns");
             return;
+        }*/
+
+        if(getSupportFragmentManager().findFragmentByTag("news") != null) {
+            //if the fragment exists, show it.
+            getSupportFragmentManager().beginTransaction().show(getSupportFragmentManager().findFragmentByTag("news")).commit();
+        } else {
+            //if the fragment does not exist, add it to fragment manager.
+            newsFragment = new NewsFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, newsFragment, "news").commit();
+        }
+        if(getSupportFragmentManager().findFragmentByTag("research") != null){
+            //if the other fragment is visible, hide it.
+            getSupportFragmentManager().beginTransaction().hide(getSupportFragmentManager().findFragmentByTag("research")).commit();
         }
 
-        if(newsFragment==null){
+        /*if(newsFragment==null){
             Log.e(TAG, "newsFrag is creating");
             // Create a new Fragment to be placed in the activity layout
             newsFragment = new NewsFragment();
@@ -299,8 +318,8 @@ public class MainActivity extends BaseActivity
             newsFragment.setArguments(getIntent().getExtras());
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, newsFragment).commit();
-        }
+                    .replace(R.id.fragment_container, newsFragment).commit();
+        }*/
     }
     public void hideNewsFrag(){
         ACTIVE_FRAME=0;
@@ -311,6 +330,7 @@ public class MainActivity extends BaseActivity
 
     public void showReportFrag(){
         hideNewsFrag();
+        hideResearchFrag();
         if(myMenu!=null){
             myMenu.findItem(R.id.action_filter).setVisible(true);
             myMenu.findItem(R.id.action_search).setVisible(false);
@@ -348,6 +368,47 @@ public class MainActivity extends BaseActivity
             myMenu.findItem(R.id.action_filter_badge).setVisible(false);
             myMenu.findItem(R.id.action_search).setVisible(true);
         }
+    }
+
+    public void showResearchFrag(){
+        hideNewsFrag();
+        hideReportFrag();
+        ACTIVE_FRAME=RESEARCH_FRAME;
+        fragCont.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.GONE);
+        /*if (savedIS != null) {
+            Log.e(TAG, "savedIS returns");
+            return;
+        }*/
+
+        if(getSupportFragmentManager().findFragmentByTag("research") != null) {
+            //if the fragment exists, show it.
+            getSupportFragmentManager().beginTransaction().show(getSupportFragmentManager().findFragmentByTag("research")).commit();
+        } else {
+            //if the fragment does not exist, add it to fragment manager.
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new DocMenuFragment(), "research").commit();
+        }
+        if(getSupportFragmentManager().findFragmentByTag("news") != null){
+            //if the other fragment is visible, hide it.
+            getSupportFragmentManager().beginTransaction().hide(getSupportFragmentManager().findFragmentByTag("news")).commit();
+        }
+
+       /* if(docMenuFrag==null){
+            Log.e(TAG, "docFrag is creating");
+            // Create a new Fragment to be placed in the activity layout
+            docMenuFrag = new DocMenuFragment();
+
+            // In case this activity was started with special instructions from an
+            // Intent, pass the Intent's extras to the fragment as arguments
+            docMenuFrag.setArguments(getIntent().getExtras());
+            // Add the fragment to the 'fragment_container' FrameLayout
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, docMenuFrag).commit();
+        }*/
+    }
+    public void hideResearchFrag(){
+        ACTIVE_FRAME=0;
+        fragCont.setVisibility(View.GONE);
     }
 
     @Override

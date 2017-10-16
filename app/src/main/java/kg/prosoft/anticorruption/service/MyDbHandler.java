@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MyDbHandler extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 17;
+    public static final int DATABASE_VERSION = 18;
     public static final String DATABASE_NAME = "anticor.db";
     public static final String KEY_ID=MyDbContract.DbEntry._ID;
 

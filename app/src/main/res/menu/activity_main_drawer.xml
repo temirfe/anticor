@@ -16,42 +16,29 @@
             android:title="@string/research_and_report" />
         <item
             android:id="@+id/nav_fight"
-            android:icon="@drawable/ic_colorize_black_24dp"
+            android:icon="@drawable/ic_data_usage_black_24dp"
             android:title="@string/corruption_fight" />
     </group>
 
     <group android:id="@+id/menu_2" android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="ShowReportFrag" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="NewsListActivity" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="TabActivity" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Authorities" />
+            android:id="@+id/nav_map"
+            android:icon="@drawable/ic_map_black_24dp"
+            android:title="@string/corruption_map" />
     </group>
 
-
-
-
-    <item android:title="Communicate">
+    <item android:title="@string/communicate">
         <menu>
             <item
-                android:id="@+id/nav_share2"
+                android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:actionProviderClass=
+                    "android.widget.ShareActionProvider"
+                android:title="@string/share" />
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="@string/send" />
         </menu>
     </item>
 

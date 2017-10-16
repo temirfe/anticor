@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -120,5 +121,13 @@ public class BaseActivity extends AppCompatActivity {
         if(db!=null && db.isOpen()){db.close();}
         RequestQueue queue = MyVolley.getInstance(context).getRequestQueue();
         queue.cancelAll(context);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if(fragmentManager.findFragmentByTag("news") != null){
+            fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag("news")).commit();
+        }
+        if(fragmentManager.findFragmentByTag("research") != null){
+            fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag("research")).commit();
+        }
     }
 }

@@ -119,6 +119,16 @@
     <string name="forgot_password">Забыли пароль?</string>
     <string name="research_and_report">Исследования и отчёты</string>
     <string name="corruption_fight">Борьба с коррупцией</string>
+    <string name="corruption_map">Карта коррупции</string>
+    <string name="corruption_report">Сообщить о коррупции</string>
+    <string name="corruption_scheme_report">Рассказать о коррупционной схеме</string>
+    <string name="wanna_know">Мне интересно знать! Откуда…?</string>
+    <string name="all_applications">Все обращения</string>
+    <string name="corruption_rating">Коррупционный рейтинг</string>
+    <string name="about">О проекте</string>
+    <string name="share">Поделиться</string>
+    <string name="send">Отправить</string>
+    <string name="communicate">Рассказать друзьям</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
