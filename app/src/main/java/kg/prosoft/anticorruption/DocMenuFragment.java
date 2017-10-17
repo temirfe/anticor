@@ -102,6 +102,7 @@ public class DocMenuFragment extends Fragment {
                         infoList.add(new DocMenu(id,value));
                     }
                 }
+                pbar.setVisibility(View.GONE);
                 listAdapter.notifyDataSetChanged();
                 Log.e(TAG, "voc data has been taken from DB");
             }

@@ -29,4 +29,6 @@ public class Endpoints {
     public static final String NEWS_DEPEND = API_URL + "/news/depend";
     public static final String AUTHORITY_RATE = AUTHORITIES + "/rate";
     public static final String AUTHORITY_USER_RATE = AUTHORITIES + "/userrate";
+    public static final String EDUCATION = API_URL + "/educations";
+    public static final String ANALYTICS = API_URL + "/analytics";
 }

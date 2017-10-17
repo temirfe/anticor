@@ -52,7 +52,7 @@ public class NewsViewActivity extends BaseActivity {
         }
 
         tv_category=(TextView)findViewById(R.id.id_tv_category);
-        tv_category.setOnClickListener(onCtgClick);
+        //tv_category.setOnClickListener(onCtgClick);
         tv_title=(TextView)findViewById(R.id.id_tv_title);
         tv_date=(TextView)findViewById(R.id.id_tv_date);
         tv_text=(TextView)findViewById(R.id.id_tv_text);
@@ -107,12 +107,16 @@ public class NewsViewActivity extends BaseActivity {
         return source.subSequence(0, i+1);
     }
 
-    View.OnClickListener onCtgClick = new View.OnClickListener() {
+    /*View.OnClickListener onCtgClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             Log.e("CTG",cat_id+"");
+            Intent intent= new Intent();
+            intent.putExtra("news_ctg_id", cat_id);
+            setResult(RESULT_OK, intent);
+            finish();
         }
-    };
+    };*/
 
     public void requestNews(final int id){
         String uri = Endpoints.NEWS+"/"+id;

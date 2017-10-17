@@ -129,6 +129,9 @@
     <string name="share">Поделиться</string>
     <string name="send">Отправить</string>
     <string name="communicate">Рассказать друзьям</string>
+    <string name="anticorruption_edu">Антикоррупционное образование</string>
+    <string name="anticor_edu">Антикор. образование</string>
+    <string name="analytics">Аналитика</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

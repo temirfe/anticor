@@ -7,27 +7,21 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Created by ProsoftPC on 9/27/2017.
+ * Created by ProsoftPC on 10/17/2017.
  */
 
-public class News {
-    private int id, category_id, views, row_id;
-    private String title,description,text,date,image;
+public class Education {
+    private int id;
+    private String title,text,date,image;
 
-    public News() {}
-    public News(int id, String title, String description, String text, String date, String image, int category_id, int views) {
+    public Education() {}
+    public Education(int id, String title, String text, String date, String image) {
         this.id = id;
         this.title = title;
         this.text = text;
         this.date=date;
-        this.description=description;
         this.image=image;
-        this.category_id=category_id;
-        this.views=views;
     }
-
-    public void setRowId(int in) {row_id=in;}
-    public int getRowId() {return row_id;}
 
     public void setId(int in) {id=in;}
     public int getId() {return id;}
@@ -46,30 +40,7 @@ public class News {
         return image;
     }
 
-    public void setCategoryId(int in) {category_id=in;}
-    public int getCategoryId() {
-        return category_id;
-    }
-
-    public void setDescription(String s) {description=s;}
-    public String getDescription() {
-        if(description==null){
-            if (text.length() > 155) {
-                description = text.substring(0, 155) + "...";
-            }
-            else{
-                description = text;
-            }
-        }
-        else if (description.length() > 155) {
-            description = description.substring(0, 155) + "...";
-        }
-        description=description.trim();
-        return description;
-    }
-
     public void setDate(String s) {date=s;}
-    public String getRawDate(){return date;}
     public String getDate() {
         //long timeNow = System.currentTimeMillis();
         //long timeThen;
@@ -102,7 +73,4 @@ public class News {
         }*/
         return "getDate() error";
     }
-
-    public void setViews(int in) {views=in;}
-    public int getViews() {return views;}
 }

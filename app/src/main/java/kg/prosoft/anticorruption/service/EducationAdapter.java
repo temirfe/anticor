@@ -1,11 +1,6 @@
 package kg.prosoft.anticorruption.service;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.support.v4.content.ContextCompat;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,15 +13,15 @@ import java.util.List;
 import kg.prosoft.anticorruption.R;
 
 /**
- * Created by ProsoftPC on 9/27/2017.
+ * Created by ProsoftPC on 10/17/2017.
  */
 
-public class NewsAdapter extends BaseAdapter {
+public class EducationAdapter extends BaseAdapter {
     private Context mContext;
-    private List<News> newsList;
+    private List<Education> newsList;
     private LayoutInflater inflater;
 
-    public NewsAdapter(Context mContext, List<News> newsList) {
+    public EducationAdapter(Context mContext, List<Education> newsList) {
         this.mContext = mContext;
         this.newsList = newsList;
     }
@@ -54,7 +49,7 @@ public class NewsAdapter extends BaseAdapter {
         if (convertView == null)
             convertView = inflater.inflate(R.layout.item_news_row,null);
 
-        News news = newsList.get(position);
+        Education news = newsList.get(position);
         String title=news.getTitle();
         /*final SpannableStringBuilder boldTitle = new SpannableStringBuilder(title);
         boldTitle.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, title.length(),
@@ -62,8 +57,8 @@ public class NewsAdapter extends BaseAdapter {
 
         TextView tv_title=(TextView) convertView.findViewById(R.id.id_tv_title);
         tv_title.setText(title);
-        TextView tv_text=(TextView) convertView.findViewById(R.id.id_tv_text);
-        tv_text.setText(news.getDescription());
+        /*TextView tv_text=(TextView) convertView.findViewById(R.id.id_tv_text);
+        tv_text.setText(news.getDescription());*/
         TextView dateTv=(TextView) convertView.findViewById(R.id.textView_date);
         dateTv.setText(news.getDate());
         ImageView iv_thumb=(ImageView)convertView.findViewById(R.id.id_iv_thumb);

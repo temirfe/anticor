@@ -42,7 +42,9 @@
             android:name=".RegisterActivity"
             android:label="@string/register" />
         <activity android:name=".AccountActivity" />
-        <activity android:name=".AddReportActivity" />
+        <activity
+            android:name=".AddReportActivity"
+            android:windowSoftInputMode="stateHidden" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -71,10 +73,15 @@
         <activity
             android:name=".NewsListActivity"
             android:label="@string/news"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".GalleryActivity" />
-        <activity android:name=".FilterActivity" android:label="@string/filter" />
+        <activity
+            android:name=".FilterActivity"
+            android:label="@string/filter" />
+        <activity android:name=".DocListActivity" />
+        <activity android:name=".DocViewActivity" />
+        <activity android:name=".EducationListActivity" />
+        <activity android:name=".EducationViewActivity"></activity>
     </application>
 
 </manifest>

@@ -40,6 +40,7 @@ public class BaseActivity extends AppCompatActivity {
     MyHelper helper;
     SessionManager session;
     SearchView searchView;
+    MenuItem searchItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,7 @@ public class BaseActivity extends AppCompatActivity {
             searchIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         }
 
-        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchItem = menu.findItem(R.id.action_search);
         //SearchManager searchManager = (SearchManager) BaseActivity.this.getSystemService(Context.SEARCH_SERVICE);
 
         if (searchItem != null) {

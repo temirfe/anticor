@@ -22,10 +22,14 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -118,12 +122,20 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     private Uri fileUri; // file url to store image/video
     String TAG ="AddReportActivity";
     Bundle savedIS;
+    Intent gotIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_report);
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle(R.string.corruption_report);
+        }
         savedIS=savedInstanceState;
+
+        gotIntent=getIntent();
 
         activity=this;
 
@@ -554,7 +566,9 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             new android.os.Handler().postDelayed(
                     new Runnable() {
                         public void run() {
-                            showMapFrame();
+                            if (activity != null && !activity.isFinishing()) {
+                                showMapFrame();
+                            }
                         }
                     },
                     3000);
@@ -792,6 +806,13 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                             parentChildMap.put(parent,childMap);
                         }
                     }
+
+                    int type_id_got=gotIntent.getIntExtra("type_id",0);
+                    if(type_id_got!=0){
+                        String title=titleMap.get(type_id_got);
+                        selected_type_id=type_id_got;
+                        tv_type.setText(title);
+                    }
                     //helper.addVocabulary(vocList);
                 }catch(JSONException e){e.printStackTrace();}
             }
@@ -893,6 +914,13 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                         childMap.put(id,voc);
                         parentChildMap.put(parent,childMap);
                     }
+                }
+
+                int type_id_got=gotIntent.getIntExtra("type_id",0);
+                if(type_id_got!=0){
+                    String title=titleMap.get(type_id_got);
+                    selected_type_id=type_id_got;
+                    tv_type.setText(title);
                 }
                 Log.e(TAG, "voc data has been taken from DB");
             }
@@ -1075,11 +1103,29 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
 
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        menu.findItem(R.id.action_search).setVisible(false);
+        return true;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         //session.clear();
         if(db!=null && db.isOpen()){db.close();}
         RequestQueue queue = MyVolley.getInstance(context).getRequestQueue();
         queue.cancelAll(context);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -11,6 +11,10 @@
             android:icon="@drawable/ic_art_track_black_24dp"
             android:title="@string/news" />
         <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/ic_map_black_24dp"
+            android:title="@string/corruption_map" />
+        <item
             android:id="@+id/nav_research"
             android:icon="@drawable/ic_assessment_black_24dp"
             android:title="@string/research_and_report" />
@@ -18,13 +22,14 @@
             android:id="@+id/nav_fight"
             android:icon="@drawable/ic_data_usage_black_24dp"
             android:title="@string/corruption_fight" />
-    </group>
-
-    <group android:id="@+id/menu_2" android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_map"
-            android:icon="@drawable/ic_map_black_24dp"
-            android:title="@string/corruption_map" />
+            android:id="@+id/nav_education"
+            android:icon="@drawable/ic_local_library_black_24dp"
+            android:title="@string/anticor_edu" />
+        <item
+            android:id="@+id/nav_analytics"
+            android:icon="@drawable/ic_font_download_black_24dp"
+            android:title="@string/analytics" />
     </group>
 
     <item android:title="@string/communicate">
