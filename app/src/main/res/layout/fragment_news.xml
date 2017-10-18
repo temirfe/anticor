@@ -14,6 +14,15 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/id_tv_notify"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:background="@drawable/blue_view_click"
+            android:gravity="center"
+            android:text="@string/reload_new_data"
+            android:padding="10dp"
+            android:layout_height="wrap_content" />
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,6 +30,7 @@
     </LinearLayout>
     <LinearLayout
         android:id="@+id/id_ll_reload"
+        android:background="@color/white"
         android:visibility="gone"
         android:orientation="vertical"
         android:layout_width="match_parent"

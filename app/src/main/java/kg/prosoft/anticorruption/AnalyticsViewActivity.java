@@ -1,26 +1,23 @@
 package kg.prosoft.anticorruption;
 
-import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.content.Intent;
 import android.text.Html;
 import android.util.Log;
-import android.view.Menu;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import kg.prosoft.anticorruption.service.Endpoints;
-import kg.prosoft.anticorruption.service.GlideApp;
 
-public class EducationViewActivity extends BaseActivity {
-    TextView tv_title, tv_date, tv_text;
-    ImageView iv_image;
-    int id;
-    String TAG ="EduViewAc";
+public class AnalyticsViewActivity extends AppCompatActivity {
+    TextView tv_title, tv_date, tv_text, tv_author;
+    int id, author_id;
+    String TAG ="AnalViewAc";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_education_view);
+        setContentView(R.layout.activity_analytics_view);
+
         if(getSupportActionBar()!=null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -28,7 +25,7 @@ public class EducationViewActivity extends BaseActivity {
         tv_title=(TextView)findViewById(R.id.id_tv_title);
         tv_date=(TextView)findViewById(R.id.id_tv_date);
         tv_text=(TextView)findViewById(R.id.id_tv_text);
-        iv_image=(ImageView)findViewById(R.id.id_iv_img);
+        tv_author=(TextView)findViewById(R.id.id_tv_author);
 
         Intent intent = getIntent();
         id=intent.getIntExtra("id",0);
@@ -36,11 +33,12 @@ public class EducationViewActivity extends BaseActivity {
         //String description=intent.getStringExtra("desc");
         String text=intent.getStringExtra("text");
         String date=intent.getStringExtra("date");
-        String image=intent.getStringExtra("image");
-        Log.e(TAG, "image: "+image);
+        String author_name=intent.getStringExtra("author_name");
+        author_id=intent.getIntExtra("author_id",0);
 
         tv_title.setText(title);
         tv_date.setText(date);
+        tv_author.setText(author_name);
         CharSequence html_text;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             html_text= Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
@@ -48,15 +46,6 @@ public class EducationViewActivity extends BaseActivity {
             html_text=Html.fromHtml(text);
         }
         tv_text.setText(trimTrailingWhitespace(html_text));
-
-        if(!image.isEmpty()){
-            GlideApp.with(this)
-                    .load(Endpoints.EDU_IMG+id+"/"+image)
-                    .placeholder(R.drawable.placeholder) // optional
-                    .dontAnimate()
-                    .into(iv_image);
-        }
-
     }
 
     public static CharSequence trimTrailingWhitespace(CharSequence source) {
@@ -78,12 +67,4 @@ public class EducationViewActivity extends BaseActivity {
         onBackPressed();
         return true;
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        menu.findItem(R.id.action_search).setVisible(false);
-        return true;
-    }
-
 }

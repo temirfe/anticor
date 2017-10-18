@@ -31,4 +31,5 @@ public class Endpoints {
     public static final String AUTHORITY_USER_RATE = AUTHORITIES + "/userrate";
     public static final String EDUCATION = API_URL + "/educations";
     public static final String ANALYTICS = API_URL + "/analytics";
+    public static final String EDU_IMG = IMG + "/education/";
 }

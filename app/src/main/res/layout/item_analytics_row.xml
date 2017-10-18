@@ -8,7 +8,6 @@
     android:paddingStart="10dp"
     android:paddingEnd="10dp"
     >
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,22 +16,6 @@
         android:textColor="@color/black"
         android:textSize="16sp"
         android:layout_alignParentTop="true"/>
-    <ImageView
-        android:id="@+id/id_iv_thumb"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="6dp"
-        android:adjustViewBounds="true"
-        android:layout_below="@+id/id_tv_title"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="2dp"
-        android:id="@+id/id_tv_text"
-        android:textColor="@color/gray5"
-        android:layout_below="@+id/id_iv_thumb"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -40,6 +23,16 @@
         android:paddingTop="5dp"
         android:textSize="12sp"
         android:id="@+id/textView_date"
-        android:layout_below="@+id/id_tv_text" />
+        android:layout_below="@+id/id_tv_title" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/id_tv_author"
+        android:layout_toEndOf="@+id/textView_date"
+        android:layout_alignBottom="@+id/textView_date"
+        />
 
 </RelativeLayout>

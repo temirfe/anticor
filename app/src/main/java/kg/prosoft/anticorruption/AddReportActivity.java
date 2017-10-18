@@ -97,7 +97,8 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     private HashMap<Integer, HashMap<Integer, Vocabulary>> parentChildMap;
     private HashMap<Integer, HashMap<Integer, Authority>> parentChildMapAuth;
     TextView tv_sector, tv_city, tv_authority, tv_type, tv_lat, tv_lng;
-    LinearLayout ll_user,ll_add_photo,ll_images;
+    LinearLayout ll_add_photo,ll_images;
+    RelativeLayout ll_user;
     CheckBox chb_anonym;
     EditText et_title, et_text, et_name, et_email, et_contact;
     int selected_sector_id=0;
@@ -123,6 +124,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     String TAG ="AddReportActivity";
     Bundle savedIS;
     Intent gotIntent;
+    String anon_help="",name_help="",email_help="",contact_help="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +140,8 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         gotIntent=getIntent();
 
         activity=this;
+
+        selected_city_id=session.getCityId();
 
         parentMap=new HashMap<>();
         childMap= new HashMap<>();
@@ -158,7 +162,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         tv_city=(TextView)findViewById(R.id.id_tv_city);
         tv_authority=(TextView)findViewById(R.id.id_tv_authority);
         tv_type=(TextView)findViewById(R.id.id_tv_type);
-        ll_user=(LinearLayout)findViewById(R.id.id_ll_user);
+        ll_user=(RelativeLayout)findViewById(R.id.id_ll_user);
         chb_anonym=(CheckBox)findViewById(R.id.id_chb_anonym);
         et_title=(EditText)findViewById(R.id.id_et_title);
         et_text=(EditText)findViewById(R.id.id_et_note);
@@ -171,6 +175,9 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         ll_add_photo=(LinearLayout)findViewById(R.id.id_ll_add_photo);
         ll_add_photo.setOnClickListener(addPhotoClick);
         selectedImages=new ArrayList<>();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("yoba").setMessage("suka").setNegativeButton(android.R.string.ok,null).create().show();
     }
 
     View.OnClickListener addPhotoClick = new View.OnClickListener() {
@@ -637,6 +644,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         if(allGood){
             //store personal details in session
             session.createContactSession(name,email,contact);
+            session.setCityId(selected_city_id);
 
             final ProgressDialog progress = new ProgressDialog(this);
             progress.setTitle(getResources().getString(R.string.sending));
@@ -805,6 +813,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                             childMap.put(id,voc);
                             parentChildMap.put(parent,childMap);
                         }
+                        populateHelp(key, value);
                     }
 
                     int type_id_got=gotIntent.getIntExtra("type_id",0);
@@ -901,6 +910,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                 for (Vocabulary voc : theList) {
                     int id=voc.getId();
                     String value=voc.getValue();
+                    String key=voc.getKey();
                     int parent=voc.getParent();
                     titleMap.put(id,value);
                     if(parent==0){
@@ -914,6 +924,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                         childMap.put(id,voc);
                         parentChildMap.put(parent,childMap);
                     }
+                    populateHelp(key, value);
                 }
 
                 int type_id_got=gotIntent.getIntExtra("type_id",0);
@@ -928,6 +939,16 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                 Log.e("VocTask", "no content in db, requesting server");
                 requestVocabularies(); //requesting server
             }
+        }
+    }
+
+    public void populateHelp(String key, String value){
+
+        switch(key){
+            case "lookup_anonym":anon_help=value;break;
+            case "lookup_name":name_help=value;break;
+            case "lookup_email":email_help=value;break;
+            case "lookup_contact":contact_help=value;break;
         }
     }
 
@@ -1101,6 +1122,23 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         }
     }
 
+
+    public void onClickEmailWarn(View v){
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(email_help).setNegativeButton(R.string.close,null).create().show();
+    }
+    public void onClickNameHelp(View v){
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(name_help).setNegativeButton(R.string.close,null).create().show();
+    }
+    public void onClickAnonWarn(View v){
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(anon_help).setNegativeButton(R.string.close,null).create().show();
+    }
+    public void onClickContactHelp(View v){
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(contact_help).setNegativeButton(R.string.close,null).create().show();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

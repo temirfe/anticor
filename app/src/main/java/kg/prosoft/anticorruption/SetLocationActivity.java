@@ -203,7 +203,9 @@ public class SetLocationActivity extends AppCompatActivity implements OnMapReady
                     Log.e(TAG, "My current loc:"+mylat+","+mylng);
 
                     LatLng myLocation=new LatLng(mylat, mylng);
-                    if(BISHKEK.contains(myLocation)){
+                    if(KG.contains(myLocation)){
+                        new_lat=mylat;
+                        new_lng=mylng;
                         myMarker=mMap.addMarker(new MarkerOptions().position(myLocation).draggable(true));
                     }
                 } else {

@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -13,15 +12,15 @@ import java.util.List;
 import kg.prosoft.anticorruption.R;
 
 /**
- * Created by ProsoftPC on 10/17/2017.
+ * Created by ProsoftPC on 10/18/2017.
  */
 
-public class EducationAdapter extends BaseAdapter {
+public class AnalyticsAdapter extends BaseAdapter {
     private Context mContext;
-    private List<Education> newsList;
+    private List<Analytics> newsList;
     private LayoutInflater inflater;
 
-    public EducationAdapter(Context mContext, List<Education> newsList) {
+    public AnalyticsAdapter(Context mContext, List<Analytics> newsList) {
         this.mContext = mContext;
         this.newsList = newsList;
     }
@@ -47,9 +46,9 @@ public class EducationAdapter extends BaseAdapter {
         if (inflater == null)
             inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null)
-            convertView = inflater.inflate(R.layout.item_edu_row,null);
+            convertView = inflater.inflate(R.layout.item_analytics_row,null);
 
-        Education news = newsList.get(position);
+        Analytics news = newsList.get(position);
         String title=news.getTitle();
         /*final SpannableStringBuilder boldTitle = new SpannableStringBuilder(title);
         boldTitle.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), 0, title.length(),
@@ -61,21 +60,8 @@ public class EducationAdapter extends BaseAdapter {
         tv_text.setText(news.getDescription());*/
         TextView dateTv=(TextView) convertView.findViewById(R.id.textView_date);
         dateTv.setText(news.getDate());
-        ImageView iv_thumb=(ImageView)convertView.findViewById(R.id.id_iv_thumb);
-        String img=news.getImage();
-        if(img!=null && !img.isEmpty()){
-            iv_thumb.setVisibility(View.VISIBLE);
-            GlideApp.with(mContext)
-                    .load(Endpoints.EDU_IMG+news.getId()+"/"+img)
-                    .placeholder(R.drawable.placeholder) // optional
-                    .dontAnimate()
-                    .into(iv_thumb);
-        }
-        else{
-            GlideApp.with(mContext).clear(iv_thumb);
-            iv_thumb.setImageDrawable(null);
-            iv_thumb.setVisibility(View.GONE);
-        }
+        TextView author=(TextView) convertView.findViewById(R.id.id_tv_author);
+        author.setText(news.getAuthorName());
 
         convertView.setTag(news.getId());
 

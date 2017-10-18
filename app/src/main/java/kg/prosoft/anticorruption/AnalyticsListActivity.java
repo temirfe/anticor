@@ -32,34 +32,34 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import kg.prosoft.anticorruption.service.Education;
-import kg.prosoft.anticorruption.service.EducationAdapter;
+import kg.prosoft.anticorruption.service.Analytics;
+import kg.prosoft.anticorruption.service.AnalyticsAdapter;
 import kg.prosoft.anticorruption.service.Endpoints;
 import kg.prosoft.anticorruption.service.MyVolley;
 
-public class EducationListActivity extends BaseActivity {
+public class AnalyticsListActivity extends BaseActivity {
 
     ListView listView;
-    EducationAdapter adapter;
-    ArrayList<Education> newsList;
+    AnalyticsAdapter adapter;
+    ArrayList<Analytics> analyticsList;
     private int page = 1, current_page = 1, total_pages;
     Uri.Builder uriB;
     ProgressBar pb;
     ProgressDialog progress;
     Button btn_reload;
     LinearLayout ll_reload;
-    String TAG = "EduList";
+    String TAG = "AnalyticsList";
     String query;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_education_list);
+        setContentView(R.layout.activity_analytics_list);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle(R.string.anticor_edu);
+            getSupportActionBar().setTitle(R.string.analytics);
         }
 
         listView = (ListView) findViewById(R.id.id_lv_news);
@@ -71,8 +71,8 @@ public class EducationListActivity extends BaseActivity {
 
         pb = (ProgressBar) findViewById(R.id.progressBar1);
 
-        newsList = new ArrayList<>();
-        adapter = new EducationAdapter(context, newsList);
+        analyticsList = new ArrayList<>();
+        adapter = new AnalyticsAdapter(context, analyticsList);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(itemClickListener);
@@ -80,7 +80,7 @@ public class EducationListActivity extends BaseActivity {
         //query=intent.getStringExtra("query");
         if (query != null) {
             Uri.Builder builder = new Uri.Builder();
-            builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
+            builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("analytics");
             builder.appendQueryParameter("text", query);
             populateList(page, builder, false, false);
         } else {
@@ -101,13 +101,14 @@ public class EducationListActivity extends BaseActivity {
                                 View itemView,
                                 int position,
                                 long id) {
-            Education item = newsList.get(position);
-            Intent intent = new Intent(context, EducationViewActivity.class);
+            Analytics item = analyticsList.get(position);
+            Intent intent = new Intent(context, AnalyticsViewActivity.class);
             intent.putExtra("id", item.getId());
             intent.putExtra("title", item.getTitle());
             intent.putExtra("text", item.getText());
             intent.putExtra("date", item.getDate());
-            intent.putExtra("image", item.getImage());
+            intent.putExtra("author_id", item.getAuthorId());
+            intent.putExtra("author_name", item.getAuthorName());
             startActivity(intent);
         }
     };
@@ -172,7 +173,7 @@ public class EducationListActivity extends BaseActivity {
 
         if (uriB == null) {
             uriB = new Uri.Builder();
-            uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
+            uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("analytics");
         }
         Uri.Builder otherBuilder = Uri.parse(uriB.build().toString()).buildUpon();
 
@@ -189,7 +190,7 @@ public class EducationListActivity extends BaseActivity {
                         progress.dismiss();
                     }
                     if (applyNewFilter || newlist) {
-                        newsList.clear();
+                        analyticsList.clear();
                     }
                     int leng = response.length();
                     if (leng > 0) {
@@ -199,10 +200,11 @@ public class EducationListActivity extends BaseActivity {
                             String title = jsonObject.getString("title");
                             String text = jsonObject.getString("text");
                             String date = jsonObject.getString("date");
-                            String image = jsonObject.getString("img");
+                            String author_name = jsonObject.getString("author_name");
+                            int author_id = jsonObject.getInt("author_id");
 
-                            Education news = new Education(id, title, text, date, image);
-                            newsList.add(news);
+                            Analytics anal = new Analytics(id, title, text, date, author_name, author_id);
+                            analyticsList.add(anal);
                         }
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -215,7 +217,7 @@ public class EducationListActivity extends BaseActivity {
                 }
 
                 if (applyNewFilter || newlist) {
-                    adapter = new EducationAdapter(context, newsList);
+                    adapter = new AnalyticsAdapter(context, analyticsList);
                     listView.setAdapter(adapter);
                 } else {
                     adapter.notifyDataSetChanged();
@@ -266,7 +268,7 @@ public class EducationListActivity extends BaseActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Uri.Builder builder = new Uri.Builder();
-                builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
+                builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("analytics");
                 builder.appendQueryParameter("text", query);
                 searchView.clearFocus();
                 populateList(1, builder, true, false);

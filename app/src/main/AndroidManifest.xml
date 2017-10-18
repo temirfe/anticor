@@ -81,7 +81,9 @@
         <activity android:name=".DocListActivity" />
         <activity android:name=".DocViewActivity" />
         <activity android:name=".EducationListActivity" />
-        <activity android:name=".EducationViewActivity"></activity>
+        <activity android:name=".EducationViewActivity" />
+        <activity android:name=".AnalyticsListActivity" />
+        <activity android:name=".AnalyticsViewActivity"></activity>
     </application>
 
 </manifest>

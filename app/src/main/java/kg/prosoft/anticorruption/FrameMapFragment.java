@@ -164,38 +164,6 @@ public class FrameMapFragment extends Fragment implements
         // applications that do not require a fine-grained location and that do not need location
         // updates. Gets the best and most recent location currently available, which may be null
         // in rare cases when a location is not available.
-        if(!marker_already){
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                //mMap.setMyLocationEnabled(true);
-                if (mLastLocation != null) {
-                    mylat=mLastLocation.getLatitude();
-                    mylng=mLastLocation.getLongitude();
-                    if (mParentFrag != null)
-                    {
-                        mParentFrag.setParent();
-                    }
-
-                    Log.e(TAG, "My current loc:"+mylat+","+mylng);
-
-                    LatLng myLocation=new LatLng(mylat, mylng);
-                    if(LOCATION_BOUND.contains(myLocation)){
-                        myMarker=googleMap.addMarker(new MarkerOptions().position(myLocation).draggable(true));
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 16));
-                    }
-                    else{
-                        Toast.makeText(getActivity(), R.string.only_kg, Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Log.e(TAG, "No location detected 179");
-                }
-            } else {
-                // Show rationale and request permission.
-                Log.e(TAG, "permission not granted");
-            }
-        }
-
     }
 
     @Override

@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -68,6 +69,7 @@ public class NewsFragment extends Fragment {
     ProgressDialog progress;
     Button btn_reload;
     LinearLayout ll_reload;
+    TextView tv_notify;
     //ImageView iv_thumb;
 
     SessionManager session;
@@ -75,6 +77,7 @@ public class NewsFragment extends Fragment {
     public MyDbHandler dbHandler;
     MyHelper helper;
     String TAG="NewsFrag";
+    boolean shownFromDb=false;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -98,6 +101,8 @@ public class NewsFragment extends Fragment {
         btn_reload=(Button)layout.findViewById(R.id.id_btn_reload);
         btn_reload.setOnClickListener(reloadClickListener);
         //iv_thumb=(ImageView)layout.findViewById(R.id.id_iv_thumb);
+        tv_notify=(TextView) layout.findViewById(R.id.id_tv_notify);
+        tv_notify.setOnClickListener(onClickNotify);
 
         pb = (ProgressBar) layout.findViewById(R.id.progressBar1);
 
@@ -243,7 +248,7 @@ public class NewsFragment extends Fragment {
 
                 }catch(JSONException e){e.printStackTrace();}
 
-                if(applyNewFilter || newlist){
+                if(applyNewFilter || newlist && !shownFromDb){
                     adapter = new NewsAdapter(context,newsList);
                     listView.setAdapter(adapter);
                 }
@@ -298,6 +303,7 @@ public class NewsFragment extends Fragment {
                     newsList.add(news);
                 }
                 adapter.notifyDataSetChanged();
+                shownFromDb=true;
                 Log.e(TAG, "news data has been taken from DB");
                 checkNewsDepend(); //also check if data has been altered on server side
             }
@@ -329,5 +335,14 @@ public class NewsFragment extends Fragment {
 
         MyVolley.getInstance(context).addToRequestQueue(volReq);
     }
+
+    //couldn't make it work (
+    View.OnClickListener onClickNotify = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Log.e(TAG, "onClickNotify");
+            //view.setVisibility(View.GONE);
+        }
+    };
 
 }

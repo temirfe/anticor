@@ -50,6 +50,7 @@ public class SessionManager {
     public static final String KEY_CONTACT = "contact";
     public static final String KEY_NAME = "name";
     public static final String KEY_EMAIL = "email";
+    public static final String KEY_CITY_ID= "city_id";
 
     // All Shared Preferences Keys
     private static final String IS_LOGIN = "IsLoggedIn";
@@ -351,5 +352,10 @@ public class SessionManager {
     public void setAdminPhone(String phone) {editor.putString(KEY_ADMIN_PHONE,phone);editor.commit();}
     public String getAdminPhone() {
         return pref.getString(KEY_ADMIN_PHONE,"");
+    }
+
+    public void setCityId(int id) {editor.putInt(KEY_CITY_ID,id);editor.commit();}
+    public int getCityId() {
+        return pref.getInt(KEY_CITY_ID,0);
     }
 }
