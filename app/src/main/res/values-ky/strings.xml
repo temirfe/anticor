@@ -1,0 +1,174 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <!--<string name="add_category">Категория кошуу</string>
+    <string name="add_incident">Билдирүү жөнөтүү</string>
+    <string name="all">Баары</string>
+    <string name="back">Артка</string>
+    <string name="ctg_required">Категория тандаңыз</string>
+    <string name="feedback">Байланыш</string>
+    <string name="feedback_success">Сиздин катыңыз жетти</string>
+    <string name="feedback_fail">Катыңыз жөнөтүлбөй калды, дагы аракет кылып көрүңүз</string>
+    <string name="full_description">Кенен баяндоо</string>
+    <string name="incident_list">Билдирүүлөр тизмеси</string>
+    <string name="incidents">Билдирүүлөр</string>
+    <string name="list">Тизме</string>
+    <string name="login_register">Кирүү/Каттоо</string>
+    <string name="menu">Меню</string>
+    <string name="message">Кат</string>
+    <string name="my_account">Жеке кабинет</string>
+    <string name="my_incidents">Менин билдирүүлөрүм</string>
+    <string name="not_active">Рахмат, билдирүүңүз карап чыгууга жөнөтүлдү</string>
+    <string name="solved">Текшерилгендер</string>
+    <string name="not_solved">Текшерилбегендер</string>
+    <string name="on_map">Картада</string>
+    <string name="send_incident">Билдирүү жөнөтүү</string>
+    <string name="person_name">Аты-Жөнү</string>
+    <string name="push_notification">Кабарландыруу:</string>
+    <string name="select">Тандоо</string>
+    <string name="select_service">Кызматты тандоо</string>
+    <string name="selected">Тандалды:</string>
+    <string name="sender">Жөнөтүүчү</string>
+    <string name="short_title">Кыскача аталышы</string>
+    <string name="status">Статус</string>
+    <string name="your_location">Жайгашкан ордун тактаңыз (адрес)</string>-->
+
+    <string name="done">Даяр</string>
+    <string name="add">Кошуу</string>
+    <string name="submit">Жөнөтүү</string>
+    <string name="required">Талааны толтуруңуз</string>
+    <string name="sending">Жиберилүүдө</string>
+    <string name="name">Аты-Жөнү</string>
+    <string name="phone">Телефон</string>
+    <string name="apply">Колдонуу</string>
+    <string name="reset">Тазала</string>
+    <string name="loading">Жүктөөдө</string>
+    <string name="about">Проект жөнүндө</string>
+    <string name="news">Жаңылыктар</string>
+    <string name="title_activity_login">Кирүү</string>
+    <string name="close">Жабуу</string>
+    <string name="logout">Чыгуу</string>
+    <string name="app_error">Ката кетти</string>
+    <string name="date_time">Дата жана убакыт:</string>
+    <string name="add_image">Сүрөт кошуу</string>
+    <string name="error_happened">Ката кетти</string>
+    <string name="reload">Кайра жүктөө</string>
+    <string name="comments">Комментарийлер</string>
+    <string name="add_comment">Комментарий кошуу</string>
+    <string name="no_result">Эч нерсе табылбады</string>
+    <string name="camera">Камера</string>
+    <string name="gallery">Галерея</string>
+    <string name="set_location">Картада көрсөтүңүз</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Сырсөз</string>
+    <string name="password_repeat">Сырсөздү кайталаңыз</string>
+    <string name="action_sign_in">Кирүү же каттоо</string>
+    <string name="action_sign_in_short">Кирүү</string>
+    <string name="error_invalid_email">Email туура эмес</string>
+    <string name="error_invalid_password">Сырсөз өтө кыска</string>
+    <string name="error_password_match">Сырсөздүдөр дал келбейт</string>
+    <string name="error_incorrect_password">Сырсөз туура эмес</string>
+    <string name="error_field_required">Талааны толтуруңуз</string>
+    <string name="register">Каттоо</string>
+    <string name="permission_rationale">Требуется разрешение к контактам для автозаполнения почты.</string>
+    <string name="login_fail">Авторизацияда ката кетти</string>
+    <string name="user_not_found">Мындай email катталбаган</string>
+    <string name="password_error">Сырсөз туура эмес</string>
+    <string name="email_taken">Бул почта менен башка адам катталган</string>
+    <string name="lang">Тил</string>
+    <string name="home">Башкы</string>
+    <string name="map">Карта</string>
+
+    /***/
+
+    <string name="app_name">Anti Corruption</string>
+    <string name="app_name_abbr">АКП КР</string>
+    <string name="project_title">КЫРГЫЗ РЕСПУБЛИКАСЫНЫН АНТИКОРРУПЦИЯЛЫК ПОРТАЛЫ</string>
+
+    <string name="navigation_drawer_open">Менюну ачуу</string>
+    <string name="navigation_drawer_close">Менюну жабуу</string>
+
+    <string name="action_settings">Орнотуулар</string>
+    <string name="action_filter">Фильтр</string>
+
+    <string name="main">Башкы</string>
+    <string name="action_empty">Бошотуу</string>
+    <string name="description">Баяндоо</string>
+    <string name="categories">Категориялар</string>
+    <string name="clear">Тазалоо</string>
+    <string name="no">Жок</string>
+    <string name="yes">Ооба</string>
+    <string name="username">Колдонуучу (Логин)</string>
+    <string name="address">Адрес</string>
+    <string name="note">Эскертүү</string>
+    <string name="login">Кирүү</string>
+    <string name="myAccount">Жеке бөлмө</string>
+    <string name="connectionError">Байланыш жок</string>
+    <string name="search">Издөө</string>
+    <string name="searchNoResult">Эч нерсе табылган жок</string>
+    <string name="attention">Көңүл бургула!</string>
+    <string name="info">Маалымат</string>
+    <string name="error">Ката</string>
+    <string name="error_invalid_phone">Туура эмес формат</string>
+    <string name="credentialsExpired">Сиздин сессияңыз бүтү, кайрадан кириңиз.</string>
+    <string name="notAuthorizedOrcredentialsExpired">Сиз каттоодон өткөн жоксуз же сессияңыз бүтү, кайрадан кириңиз.</string>
+    <string name="authorization">Авторизация</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_username_or_email">Логин же Email</string>
+
+    <string name="select_sector">Коррупция секторун тандаңыз</string>
+    <string name="title">Кыскача аталышы</string>
+    <string name="report_description">Кененирээк баяндоо</string>
+    <string name="select_authority">Мамлекеттик органды тандаңыз</string>
+    <string name="select_city">Шаарды же регионду тандаңыз</string>
+    <string name="select_type">Билдирүүнү түрүн тандаңыз</string>
+    <string name="wannabe_anonym">Аноним түрүндө</string>
+    <string name="contact">Телефон</string>
+    <string name="title_activity_maps">Карта</string>
+    <string name="only_kg">Кыргыз Республикасынын ичинде гана көрсөтүүгө болот!</string>
+    <string name="grant_location_permission">Ордуңузду билдирүгө уруксат бериңиз</string>
+    <string name="grant_location_permission_en">Please, give permission to locate your location</string>
+    <string name="upload_limit">10дон ашык жүктөгөнгө болбойт!</string>
+    <string name="title_activity_tab">TabActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="all_news">Баардык жаңылыктар</string>
+    <string name="reports">Билдирүүлөр</string>
+    <string name="comment">Комментарий</string>
+    <string name="no_comments">Комментарий жок</string>
+    <string name="comment_moder">Сиздин комментарийиңиз текшерүүдөн өткөндөн кийин чыгат, рахмат.</string>
+    <string name="rate_authority">Мамлекеттик органды баалоо</string>
+    <string name="cancel">Жокко чыгаруу</string>
+    <string name="city">Шаар</string>
+    <string name="authority">Мамлекеттик орган</string>
+    <string name="category">Коррупция сектору</string>
+    <string name="type_header">Билдирүүнүн түрү</string>
+    <string name="filter">Фильтр</string>
+    <string name="anonymous">Аноним</string>
+    <string name="forgot_password">Сырсөз эсимде жок</string>
+    <string name="research_and_report">Изилдөөлөр жана отчеттор</string>
+    <string name="corruption_fight">Борьба с коррупцией</string>
+    <string name="corruption_map">Коррупция менен күрөшүү</string>
+    <string name="corruption_report">Коррупция жөнүндө билдирүү</string>
+    <string name="corruption_scheme_report">Коррупциялык схеманы айтып берүү</string>
+    <string name="wanna_know">Билгим келет! Кайдан…?</string>
+    <string name="all_applications">Баардык билдирүүлөр</string>
+    <string name="corruption_rating">Коррупциялык рейтинг</string>
+    <string name="share">Бөлүшүү</string>
+    <string name="send">Жиберүү</string>
+    <string name="communicate">Досторго билдирүү</string>
+    <string name="anticorruption_edu">Антикоррупциялык билим берүү</string>
+    <string name="anticor_edu">Антикор. билим берүү</string>
+    <string name="anticor_politics">Антикор. саясат</string>
+    <string name="analytics">Аналитика</string>
+    <string name="reload_new_data">Акыркыларын көрсөтүү</string>
+    <string name="contacts">Байланыш</string>
+    <string name="lang_ru">Русский</string>
+    <string name="lang_ky">Кыргызча</string>
+    <string name="lang_en">English</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_authority_view">AuthorityViewActivity</string>
+</resources>

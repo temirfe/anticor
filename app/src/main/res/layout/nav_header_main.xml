@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
@@ -27,53 +28,47 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/id_tv_logo"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:text="@string/project_title"
             />
     </LinearLayout>
 
-    <RelativeLayout
-        android:visibility="gone"
-        android:id="@+id/id_rl_login"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_height="wrap_content">
-        <Button
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin">
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/id_btn_login"
+            android:id="@+id/id_tv_login"
             android:text="@string/login"
-            android:layout_alignParentLeft="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
             />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/id_btn_register"
-            android:text="@string/register"
-            android:layout_alignParentRight="true"
-            />
-    </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/id_rl_account"
-        android:layout_width="match_parent"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:clickable="true"
-        android:layout_height="wrap_content">
         <TextView
             android:id="@+id/id_tv_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-        <ImageView
-            android:id="@+id/id_iv_man"
+        <TextView
+            android:id="@+id/id_tv_lang"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:tint="@android:color/white"
-            android:src="@drawable/ic_account_circle_black_24dp" />
-    </RelativeLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:clickable="true"
+            android:text="KY"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+
 
 
 </LinearLayout>

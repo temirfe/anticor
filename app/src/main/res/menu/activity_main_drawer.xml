@@ -27,27 +27,30 @@
             android:icon="@drawable/ic_local_library_black_24dp"
             android:title="@string/anticor_edu" />
         <item
+            android:id="@+id/nav_anticor_politics"
+            android:icon="@drawable/ic_mode_comment_black_24dp"
+            android:title="@string/anticor_politics" />
+        <item
             android:id="@+id/nav_analytics"
             android:icon="@drawable/ic_font_download_black_24dp"
             android:title="@string/analytics" />
     </group>
-
-    <item android:title="@string/communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:actionProviderClass=
-                    "android.widget.ShareActionProvider"
-                android:title="@string/share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="@string/send" />
-        </menu>
-    </item>
+    <group android:id="@+id/menu_2" android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_info_black_24dp"
+            android:title="@string/about" />
+        <item
+            android:id="@+id/nav_contacts"
+            android:icon="@drawable/ic_mail_black_24dp"
+            android:title="@string/contacts" />
+    </group>
 
     <group android:id="@+id/menu_4" android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/action_settings" />
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_power_settings_new_black_24dp"

@@ -3,10 +3,13 @@ package kg.prosoft.anticorruption;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 
+import kg.prosoft.anticorruption.service.LocaleHelper;
 import kg.prosoft.anticorruption.service.MyHelper;
 
 public class AccountActivity extends BaseActivity {
@@ -44,6 +47,11 @@ public class AccountActivity extends BaseActivity {
             //startActivity(intent);
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

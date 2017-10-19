@@ -11,7 +11,7 @@ public class ReportMapItem implements ClusterItem {
     private final LatLng mPosition;
     private String mTitle;
     private String mSnippet;
-    private int report_id;
+    private int report_id, type_id;
 
     public ReportMapItem(double lat, double lng) {
         mPosition = new LatLng(lat, lng);
@@ -23,10 +23,11 @@ public class ReportMapItem implements ClusterItem {
         mSnippet = snippet;
     }
 
-    public ReportMapItem(double lat, double lng, String title, int reportId) {
+    public ReportMapItem(double lat, double lng, String title, int reportId, int typeId) {
         mPosition = new LatLng(lat, lng);
         mTitle = title;
         report_id=reportId;
+        type_id=typeId;
     }
 
     @Override
@@ -46,5 +47,9 @@ public class ReportMapItem implements ClusterItem {
 
     public int getReportId() {
         return report_id;
+    }
+
+    public int getTypeId() {
+        return type_id;
     }
 }

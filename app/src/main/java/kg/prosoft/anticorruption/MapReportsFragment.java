@@ -10,9 +10,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ZoomControls;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -22,8 +25,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
@@ -104,8 +110,9 @@ public class MapReportsFragment extends Fragment implements
         LatLng center=KG.getCenter();
         //LatLng bishkek = new LatLng(42.8742589,74.6131682);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center,6));
+        mMap.getUiSettings().setZoomControlsEnabled(true);
         mClusterManager = new ClusterManager<>(context, mMap);
-        mClusterManager.setRenderer(new CustomRenderer<>(getActivity(), mMap, mClusterManager));
+        mClusterManager.setRenderer(new CustomRenderer(getActivity(), mMap, mClusterManager));
         mMap.setOnCameraIdleListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
 
@@ -129,6 +136,13 @@ public class MapReportsFragment extends Fragment implements
         if(populate){
             populateMap(null);
         }
+
+        mMap.setPadding(0,0,0,90);
+        //reposition map zoom control because fab overlaps it
+        /*FrameLayout.LayoutParams zoomParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+        ZoomControls controls = (ZoomControls) mMap.getZoomButtonsController().getZoomControls();
+        controls.setGravity(Gravity.LEFT);
+        controls.setLayoutParams(zoomParams);*/
     }
 
     @Override
@@ -180,13 +194,14 @@ public class MapReportsFragment extends Fragment implements
                             String text=jsonObject.getString("text");
                             String date=jsonObject.getString("date");
                             //int category_id=jsonObject.getInt("category_id");
+                            int type_id=jsonObject.getInt("type_id");
                             double lat=jsonObject.getDouble("lat");
                             double lng=jsonObject.getDouble("lon");
                             String city=jsonObject.getString("city_title");
                             Report report=new Report(id,title,text,date,lat,lng);
                             report.setCityTitle(city);
                             reportSparse.put(id,report);
-                            mClusterManager.addItem(new ReportMapItem(lat, lng, title,id));
+                            mClusterManager.addItem(new ReportMapItem(lat, lng, title,id, type_id));
 
                             /*myMarker=mMap.addMarker(
                                     new MarkerOptions()
@@ -220,15 +235,34 @@ public class MapReportsFragment extends Fragment implements
         //intent.putExtra("id",markId);
     }*/
 
-    private class CustomRenderer<T extends ClusterItem> extends DefaultClusterRenderer<T> {
-        private CustomRenderer(Context context, GoogleMap map, ClusterManager<T> clusterManager) {
+    private class CustomRenderer extends DefaultClusterRenderer<ReportMapItem> {
+        private CustomRenderer(Context context, GoogleMap map, ClusterManager<ReportMapItem> clusterManager) {
             super(context, map, clusterManager);
         }
 
         @Override
-        protected boolean shouldRenderAsCluster(Cluster<T> cluster) {
+        protected boolean shouldRenderAsCluster(Cluster<ReportMapItem> cluster) {
             //start clustering if at least 2 items overlap
             return cluster.getSize() > 1;
+        }
+
+        @Override
+        protected void onBeforeClusterItemRendered(ReportMapItem item,
+                                                   MarkerOptions markerOptions) {
+            int typeId=item.getTypeId();
+            float color=0;
+            switch(typeId){
+                case 134: color=BitmapDescriptorFactory.HUE_RED; break;
+                case 135: color=BitmapDescriptorFactory.HUE_BLUE; break;
+                case 137: color=BitmapDescriptorFactory.HUE_YELLOW; break;
+                case 138: color=BitmapDescriptorFactory.HUE_ORANGE; break;
+            }
+
+            if(color!=0){
+                BitmapDescriptor markerDescriptor = BitmapDescriptorFactory.defaultMarker(color);
+                markerOptions.icon(markerDescriptor);
+            }
+            //Log.e("HUE",item.getTypeId()+"");
         }
     }
 

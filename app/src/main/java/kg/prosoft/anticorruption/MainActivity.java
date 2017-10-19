@@ -1,6 +1,7 @@
 package kg.prosoft.anticorruption;
 
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,7 +13,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -46,8 +46,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import kg.prosoft.anticorruption.service.Endpoints;
+import kg.prosoft.anticorruption.service.LocaleHelper;
 import kg.prosoft.anticorruption.service.MyDbHandler;
 import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.ReportsTabAdapter;
@@ -58,10 +60,10 @@ public class MainActivity extends BaseActivity
 
     private String TAG = MainActivity.class.getSimpleName();
     LinearLayout ll_logo;
-    RelativeLayout rl_login, rl_account;
-    TextView tv_name, tv_logo;
-    Button btn_login;
-    Button btn_register;
+    //RelativeLayout rl_login, rl_account;
+    TextView tv_name, tv_logo, tv_lang, tv_login;
+    //Button btn_login;
+    //Button btn_register;
     public ListReportsFragment listFrag;
     public MapReportsFragment mapFrag;
     public DocMenuFragment docMenuFrag;
@@ -84,10 +86,11 @@ public class MainActivity extends BaseActivity
     int news_ctg_id=0;
     int ACTIVE_FRAME=0, NEWS_FRAME=1, RESEARCH_FRAME=2, MAPMENU_FRAME=3, MAIN_FRAME=4, REPORT_FRAME=5;
     int PREV_FRAME=0;
-    private ShareActionProvider mShareActionProvider;
     FragmentManager fm;
     NavigationView navigationView;
     int visible_tab=1;
+    static int SETTINGS_FLAG=31;
+    String lang="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,28 +138,33 @@ public class MainActivity extends BaseActivity
         idMap= new HashMap<>();
         setNewsBarSpinner();
 
-        rl_login = (RelativeLayout) header.findViewById(R.id.id_rl_login);
-        rl_account = (RelativeLayout) header.findViewById(R.id.id_rl_account);
+        //rl_login = (RelativeLayout) header.findViewById(R.id.id_rl_login);
+        //rl_account = (RelativeLayout) header.findViewById(R.id.id_rl_account);
         ll_logo = (LinearLayout) header.findViewById(R.id.id_ll_logo);
 
-        btn_login = (Button) header.findViewById(R.id.id_btn_login);
-        btn_register = (Button) header.findViewById(R.id.id_btn_register);
+        //btn_login = (Button) header.findViewById(R.id.id_btn_login);
+        //btn_register = (Button) header.findViewById(R.id.id_btn_register);
+        tv_login = (TextView) header.findViewById(R.id.id_tv_login);
         tv_name = (TextView) header.findViewById(R.id.id_tv_name);
         tv_logo = (TextView) header.findViewById(R.id.id_tv_logo);
+        tv_lang = (TextView) header.findViewById(R.id.id_tv_lang);
+        lang=LocaleHelper.getLanguage(context);
+        tv_lang.setText(lang.toUpperCase());
+        tv_lang.setOnClickListener(onClickSettings);
 
         Menu nav_Menu = navigationView.getMenu();
 
         if(session.isLoggedIn()){
             Log.e(TAG,"is logged in "+session.getUserName());
             tv_name.setText(session.getUserName());
-            rl_account.setOnClickListener(onClickName);
-            rl_login.setVisibility(View.GONE);
+            tv_name.setOnClickListener(onClickName);
+            tv_login.setVisibility(View.GONE);
         }
         else{
-            rl_login.setVisibility(View.VISIBLE);
-            btn_login.setOnClickListener(onClickLogin);
-            btn_register.setOnClickListener(onClickRegister);
-            rl_account.setVisibility(View.GONE);
+            tv_login.setVisibility(View.VISIBLE);
+            tv_login.setOnClickListener(onClickLogin);
+            //btn_register.setOnClickListener(onClickRegister);
+            tv_name.setVisibility(View.GONE);
             nav_Menu.findItem(R.id.nav_logout).setVisible(false);
         }
 
@@ -168,6 +176,9 @@ public class MainActivity extends BaseActivity
             //Log.e("MainAct","showReport fired");
         }
 
+        Log.e("LANGUAGE DEFAULT", Locale.getDefault().getLanguage());
+        Log.e("LANGUAGE SAVED",lang);
+        Log.e("LANGUAGE session","s "+session.getLanguage());
     }
 
     public void setNewsBarSpinner(){
@@ -235,7 +246,17 @@ public class MainActivity extends BaseActivity
             startActivity(regIntent);
         }
     };
+    View.OnClickListener onClickSettings = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            clickSettings();
+        }
+    };
 
+    public void clickSettings(){
+        Intent intent=new Intent(context, SettingsActivity.class);
+        startActivityForResult(intent,SETTINGS_FLAG);
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -258,29 +279,27 @@ public class MainActivity extends BaseActivity
         else if (id == R.id.nav_education ){
             Intent intent= new Intent(MainActivity.this, EducationListActivity.class);
             startActivity(intent);
-        }  else if (id == R.id.nav_analytics ){
+        }
+
+        else if (id == R.id.nav_analytics ){
             Intent intent= new Intent(MainActivity.this, AnalyticsListActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_share) {
-            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
-        } else if (id == R.id.nav_send) {
-
+        }
+        else if (id == R.id.nav_anticor_politics ){
+        }
+        else if (id == R.id.nav_about ){
+        }
+        else if (id == R.id.nav_contacts ){
         } else if (id == R.id.nav_logout) {
             session.logoutUser();
+        } else if (id == R.id.nav_settings) {
+            clickSettings();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-    // Call to update the share intent
-    private void setShareIntent(Intent shareIntent) {
-        if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(shareIntent);
-        }
-    }
-
 
     public void showMainFrag(){
         PREV_FRAME=0;
@@ -505,6 +524,16 @@ public class MainActivity extends BaseActivity
         if(requestCode==FILTER_FLAG){
             applyFilter(data);
         }
+        else if(requestCode==SETTINGS_FLAG){
+            String lang=data.getStringExtra("lang");
+            Log.e(TAG,"result "+lang);
+            LocaleHelper.setLocale(context, lang);
+            session.setLanguage(lang);
+            Intent myIntent = getIntent();
+            myIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            finish();
+            startActivity(myIntent);
+        }
     }
 
     public void applyFilter(Intent data){
@@ -667,4 +696,9 @@ public class MainActivity extends BaseActivity
         else {showMainFrag();}
     }
 
+    //change language
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleHelper.onAttach(base));
+    }
 }

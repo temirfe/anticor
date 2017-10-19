@@ -51,6 +51,7 @@ public class SessionManager {
     public static final String KEY_NAME = "name";
     public static final String KEY_EMAIL = "email";
     public static final String KEY_CITY_ID= "city_id";
+    public static final String KEY_LANGUAGE= "language";
 
     // All Shared Preferences Keys
     private static final String IS_LOGIN = "IsLoggedIn";
@@ -352,6 +353,11 @@ public class SessionManager {
     public void setAdminPhone(String phone) {editor.putString(KEY_ADMIN_PHONE,phone);editor.commit();}
     public String getAdminPhone() {
         return pref.getString(KEY_ADMIN_PHONE,"");
+    }
+
+    public void setLanguage(String s) {editor.putString(KEY_LANGUAGE,s);editor.commit();}
+    public String getLanguage() {
+        return pref.getString(KEY_LANGUAGE,"");
     }
 
     public void setCityId(int id) {editor.putInt(KEY_CITY_ID,id);editor.commit();}

@@ -1,10 +1,12 @@
 package kg.prosoft.anticorruption;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -35,6 +37,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -42,6 +45,7 @@ import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -68,6 +72,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -125,6 +130,14 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     Bundle savedIS;
     Intent gotIntent;
     String anon_help="",name_help="",email_help="",contact_help="";
+    private TextView tv_date;
+    private TextView tv_time;
+    private int year, month, day, hour, minute;
+    private DatePickerDialog dateDialog;
+    private TimePickerDialog timeDialog;
+    private SimpleDateFormat dateFormatter;
+    private SimpleDateFormat timeFormatter;
+    public Calendar calendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,10 +188,62 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         ll_add_photo=(LinearLayout)findViewById(R.id.id_ll_add_photo);
         ll_add_photo.setOnClickListener(addPhotoClick);
         selectedImages=new ArrayList<>();
+        tv_date=(TextView)findViewById(R.id.id_tv_date);
+        tv_date.setOnClickListener(dateClick);
+        tv_time=(TextView) findViewById(R.id.id_tv_time);
+        tv_time.setOnClickListener(timeClick);
+
+        dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        timeFormatter = new SimpleDateFormat("H:mm", Locale.US);
+
+        calendar = Calendar.getInstance();
+        tv_date.setText(dateFormatter.format(calendar.getTime()));
+        tv_time.setText(timeFormatter.format(calendar.getTime()));
+        setDateTimeField();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("yoba").setMessage("suka").setNegativeButton(android.R.string.ok,null).create().show();
     }
+
+    private void setDateTimeField() {
+        year = calendar.get(Calendar.YEAR);
+        month = calendar.get(Calendar.MONTH);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        hour = calendar.get(Calendar.HOUR_OF_DAY);
+        minute = calendar.get(Calendar.MINUTE);
+
+        dateDialog = new DatePickerDialog(activity, new DatePickerDialog.OnDateSetListener() {
+            public void onDateSet(DatePicker view, int yearSelected, int monthOfYear, int dayOfMonth) {
+                Calendar newDate = Calendar.getInstance();
+                newDate.set(yearSelected, monthOfYear, dayOfMonth);
+                tv_date.setText(dateFormatter.format(newDate.getTime()));
+            }
+        },year, month, day);
+
+        timeDialog = new TimePickerDialog(activity, new TimePickerDialog.OnTimeSetListener() {
+            public void onTimeSet(TimePicker view, int hourOfDay, int minuteS) {
+                Calendar newTime = Calendar.getInstance();
+                newTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                newTime.set(Calendar.MINUTE, minuteS);
+                tv_time.setText(timeFormatter.format(newTime.getTime()));
+            }
+        },hour, minute, true);
+    }
+
+    View.OnClickListener dateClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            dateDialog.show();
+        }
+    };
+
+    View.OnClickListener timeClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            timeDialog.show();
+        }
+    };
 
     View.OnClickListener addPhotoClick = new View.OnClickListener() {
         @Override

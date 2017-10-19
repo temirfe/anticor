@@ -24,6 +24,9 @@ import com.android.volley.RequestQueue;
 
 import org.w3c.dom.Text;
 
+import java.util.Locale;
+
+import kg.prosoft.anticorruption.service.LocaleHelper;
 import kg.prosoft.anticorruption.service.MyDbHandler;
 import kg.prosoft.anticorruption.service.MyHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
@@ -75,17 +78,24 @@ public class BaseActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main, menu);
 
         //change search icon color to white
+        int color;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            color =activity.getResources().getColor(android.R.color.white, activity.getTheme());
+        }else {
+            color =activity.getResources().getColor(android.R.color.white);
+        }
+
         Drawable searchIcon = menu.findItem(R.id.action_search).getIcon();
         if(searchIcon != null) {
             searchIcon.mutate();
-            int color;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                color =activity.getResources().getColor(android.R.color.white, activity.getTheme());
-            }else {
-                color =activity.getResources().getColor(android.R.color.white);
-            }
             searchIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         }
+/*
+        Drawable settingsIcon = menu.findItem(R.id.action_settings).getIcon();
+        if(settingsIcon != null) {
+            settingsIcon.mutate();
+            settingsIcon.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        }*/
 
         searchItem = menu.findItem(R.id.action_search);
         //SearchManager searchManager = (SearchManager) BaseActivity.this.getSystemService(Context.SEARCH_SERVICE);
