@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,14 +27,33 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.Profile;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterAuthToken;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import kg.prosoft.anticorruption.service.Endpoints;
+import kg.prosoft.anticorruption.service.LocaleHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.SessionManager;
 
@@ -55,6 +75,10 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
     Context context;
+    LoginButton fbLoginButton;
+    CallbackManager callbackManager;
+    TwitterLoginButton twiLoginButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +119,102 @@ public class LoginActivity extends AppCompatActivity {
         tv_register.setOnClickListener(onClickGoToRegister);
         TextView tv_forgot = (TextView)findViewById(R.id.id_tv_forgot);
         tv_forgot.setOnClickListener(onClickForgot);
+
+        //--- facebook login start --//
+        fbLoginButton = (LoginButton) findViewById(R.id.fb_login_button);
+        fbLoginButton.setReadPermissions("email");
+        // Other app specific specialization
+
+        // Callback registration
+        callbackManager = CallbackManager.Factory.create();
+        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code
+                AccessToken fb_access_token=loginResult.getAccessToken();
+                Set fb_granted_perm_set=loginResult.getRecentlyGrantedPermissions();
+                Set fb_denied_perm_set=loginResult.getRecentlyDeniedPermissions();
+
+                Log.e("FbSuc","at: "+fb_access_token);
+                Log.e("FbSuc","gp: "+fb_granted_perm_set);
+                Log.e("FbSuc","dp: "+fb_denied_perm_set);
+                Log.e("FbSuc","uid: "+fb_access_token.getUserId());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.e("FBonCancel","yep");
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                // App code
+                Log.e("FBonError",exception+"");
+            }
+        });
+
+        //later
+        Log.e("LoginAct","fb token:"+AccessToken.getCurrentAccessToken());
+        Log.e("LoginAct","fb profile:"+Profile.getCurrentProfile());
+        //--- facebook login end --//
+
+        //twitter login start//
+        twiLoginButton = (TwitterLoginButton) findViewById(R.id.twi_login_button);
+        twiLoginButton.setCallback(new Callback<TwitterSession>() {
+            @Override
+            public void success(Result<TwitterSession> result) {
+                // Do something with result, which provides a TwitterSession for making API calls
+                Log.e("twiSuccess",result+"");
+                TwitterSession twiSession = result.data;
+                Log.e("twiSuccess","user_id "+twiSession.getUserId());
+                Log.e("twiSuccess","user_name "+twiSession.getUserName());
+
+                //request email
+                TwitterAuthClient twiAuthClient = new TwitterAuthClient();
+                twiAuthClient.requestEmail(twiSession, new Callback<String>() {
+                    @Override
+                    public void success(Result<String> result) {
+                        // Do something with the result, which provides the email address
+                        String resString=result.data;
+                        Log.e("twiEmailSuccess","res "+resString);
+                    }
+
+                    @Override
+                    public void failure(TwitterException exception) {
+                        // Do something on failure
+                        Log.e("twiEmailFail",exception.toString());
+                    }
+                });
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                // Do something on failure
+                Log.e("twiFailure",exception+"");
+            }
+        });
+
+        //later
+        TwitterSession twiSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
+        if(twiSession!=null){
+            TwitterAuthToken twiAuthToken = twiSession.getAuthToken();
+            String twiToken = twiAuthToken.token;
+            String twiSecret = twiAuthToken.secret;
+            Log.e("LoginAct","twi token:"+twiToken);
+            Log.e("LoginAct","twi secret:"+twiSecret);
+        }
+        //--- twitter login end --//
+
+
+    }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        twiLoginButton.onActivityResult(requestCode, resultCode, data);
     }
 
     View.OnClickListener onClickGoToRegister = new View.OnClickListener(){
@@ -291,4 +411,20 @@ public class LoginActivity extends AppCompatActivity {
         RequestQueue queue = MyVolley.getInstance(this).getRequestQueue();
         queue.cancelAll(this);
     }
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        String lang=session.getLanguage();
+        if(lang.isEmpty()){lang="ky";}
+        LocaleHelper.setLocale(context, lang);
+    }
+
+    /*@Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        super.onSaveInstanceState(outState);
+    }*/
 }

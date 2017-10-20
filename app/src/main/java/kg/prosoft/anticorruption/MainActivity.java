@@ -175,10 +175,6 @@ public class MainActivity extends BaseActivity
             showReportFrag(1);
             //Log.e("MainAct","showReport fired");
         }
-
-        Log.e("LANGUAGE DEFAULT", Locale.getDefault().getLanguage());
-        Log.e("LANGUAGE SAVED",lang);
-        Log.e("LANGUAGE session","s "+session.getLanguage());
     }
 
     public void setNewsBarSpinner(){

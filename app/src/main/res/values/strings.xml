@@ -106,7 +106,7 @@
     <string name="reset">Reset</string>
     <string name="anonymous">Anonymous</string>
     <string name="forgot_password">Forgot password?</string>
-    <string name="research_and_report">Investigations</string>
+    <string name="research_and_report">Investigations/Reports</string>
     <string name="corruption_fight">Corruption Struggle</string>
     <string name="corruption_map">Corruption Map</string>
     <string name="corruption_report">Report about a corruption</string>
@@ -135,5 +135,10 @@
     <string name="title_activity_authority_view">AuthorityViewActivity</string>
     <string name="title_activity_drop">DropActivity</string>
     <string name="title_activity_spin">SpinActivity</string>
+    <string name="facebook_app_id">2026864364212005</string>
+    <string name="fb_login_protocol_scheme">fb2026864364212005</string>
+
+    <string name="com.twitter.sdk.android.CONSUMER_KEY">AIw8j1pjMcH2QXUAPLaQQJ3SL</string>
+    <string name="com.twitter.sdk.android.CONSUMER_SECRET">72HJCEZjjNU77TgrELQoskYpxhSuQslXciMolHrF9AW4lfnwbt</string>
 
 </resources>

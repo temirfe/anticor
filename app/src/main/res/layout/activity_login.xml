@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_username_or_email"
                 android:inputType="textEmailAddress"
-                android:imeOptions="actionNext"
+                android:imeOptions="actionNext|flagNoExtractUi"
                 android:maxLines="1"/>
 
             <EditText
@@ -67,9 +67,9 @@
                 android:text="@string/forgot_password"
                 android:id="@+id/id_tv_forgot"
                 android:textColor="@drawable/link"
-                android:padding="10dp"
+                android:padding="6dp"
                 android:gravity="center"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="5dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -77,9 +77,24 @@
                 android:text="@string/register"
                 android:id="@+id/id_tv_register"
                 android:textColor="@drawable/link"
-                android:padding="10dp"
+                android:padding="6dp"
                 android:gravity="center"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="5dp" />
+
+
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/fb_login_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp" />
+
+            <com.twitter.sdk.android.core.identity.TwitterLoginButton
+                android:id="@+id/twi_login_button"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>

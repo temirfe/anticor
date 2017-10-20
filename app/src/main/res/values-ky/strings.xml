@@ -147,9 +147,9 @@
     <string name="filter">Фильтр</string>
     <string name="anonymous">Аноним</string>
     <string name="forgot_password">Сырсөз эсимде жок</string>
-    <string name="research_and_report">Изилдөөлөр жана отчеттор</string>
-    <string name="corruption_fight">Борьба с коррупцией</string>
-    <string name="corruption_map">Коррупция менен күрөшүү</string>
+    <string name="research_and_report">Изилдөөлөр/Отчеттор</string>
+    <string name="corruption_fight">Коррупция м/н күрөшүү</string>
+    <string name="corruption_map">Коррупция картасы</string>
     <string name="corruption_report">Коррупция жөнүндө билдирүү</string>
     <string name="corruption_scheme_report">Коррупциялык схеманы айтып берүү</string>
     <string name="wanna_know">Билгим келет! Кайдан…?</string>

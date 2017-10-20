@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/id_tv_login"
             android:text="@string/login"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@drawable/white_link"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             />
@@ -55,6 +55,7 @@
             android:clickable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
+            android:textColor="@drawable/white_link"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
         <TextView
