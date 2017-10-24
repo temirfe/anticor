@@ -80,6 +80,10 @@ public class ReportViewActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         id=intent.getIntExtra("id",0);
+        if(intent.hasExtra("from")){
+            String from=intent.getStringExtra("from");
+            Log.e("RepView","from: "+from);
+        }
         String title=intent.getStringExtra("title");
         String text=intent.getStringExtra("text");
         String date=intent.getStringExtra("date");

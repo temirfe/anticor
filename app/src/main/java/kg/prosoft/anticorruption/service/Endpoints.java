@@ -12,6 +12,7 @@ public class Endpoints {
     public static final String BASE_URL = "http://anticorruption.cf";
     public static final String API_URL = BASE_URL +"/api";
     public static final String LOGIN = API_URL + "/accounts/login";
+    public static final String SOCIAL = API_URL + "/accounts/social";
     public static final String USERS = API_URL + "/accounts";
     public static final String VOC_DEPEND = API_URL + "/vocabularies/depend";
     public static final String IMG = BASE_URL +"/images";

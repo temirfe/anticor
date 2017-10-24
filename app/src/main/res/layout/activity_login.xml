@@ -96,6 +96,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/google_login_button"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp" />
+
+            <Button
+                android:id="@+id/ok_login_button"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

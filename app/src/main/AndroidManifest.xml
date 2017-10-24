@@ -109,6 +109,18 @@
         <activity android:name=".AnalyticsListActivity" />
         <activity android:name=".AnalyticsViewActivity" />
         <activity android:name=".SettingsActivity"></activity>
+        <activity
+            android:name="ru.ok.android.sdk.OkAuthActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                    android:host="ok1256974336"
+                    android:scheme="okauth"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.facebook.login.LoginManager;
+
 import kg.prosoft.anticorruption.LoginActivity;
 import kg.prosoft.anticorruption.MainActivity;
 //import kg.prosoft.anticorruption.model.User;
@@ -287,8 +289,9 @@ public class SessionManager {
     public void logoutUser(){
         // Clearing all data from Shared Preferences
         clear();
+        LoginManager.getInstance().logOut();//facebook logout
 
-        // After logout redirect user to Loing Activity
+        // After logout redirect user to MainActivity
         Intent i = new Intent(_context, MainActivity.class);
         // Closing all the Activities
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -214,7 +214,7 @@ public class ListReportsFragment extends Fragment {
     };
 
     public void populateList(final int page,Uri.Builder urlB, final boolean applyNewFilter, final boolean newlist){
-
+        Log.e("populateList", "request sent");
         if(applyNewFilter){
             progress = new ProgressDialog(activity);
             progress.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
@@ -239,7 +239,7 @@ public class ListReportsFragment extends Fragment {
             @Override
             public void onResponse(JSONArray response) {
                 try{
-                    Log.i("RESPONSE", "reports keldi");
+                    Log.e("RESPONSE", "reports keldi");
                     if(progress!=null){progress.dismiss();}
                     if(applyNewFilter || newlist){reportList.clear();}
                     int leng=response.length();

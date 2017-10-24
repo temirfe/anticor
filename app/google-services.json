@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "170973181296",
+    "project_id": "anticorruption-1505147964253"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:170973181296:android:4d4f054bb4ed9393",
+        "android_client_info": {
+          "package_name": "kg.prosoft.anticorruption"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "170973181296-cuvel3irbmr58lq4n250li858m4qv2g6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "kg.prosoft.anticorruption",
+            "certificate_hash": "a24824a2b14a254db5f6ad0c310f64663f8a6f64"
+          }
+        },
+        {
+          "client_id": "170973181296-95l2bfoimt60cgoe7nairr0i0vt7kko7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXrkVwYcTMDp5xoiWxgR93ErYVFcMUOsg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

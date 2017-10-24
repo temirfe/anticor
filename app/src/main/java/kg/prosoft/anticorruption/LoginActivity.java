@@ -4,10 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -31,10 +35,22 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterAuthToken;
@@ -47,6 +63,8 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -56,14 +74,20 @@ import kg.prosoft.anticorruption.service.Endpoints;
 import kg.prosoft.anticorruption.service.LocaleHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.SessionManager;
+import ru.ok.android.sdk.Odnoklassniki;
+import ru.ok.android.sdk.OkListener;
+import ru.ok.android.sdk.OkAuthListener;
+import ru.ok.android.sdk.OkRequestMode;
+import ru.ok.android.sdk.util.OkAuthType;
+import ru.ok.android.sdk.util.OkDevice;
+import ru.ok.android.sdk.util.OkScope;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
     /**
      * save credential in session
      */
     SessionManager session;
-
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -78,6 +102,17 @@ public class LoginActivity extends AppCompatActivity {
     LoginButton fbLoginButton;
     CallbackManager callbackManager;
     TwitterLoginButton twiLoginButton;
+    GoogleApiClient mGoogleApiClient;
+    int RC_SIGN_IN=4433;
+    private ProgressDialog mProgressDialog;
+    String TAG="LoginAct";
+
+    protected Odnoklassniki odnoklassniki;
+    protected static final String OK_APP_ID = "1256974336";
+    protected static final String OK_APP_KEY = "CBAJOMOLEBABABABA";
+    protected static final String OK_REDIRECT_URL = "okauth://ok1256974336";
+
+    String provider, provider_data, puid, provider_email, provider_username,provider_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,13 +167,48 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
                 // App code
                 AccessToken fb_access_token=loginResult.getAccessToken();
-                Set fb_granted_perm_set=loginResult.getRecentlyGrantedPermissions();
-                Set fb_denied_perm_set=loginResult.getRecentlyDeniedPermissions();
+                String fb_user_id=fb_access_token.getUserId();
 
                 Log.e("FbSuc","at: "+fb_access_token);
-                Log.e("FbSuc","gp: "+fb_granted_perm_set);
-                Log.e("FbSuc","dp: "+fb_denied_perm_set);
                 Log.e("FbSuc","uid: "+fb_access_token.getUserId());
+
+                Profile profile = Profile.getCurrentProfile();
+                final String fbName = profile.getName();
+                final Uri fb_link = profile.getLinkUri();
+                Log.e("FbSuc","name: "+fbName +" uri: "+fb_link);
+
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                Log.v("LoginActivity", response.toString());
+                                try {
+                                    // Application code
+                                    String email = object.getString("email");
+                                    String name = object.getString("name");
+                                    String id = object.getString("id");
+                                    Log.e("FbGraph","email: "+email +" uri: "+name+" id:"+id);
+
+                                    puid=id;
+                                    provider_name=fbName;
+                                    provider="facebook";
+                                    provider_data=response.toString()+" "+fbName+" "+fb_link;
+                                    provider_email=email;
+                                    provider_username="";
+                                    if(puid!=null && !puid.isEmpty()){
+                                        postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
+                                    }
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,link");
+                request.setParameters(parameters);
+                request.executeAsync();
             }
 
             @Override
@@ -154,8 +224,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         //later
-        Log.e("LoginAct","fb token:"+AccessToken.getCurrentAccessToken());
-        Log.e("LoginAct","fb profile:"+Profile.getCurrentProfile());
+        //Log.e("LoginAct","fb token:"+AccessToken.getCurrentAccessToken());
+        //Log.e("LoginAct","fb profile:"+Profile.getCurrentProfile());
         //--- facebook login end --//
 
         //twitter login start//
@@ -166,8 +236,10 @@ public class LoginActivity extends AppCompatActivity {
                 // Do something with result, which provides a TwitterSession for making API calls
                 Log.e("twiSuccess",result+"");
                 TwitterSession twiSession = result.data;
-                Log.e("twiSuccess","user_id "+twiSession.getUserId());
-                Log.e("twiSuccess","user_name "+twiSession.getUserName());
+                final long id=twiSession.getUserId();
+                final String username=twiSession.getUserName();
+                Log.e("twiSuccess","user_id "+id);
+                Log.e("twiSuccess","user_name "+username);
 
                 //request email
                 TwitterAuthClient twiAuthClient = new TwitterAuthClient();
@@ -175,8 +247,18 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void success(Result<String> result) {
                         // Do something with the result, which provides the email address
-                        String resString=result.data;
-                        Log.e("twiEmailSuccess","res "+resString);
+                        String email=result.data;
+                        Log.e("twiEmailSuccess","res "+email);
+                        puid=Long.toString(id);
+                        provider_name="";
+                        provider="twitter";
+                        provider_data="username: "+username+" email: "+email;
+                        provider_email=email;
+                        provider_username=username;
+                        if(puid!=null && !puid.isEmpty()){
+                            Log.e("twi",provider_data+" id:"+id);
+                            //postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
+                        }
                     }
 
                     @Override
@@ -195,19 +277,65 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         //later
-        TwitterSession twiSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
+        /*TwitterSession twiSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
         if(twiSession!=null){
             TwitterAuthToken twiAuthToken = twiSession.getAuthToken();
             String twiToken = twiAuthToken.token;
             String twiSecret = twiAuthToken.secret;
             Log.e("LoginAct","twi token:"+twiToken);
             Log.e("LoginAct","twi secret:"+twiSecret);
-        }
+        }*/
         //--- twitter login end --//
 
+        //--- google login start --//
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        // Build a GoogleApiClient with access to the Google Sign-In API and the
+        // options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        // Set the dimensions of the sign-in button.
+        SignInButton signInButton = (SignInButton) findViewById(R.id.google_login_button);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
 
+        signInButton.setOnClickListener(googleLoginClick);
+        //--- google login end --//
+
+        //--- ok login start --//
+        Button okLoginButton = (Button) findViewById(R.id.ok_login_button);
+        okLoginButton.setOnClickListener(new LoginClickListener(OkAuthType.WEBVIEW_OAUTH));
+        odnoklassniki = Odnoklassniki.createInstance(this, OK_APP_ID, OK_APP_KEY);
+        /*odnoklassniki.checkValidTokens(new OkListener() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                Log.e("OkSuccess","token valid "+json);
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e("OkError",String.format("%s: %s", getString(R.string.error), error));
+            }
+        });*/
+        //--- ok login end --//
     }
 
+    View.OnClickListener googleLoginClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        }
+    };
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d("LogInAct", "onConnectionFailed:" + connectionResult);
+    }
 
 
     @Override
@@ -215,6 +343,162 @@ public class LoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
         twiLoginButton.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleGoogleSignInResult(result);
+        }
+        if (Odnoklassniki.getInstance().isActivityRequestOAuth(requestCode)) {
+            Odnoklassniki.getInstance().onAuthActivityResult(requestCode, resultCode, data, getAuthListener());
+        } else if (Odnoklassniki.getInstance().isActivityRequestViral(requestCode)) {
+            Odnoklassniki.getInstance().onActivityResultResult(requestCode, resultCode, data, getToastListener());
+        }
+    }
+
+    private void testIfInstallationSourceIsOK() {
+        Map<String, String> args = Collections.singletonMap("adv_id", OkDevice.getAdvertisingId(LoginActivity.this));
+        odnoklassniki.requestAsync("sdk.getInstallSource", args, EnumSet.of(OkRequestMode.UNSIGNED), new OkListener() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                try {
+                    int result = Integer.parseInt(json.optString("result"));
+                    String msg=result > 0 ?
+                            "application installation caused by OK app (" + result + ")" :
+                            "application is not caused by OK app (" + result + ")";
+                    Log.e("okTest",msg);
+                } catch (NumberFormatException e) {
+                    Log.e("okTestCatch","invalid value while getting install source " + json);
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e("okTestError","error while getting install source " + error);
+            }
+        });
+    }
+
+    /**
+     * Creates a listener that displays result as a toast message
+     */
+    @NonNull
+    private OkListener getToastListener() {
+        return new OkListener() {
+            @Override
+            public void onSuccess(final JSONObject json) {
+                Log.e("OkToastSuccess",json.toString());
+                getOkUser();
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e("OkToastError",String.format("%s: %s", getString(R.string.error), error));
+            }
+        };
+    }
+
+    private void getOkUser(){
+        odnoklassniki.requestAsync("users.getCurrentUser", null, null, new OkListener() {
+            @Override
+            public void onSuccess(JSONObject json) {
+                try {
+                    if(json.has("uid")){puid=json.getString("uid");}
+                    provider_name="";
+                    if(json.has("name")){provider_name=json.getString("name");}
+                    provider="odnoklassniki";
+                    provider_data=json.toString();
+                    provider_email="";
+                    provider_username="";
+                    if(puid!=null && !puid.isEmpty()){
+                        postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Log.e("getOkUser success",json.toString());
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e("getOkUser error","Get current user failed: " + error);
+            }
+        });
+    }
+
+    /**
+     * Creates a listener that is run on OAUTH authorization completion
+     */
+    @NonNull
+    private OkAuthListener getAuthListener() {
+        return new OkAuthListener() {
+            @Override
+            public void onSuccess(final JSONObject json) {
+                try {
+                    Log.e("OkOnSuccess",json.toString());
+                    Log.e("OkOnSuccess",String.format("access_token: %s", json.getString("access_token")));
+                    //testIfInstallationSourceIsOK();
+                    getOkUser();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //showForm();
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e("AuthError",String.format("%s: %s", getString(R.string.error), error));
+            }
+
+            @Override
+            public void onCancel(String error) {
+                        Log.e("AuthCancel",error+"");
+            }
+        };
+    }
+
+    protected class LoginClickListener implements View.OnClickListener {
+        private OkAuthType authType;
+
+        public LoginClickListener(OkAuthType authType) {
+            this.authType = authType;
+        }
+
+        @Override
+        public void onClick(final View view) {
+            odnoklassniki.requestAuthorization(LoginActivity.this, OK_REDIRECT_URL, authType, OkScope.VALUABLE_ACCESS);
+        }
+    }
+
+    private void handleGoogleSignInResult(GoogleSignInResult result) {
+        Log.d("LoginAct", "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            GoogleSignInAccount acct = result.getSignInAccount();
+            String name=acct.getDisplayName();
+            String email=acct.getEmail();
+            Uri photo=acct.getPhotoUrl();
+            String id=acct.getId();
+            Log.e("googSuccess","name: "+name);
+            Log.e("googSuccess","email: "+email);
+            Log.e("googSuccess","id: "+id);
+            Log.e("googSuccess","token id: "+acct.getIdToken());
+
+            puid=id;
+            provider_name=name;
+            provider="google";
+            provider_data="name: "+name+" email: "+email+" photo:"+photo;
+            provider_email=email;
+            provider_username="";
+            if(puid!=null && !puid.isEmpty()){
+                postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
+            }
+            //updateUI(true);
+        } else {
+            // Signed out, show unauthenticated UI.
+            //updateUI(false);
+        }
     }
 
     View.OnClickListener onClickGoToRegister = new View.OnClickListener(){
@@ -393,6 +677,105 @@ public class LoginActivity extends AppCompatActivity {
         MyVolley.getInstance(this).addToRequestQueue(loginRequest);
     }
 
+    public void postSocial(final String provider, final String provider_data, final String puid,
+                           final String provider_email, final String provider_username, final String provider_name){
+        showProgress(true);
+        Response.Listener<String> responseListener = new Response.Listener<String>(){
+            @Override
+            public void onResponse(String response) {
+                Log.e("Social", "response:"+response);
+                try {
+                    if(response.contains("ask_email")){
+                        askEmail();
+                    }
+                    else if(response.contains("error")){
+                        showProgress(false);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                        builder.setMessage(R.string.login_fail).setNegativeButton(R.string.close,null).create().show();
+                    }
+                    else{
+                        showProgress(false);
+                        JSONObject jsonResponse = new JSONObject(response);
+                        int user_id = jsonResponse.getInt("id");
+                        if(user_id!=0){
+                            String name = jsonResponse.getString("username");
+                            String email = jsonResponse.getString("email");
+                            String access_token = jsonResponse.getString("auth_key");
+                            Log.i("LOGIN ACT", "auth_key:"+access_token+" user_id:"+user_id);
+
+                            session.createLoginSession(name,email, user_id, access_token);
+
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("from","login");
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                        }
+                        else{
+                            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                            builder.setMessage(R.string.login_fail).setNegativeButton(R.string.close,null).create().show();
+                        }
+                    }
+
+                } catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        Response.ErrorListener errorListener =new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Log.e("Response", error.toString());
+                Toast.makeText(getApplicationContext(), "Произошла ошибка, перезагрузите приложение", Toast.LENGTH_LONG).show();
+            }
+        };
+
+        String url = Endpoints.SOCIAL;
+        StringRequest loginRequest = new StringRequest(Request.Method.POST, url,responseListener, errorListener){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("puid",puid);
+                params.put("provider",provider);
+                params.put("data",provider_data);
+                params.put("email",provider_email);
+                params.put("username",provider_username);
+                params.put("name",provider_name);
+
+                return params;
+            }
+        };
+        MyVolley.getInstance(this).addToRequestQueue(loginRequest);
+    }
+
+    public void askEmail(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+        final EditText edittext = new EditText(LoginActivity.this);
+        builder.setTitle(R.string.prompt_email);
+        builder.setMessage(R.string.enter_email_to_complete);
+        builder.setView(edittext);
+        builder.setPositiveButton(R.string.submit, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String email = edittext.getText().toString();
+                if(isEmailValid(email)){
+                    provider_email=email;
+                    postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
+                }
+                else{
+                    askEmail();
+                }
+                Log.e(TAG,"alert email "+email);
+            }
+        });
+        builder.setNegativeButton(R.string.close,new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                showProgress(false);
+            }
+        });
+        builder.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -427,4 +810,67 @@ public class LoginActivity extends AppCompatActivity {
 
         super.onSaveInstanceState(outState);
     }*/
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
+    }
+
+    //later if needed
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (opr.isDone()) {
+            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+            // and the GoogleSignInResult will be available instantly.
+            Log.d(TAG, "Got gooogle cached sign-in");
+            GoogleSignInResult result = opr.get();
+            //handleGoogleSignInResult(result);
+        } else {
+            // If the user has not previously signed in on this device or the sign-in has expired,
+            // this asynchronous branch will attempt to sign in the user silently.  Cross-device
+            // single sign-on will occur in this branch.
+            showProgressDialog();
+            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(GoogleSignInResult googleSignInResult) {
+                    hideProgressDialog();
+                    //handleGoogleSignInResult(googleSignInResult);
+                }
+            });
+        }
+    }
+
+    private void signOutGoogle() {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        //updateUI(false);
+                    }
+                });
+    }
+
+    private void revokeAccessGoogle() {
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        //updateUI(false);
+                    }
+                });
+    }
+
 }

@@ -153,6 +153,7 @@ public class MainActivity extends BaseActivity
         tv_lang.setOnClickListener(onClickSettings);
 
         Menu nav_Menu = navigationView.getMenu();
+        Log.e(TAG,"sessLang "+session.getLanguage());
 
         if(session.isLoggedIn()){
             Log.e(TAG,"is logged in "+session.getUserName());

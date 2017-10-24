@@ -135,9 +135,11 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     private int year, month, day, hour, minute;
     private DatePickerDialog dateDialog;
     private TimePickerDialog timeDialog;
-    private SimpleDateFormat dateFormatter;
+    private SimpleDateFormat dateFormatter, dateFormatterForm;
     private SimpleDateFormat timeFormatter;
     public Calendar calendar;
+    String date_form;
+    int user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +155,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         gotIntent=getIntent();
 
         activity=this;
-
+        user_id=session.getUserId();
         selected_city_id=session.getCityId();
 
         parentMap=new HashMap<>();
@@ -194,10 +196,12 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         tv_time.setOnClickListener(timeClick);
 
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        dateFormatterForm = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
         timeFormatter = new SimpleDateFormat("H:mm", Locale.US);
 
         calendar = Calendar.getInstance();
         tv_date.setText(dateFormatter.format(calendar.getTime()));
+        date_form=dateFormatter.format(calendar.getTime());
         tv_time.setText(timeFormatter.format(calendar.getTime()));
         setDateTimeField();
 
@@ -218,6 +222,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                 Calendar newDate = Calendar.getInstance();
                 newDate.set(yearSelected, monthOfYear, dayOfMonth);
                 tv_date.setText(dateFormatter.format(newDate.getTime()));
+                date_form=dateFormatterForm.format(newDate.getTime());
             }
         },year, month, day);
 
@@ -415,7 +420,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(80, 80);
             iv.setLayoutParams(layoutParams);
             iv.setImageBitmap(bitmap);
-            ll_images.setPadding(0,10,0,10);
+            ll_images.setPadding(5,5,5,5);
             ll_images.addView(iv);
         }
         else{
@@ -661,6 +666,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         final String contact = et_contact.getText().toString();
         final String latitude = tv_lat.getText().toString();
         final String longitude = tv_lng.getText().toString();
+        final String date=date_form+" "+tv_time.getText().toString();
 
         if(title.trim().equals("")){
             et_title.setError(getResources().getString(R.string.required));
@@ -711,6 +717,22 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             session.createContactSession(name,email,contact);
             session.setCityId(selected_city_id);
 
+            Log.e(TAG,"title: "+title+" text: "+description);
+            if(anonym){
+                Log.e(TAG,"anonumous");
+            }
+            else{
+                Log.e(TAG,"author: "+name+" email: "+email+" cont: "+contact);
+            }
+            Log.e(TAG,"lat: "+latitude+" lon: "+longitude);
+            Log.e(TAG,"authority_id: "+selected_authority_id+" city_id: "+selected_city_id);
+            Log.e(TAG,"type_id: "+selected_type_id+" category_id: "+selected_sector_id);
+            Log.e(TAG,"date: "+date);
+            for (String img : selectedImages)
+            {
+                Log.e(TAG,"image: "+img);
+            }
+
             final ProgressDialog progress = new ProgressDialog(this);
             progress.setTitle(getResources().getString(R.string.sending));
             progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
@@ -729,6 +751,12 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                                 Intent intent = new Intent(AddReportActivity.this, ReportViewActivity.class);
                                 intent.putExtra("id",id);
                                 intent.putExtra("from","form");
+                                intent.putExtra("title",title);
+                                intent.putExtra("text",description);
+                                intent.putExtra("date",date);
+                                intent.putExtra("lat",Double.parseDouble(latitude));
+                                intent.putExtra("lng",Double.parseDouble(longitude));
+                                intent.putExtra("city",titleMap.get(selected_city_id));
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             }
@@ -783,7 +811,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                     params.put("title",title);
                     params.put("text",description);
                     if(anonym){
-                        params.put("anonumous","1");
+                        params.put("anonymous","1");
                     }
                     else{
                         params.put("author",name);
@@ -796,7 +824,8 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                     params.put("city_id",Integer.toString(selected_city_id));
                     params.put("category_id",Integer.toString(selected_sector_id));
                     params.put("type_id",Integer.toString(selected_type_id));
-                    //if(user_id!=0){params.put("user_id",Integer.toString(user_id));}
+                    params.put("date",date);
+                    params.put("user_id",Integer.toString(user_id));
                     int im=1;
                     for (String img : selectedImages)
                     {
