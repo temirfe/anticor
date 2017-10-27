@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +54,7 @@ import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.SessionManager;
 
 public class AuthorityViewActivity extends AppCompatActivity {
-    TextView tv_title, tv_text, tv_zero_comment;
+    TextView tv_title, tv_text, tv_zero_comment, tv_report_count, tv_report_link;
     RatingBar ratingBar;
     ImageView iv_image;
     Activity activity;
@@ -63,6 +64,8 @@ public class AuthorityViewActivity extends AppCompatActivity {
     int id;
     int rating=0;
     int user_rating=0;
+    boolean loadAll;
+    public RelativeLayout rl_pb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,30 +83,40 @@ public class AuthorityViewActivity extends AppCompatActivity {
         tv_text=(TextView)findViewById(R.id.id_tv_text);
         iv_image=(ImageView)findViewById(R.id.id_iv_img);
         tv_zero_comment=(TextView)findViewById(R.id.id_tv_comments_zero);
+        tv_report_count=(TextView)findViewById(R.id.id_tv_report_count);
+        tv_report_link=(TextView)findViewById(R.id.id_tv_report_link);
         ll_comments=(LinearLayout) findViewById(R.id.id_ll_comments);
+        rl_pb=(RelativeLayout)findViewById(R.id.id_rl_pb);
 
         Intent intent = getIntent();
         id=intent.getIntExtra("id",0);
-        int parent_id=intent.getIntExtra("parent_id",0);
-        String title=intent.getStringExtra("title");
-        String text=intent.getStringExtra("text");
-        String image=intent.getStringExtra("image");
-        rating=intent.getIntExtra("rating",0);
+        if(intent.hasExtra("title")){
+            int parent_id=intent.getIntExtra("parent_id",0);
+            String title=intent.getStringExtra("title");
+            String text=intent.getStringExtra("text");
+            String image=intent.getStringExtra("image");
+            rating=intent.getIntExtra("rating",0);
 
-        tv_title.setText(title);
-        tv_text.setText(text);
+            tv_title.setText(title);
+            tv_text.setText(text);
 
-        if(!image.isEmpty()){
-            GlideApp.with(this)
-                    .load(Endpoints.AUTHORITY_IMG+"/"+image)        // optional
-                    .into(iv_image);
+            if(!image.isEmpty()){
+                GlideApp.with(this)
+                        .load(Endpoints.AUTHORITY_IMG+"/"+image)        // optional
+                        .into(iv_image);
+            }
+
+            ratingBar = (RatingBar) findViewById(R.id.id_rating);
+            ratingBar.setOnTouchListener(showRatingDialog);
+            if(rating>0){
+                float f_rating=(float)rating/2;
+                ratingBar.setRating(f_rating);
+            }
+            loadAll=false;
         }
-
-        ratingBar = (RatingBar) findViewById(R.id.id_rating);
-        ratingBar.setOnTouchListener(showRatingDialog);
-        if(rating>0){
-            float f_rating=(float)rating/2;
-            ratingBar.setRating(f_rating);
+        else{
+            loadAll=true;
+            rl_pb.setVisibility(View.VISIBLE);
         }
 
         //although we have info from intent, we make a request to get comments
@@ -118,6 +131,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
+                rl_pb.setVisibility(View.GONE);
                 try{
                     if(jsonObject.has("comments")){
                         JSONArray comments = jsonObject.getJSONArray("comments");
@@ -129,6 +143,33 @@ public class AuthorityViewActivity extends AppCompatActivity {
                             showCommentItem(com_name,com_text,com_date);
                         }
                         if(comments.length()==0){tv_zero_comment.setVisibility(View.VISIBLE);}
+                    }
+                    int rep_count=jsonObject.getInt("reports");
+                    if(rep_count>0){
+                        tv_report_count.setText(Integer.toString(rep_count));
+                        tv_report_link.setVisibility(View.VISIBLE);
+                    }
+                    if(loadAll){
+                        String title=jsonObject.getString("title");
+                        String text=jsonObject.getString("text");
+                        String image=jsonObject.getString("img");
+                        rating=jsonObject.getInt("rating");
+
+                        tv_title.setText(title);
+                        tv_text.setText(text);
+
+                        if(!image.isEmpty()){
+                            GlideApp.with(activity)
+                                    .load(Endpoints.AUTHORITY_IMG+"/"+image)        // optional
+                                    .into(iv_image);
+                        }
+
+                        ratingBar = (RatingBar) findViewById(R.id.id_rating);
+                        ratingBar.setOnTouchListener(showRatingDialog);
+                        if(rating>0){
+                            float f_rating=(float)rating/2;
+                            ratingBar.setRating(f_rating);
+                        }
                     }
 
                 }catch(JSONException e){e.printStackTrace();}
@@ -186,6 +227,12 @@ public class AuthorityViewActivity extends AppCompatActivity {
         intent.putExtra("id",id);
         startActivity(intent);
     }
+    public void openReports(View v){
+        Intent intent = new Intent(v.getContext(), MainActivity.class);
+        intent.putExtra("authority_id",id);
+        intent.putExtra("showReport",true);
+        startActivity(intent);
+    }
 
     View.OnTouchListener showRatingDialog = new View.OnTouchListener(){
         @Override
@@ -208,6 +255,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 float user_rate=rateMe.getRating();
+                                user_rate=user_rate*2; //since it's only 5 star system here, but 10 star in server
                                 sendRating(id,user_rate);
                                 dialog.dismiss();
                             }

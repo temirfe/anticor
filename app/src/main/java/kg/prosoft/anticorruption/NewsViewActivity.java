@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -41,6 +42,8 @@ public class NewsViewActivity extends BaseActivity {
     public LinearLayout ll_comments;
     int id, cat_id;
     String TAG ="NewsViewAc";
+    boolean loadAll;
+    ProgressBar pb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,7 @@ public class NewsViewActivity extends BaseActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
-
+        pb=(ProgressBar)findViewById(R.id.progressBar1);
         tv_category=(TextView)findViewById(R.id.id_tv_category);
         //tv_category.setOnClickListener(onCtgClick);
         tv_title=(TextView)findViewById(R.id.id_tv_title);
@@ -62,34 +65,41 @@ public class NewsViewActivity extends BaseActivity {
 
         Intent intent = getIntent();
         id=intent.getIntExtra("id",0);
-        cat_id=intent.getIntExtra("cat_id",0);
-        String title=intent.getStringExtra("title");
-        //String description=intent.getStringExtra("desc");
-        String text=intent.getStringExtra("text");
-        String date=intent.getStringExtra("date");
-        String image=intent.getStringExtra("image");
+        if(intent.hasExtra("title")) //if opened from commentActivity then intent has only id
+        {
+            String title=intent.getStringExtra("title");
+            cat_id=intent.getIntExtra("cat_id",0);
+            //String description=intent.getStringExtra("desc");
+            String text=intent.getStringExtra("text");
+            String date=intent.getStringExtra("date");
+            String image=intent.getStringExtra("image");
 
-        tv_title.setText(title);
-        tv_date.setText(date);
-        CharSequence html_text;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            html_text=Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
-        } else {
-            html_text=Html.fromHtml(text);
+            tv_title.setText(title);
+            tv_date.setText(date);
+            CharSequence html_text;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                html_text=Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
+            } else {
+                html_text=Html.fromHtml(text);
+            }
+            tv_text.setText(trimTrailingWhitespace(html_text));
+
+            if(!image.isEmpty()){
+                GlideApp.with(this)
+                        .load(Endpoints.NEWS_IMG+id+"/"+image)
+                        .placeholder(R.drawable.placeholder) // optional
+                        .dontAnimate()
+                        .into(iv_image);
+            }
+
+            new VocabularyTask().execute();
+            loadAll=false;
         }
-        tv_text.setText(trimTrailingWhitespace(html_text));
-
-        if(!image.isEmpty()){
-            GlideApp.with(this)
-                    .load(Endpoints.NEWS_IMG+id+"/"+image)
-                    .placeholder(R.drawable.placeholder) // optional
-                    .dontAnimate()
-                    .into(iv_image);
+        else{
+            loadAll=true;
+            pb.setVisibility(View.VISIBLE);
         }
 
-        new VocabularyTask().execute();
-
-        //although we have info from intent, we make a request to get comments
         requestNews(id);
     }
 
@@ -124,6 +134,7 @@ public class NewsViewActivity extends BaseActivity {
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
+                pb.setVisibility(View.GONE);
                 try{
                     if(jsonObject.has("comments")){
                         JSONArray comments = jsonObject.getJSONArray("comments");
@@ -139,6 +150,31 @@ public class NewsViewActivity extends BaseActivity {
 
                     JSONObject ctgObj = jsonObject.getJSONObject("category");
                     tv_category.setText(ctgObj.getString("value"));
+
+                    if(loadAll){
+                        String title=jsonObject.getString("title");
+                        tv_title.setText(title);
+                        String text=jsonObject.getString("text");
+                        CharSequence html_text;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            html_text=Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
+                        } else {
+                            html_text=Html.fromHtml(text);
+                        }
+                        tv_text.setText(trimTrailingWhitespace(html_text));
+                        cat_id=jsonObject.getInt("id");
+                        String date=jsonObject.getString("date");
+                        date=getDate(date);
+                        tv_date.setText(date);
+                        String image=jsonObject.getString("image");
+                        if(!image.isEmpty()){
+                            GlideApp.with(context)
+                                    .load(Endpoints.NEWS_IMG+id+"/"+image)
+                                    .placeholder(R.drawable.placeholder) // optional
+                                    .dontAnimate()
+                                    .into(iv_image);
+                        }
+                    }
 
                 }catch(JSONException e){e.printStackTrace();}
             }

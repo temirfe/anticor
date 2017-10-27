@@ -72,16 +72,19 @@ public class AddCommentActivity extends AppCompatActivity {
 
         String name=session.getName();
         String email=session.getEmail();
+        if(name==null || name.isEmpty()){
+            name=session.getUserName();
+        }
         //user_id=session.getUserId();
         if(session.isLoggedIn()){
             if(name.length()>0){
                 et_name.setText(name);
-                et_name.setVisibility(View.GONE);
                 et_comment.requestFocus();
             }
             if(email.length()>0){
                 et_email.setText(email);
                 et_email.setVisibility(View.GONE);
+                et_comment.requestFocus();
             }
         }
         else if(name.length()>0 && email.length()>0){
@@ -191,6 +194,7 @@ public class AddCommentActivity extends AppCompatActivity {
                 params.put("name",name);
                 params.put("email",email);
                 params.put("text",comment);
+                params.put("user_id",Integer.toString(session.getUserId()));
                 //if(user_id!=0){params.put("user_id",Integer.toString(user_id));}
                 String to_id="x";
                 if(model.equals("report")){to_id="report_id";}

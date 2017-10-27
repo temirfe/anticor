@@ -7,8 +7,8 @@ android {
         applicationId "kg.prosoft.anticorruption"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 102
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -41,11 +41,12 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:11.0.4'
     compile 'com.google.android.gms:play-services-auth:11.0.4'
     compile 'com.google.maps.android:android-maps-utils:0.5'
-    testCompile 'junit:junit:4.12'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
     compile 'com.facebook.android:facebook-login:[4,5)'
     compile 'com.twitter.sdk.android:twitter-core:3.1.1'
     compile 'ru.ok:odnoklassniki-android-sdk:2.1.2'
+    testCompile 'junit:junit:4.12'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
 }
+
 
 apply plugin: 'com.google.gms.google-services'

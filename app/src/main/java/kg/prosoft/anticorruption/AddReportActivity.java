@@ -205,8 +205,8 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         tv_time.setText(timeFormatter.format(calendar.getTime()));
         setDateTimeField();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("yoba").setMessage("suka").setNegativeButton(android.R.string.ok,null).create().show();
+        //AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        //builder.setTitle("warning").setMessage("warning text").setNegativeButton(android.R.string.ok,null).create().show();
     }
 
     private void setDateTimeField() {

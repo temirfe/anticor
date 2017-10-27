@@ -22,6 +22,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -37,7 +38,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,7 +60,8 @@ import kg.prosoft.anticorruption.service.ReportsTabAdapter;
 import kg.prosoft.anticorruption.service.Vocabulary;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ListReportsFragment.OnCompleteListener{
+        implements NavigationView.OnNavigationItemSelectedListener, ListReportsFragment.OnCompleteListener,
+        OnMapReadyCallback {
 
     private String TAG = MainActivity.class.getSimpleName();
     LinearLayout ll_logo;
@@ -77,7 +82,7 @@ public class MainActivity extends BaseActivity
     TabLayout tabLayout;
     ViewPager mViewPager;
     FrameLayout fragCont;
-    NewsFragment newsFragment;
+    NewsFragment newsFrag;
     List<String> spinOptions;
     ArrayAdapter<String> spinnerDataAdapter;
     Spinner spinner;
@@ -91,6 +96,8 @@ public class MainActivity extends BaseActivity
     int visible_tab=1;
     static int SETTINGS_FLAG=31;
     String lang="";
+    MapView mMapView;
+    OnMapReadyCallback mcback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +165,7 @@ public class MainActivity extends BaseActivity
         if(session.isLoggedIn()){
             Log.e(TAG,"is logged in "+session.getUserName());
             tv_name.setText(session.getUserName());
+            tv_name.setTag(session.getUserId());
             tv_name.setOnClickListener(onClickName);
             tv_login.setVisibility(View.GONE);
         }
@@ -173,9 +181,17 @@ public class MainActivity extends BaseActivity
         showFilteredReport=gotIntent.getBooleanExtra("showReport",false);
         if(showFilteredReport){
             showFilterBadge=true;
+            if(gotIntent.hasExtra("authority_id")){
+                filter_authority_id=gotIntent.getIntExtra("authority_id",0);
+            }
+
             showReportFrag(1);
             //Log.e("MainAct","showReport fired");
         }
+        else{
+            showMainFrag();
+        }
+        initMapSettings(savedInstanceState);
     }
 
     public void setNewsBarSpinner(){
@@ -213,7 +229,7 @@ public class MainActivity extends BaseActivity
                 if(news_ctg_id!=0){
                     builder.appendQueryParameter("category_id", ""+news_ctg_id);
                 }
-                newsFragment.populateList(1,builder,true,false);
+                newsFrag.populateList(1,builder,true,false);
             }
         }
 
@@ -224,6 +240,8 @@ public class MainActivity extends BaseActivity
         @Override
         public void onClick(View view) {
             Intent intent = new Intent(MainActivity.this, AccountActivity.class);
+            int id=(int)view.getTag();
+            intent.putExtra("user_id",id);
             startActivity(intent);
         }
     };
@@ -304,6 +322,56 @@ public class MainActivity extends BaseActivity
         Log.e(TAG, "showMainFrag");
         hideFragContainer();
         navigationView.setCheckedItem(R.id.nav_main);
+        if(myMenu!=null){
+            myMenu.findItem(R.id.action_filter).setVisible(false);
+            myMenu.findItem(R.id.action_search).setVisible(false);
+        }
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager.setVisibility(View.VISIBLE);
+        tabLayout.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.VISIBLE);
+
+        Bundle bundle = new Bundle();
+        if(!showFilteredReport){
+            bundle.putBoolean("populate",true);
+        }
+
+        if(listFrag==null){listFrag = new ListReportsFragment(); listFrag.setArguments(bundle);}
+        if(mapFrag==null){mapFrag = new MapReportsFragment(); mapFrag.setArguments(bundle);}
+        if(newsFrag==null){newsFrag = new NewsFragment();}
+        //listFrag.setArguments(gotIntent.getExtras());
+        //mapFrag.setArguments(gotIntent.getExtras());
+        ReportsTabAdapter adapter = new ReportsTabAdapter(fm);
+
+        adapter.addFragment(newsFrag, getResources().getString(R.string.news));
+        adapter.addFragment(listFrag, getResources().getString(R.string.reports));
+        adapter.addFragment(mapFrag, getResources().getString(R.string.map));
+
+        mViewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(mViewPager);
+        ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
+        Log.e(TAG,"lang "+lang);
+        if(lang.equals("ky")){
+            changeTextSize(vg,0,11);
+            changeTextSize(vg,1,10);
+            changeTextSize(vg,2,11);
+        }
+        else if(lang.equals("en")){
+            changeTextSize(vg,1,11);
+        }
+    }
+
+    //changing tab text size because don't fit to one line
+    public void changeTextSize(ViewGroup vg,int tab, int size){
+        ViewGroup vgTab = (ViewGroup) vg.getChildAt(tab);
+        for (int i = 0; i < vgTab.getChildCount(); i++) {
+            View tabViewChild = vgTab.getChildAt(i);
+            if (tabViewChild instanceof TextView) {
+                ((TextView) tabViewChild).setTextSize(size);
+
+            }
+        }
     }
 
     public void showNewsFrag(){
@@ -326,8 +394,8 @@ public class MainActivity extends BaseActivity
         if(fm.findFragmentByTag("news") != null) {
             fm.beginTransaction().show(fm.findFragmentByTag("news")).commit();
         } else {
-            newsFragment = new NewsFragment();
-            fm.beginTransaction().add(R.id.fragment_container, newsFragment, "news").addToBackStack(null).commit();
+            newsFrag = new NewsFragment();
+            fm.beginTransaction().add(R.id.fragment_container, newsFrag, "news").addToBackStack(null).commit();
         }
         if(fm.findFragmentByTag("research") != null){
             fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
@@ -358,31 +426,27 @@ public class MainActivity extends BaseActivity
         tabLayout.setVisibility(View.VISIBLE);
         fab.setVisibility(View.VISIBLE);
 
-        if(listFrag==null || mapFrag==null){
-            Log.e(TAG, "Report frags are creating");
-            listFrag = new ListReportsFragment();
-            mapFrag = new MapReportsFragment();
-            if(!showFilteredReport){
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("populate",true);
-                listFrag.setArguments(bundle);
-                mapFrag.setArguments(bundle);
-            }
-            //listFrag.setArguments(gotIntent.getExtras());
-            //mapFrag.setArguments(gotIntent.getExtras());
-            ReportsTabAdapter adapter = new ReportsTabAdapter(fm);
-
-            if(showFirst==1){
-                adapter.addFragment(listFrag, getResources().getString(R.string.reports));
-                adapter.addFragment(mapFrag, getResources().getString(R.string.map));
-            }
-            else{
-                adapter.addFragment(mapFrag, getResources().getString(R.string.map));
-                adapter.addFragment(listFrag, getResources().getString(R.string.reports));
-            }
-            mViewPager.setAdapter(adapter);
-            tabLayout.setupWithViewPager(mViewPager);
+        Bundle bundle = new Bundle();
+        if(!showFilteredReport){
+            bundle.putBoolean("populate",true);
         }
+        if(listFrag==null){listFrag = new ListReportsFragment(); listFrag.setArguments(bundle);}
+        if(mapFrag==null){mapFrag = new MapReportsFragment(); mapFrag.setArguments(bundle);}
+
+        //listFrag.setArguments(gotIntent.getExtras());
+        //mapFrag.setArguments(gotIntent.getExtras());
+        ReportsTabAdapter adapter = new ReportsTabAdapter(fm);
+
+        if(showFirst==1){
+            adapter.addFragment(listFrag, getResources().getString(R.string.reports));
+            adapter.addFragment(mapFrag, getResources().getString(R.string.map));
+        }
+        else{
+            adapter.addFragment(mapFrag, getResources().getString(R.string.map));
+            adapter.addFragment(listFrag, getResources().getString(R.string.reports));
+        }
+        mViewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(mViewPager);
     }
     public void hideReportFrag(){
         mViewPager.setVisibility(View.GONE);
@@ -491,7 +555,7 @@ public class MainActivity extends BaseActivity
                     }
                     builder.appendQueryParameter("text", query);
                     searchView.clearFocus();
-                    newsFragment.populateList(1,builder,true,false);
+                    newsFrag.populateList(1,builder,true,false);
                 }
                 else if( ACTIVE_FRAME==RESEARCH_FRAME){
                     searchView.setQuery("", false);
@@ -697,5 +761,29 @@ public class MainActivity extends BaseActivity
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(LocaleHelper.onAttach(base));
+    }
+
+    //map initialization is needed so that when you navigate to map tab it opens without lags
+    public void initMapSettings(final Bundle savedInstanceState){
+        mMapView = (MapView) findViewById(R.id.mapViewFalse);
+        mcback=this;
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        mMapView.onCreate(savedInstanceState);
+                        mMapView.onResume(); // needed to get the map to display immediately
+                        try {
+                            MapsInitializer.initialize(context);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        mMapView.getMapAsync(mcback);
+                    }
+                },
+                1000);
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
     }
 }

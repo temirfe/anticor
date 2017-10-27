@@ -21,6 +21,7 @@
     <string name="sending">Отправка</string>
     <string name="app_error">Произошла ошибка</string>
     <string name="close">Закрыть</string>
+    <string name="show">показать</string>
     <string name="name">Имя</string>
     <string name="username">Имя пользователья (Логин)</string>
     <string name="phone">Телефон</string>
@@ -29,7 +30,7 @@
     <string name="login">Вход</string>
     <string name="register">Регистрация</string>
     <string name="password_repeat">Повторите пароль</string>
-    <string name="myAccount">Личный кабинет</string>
+    <string name="myAccount">Пользователь</string>
     <string name="connectionError">Нет соединения</string>
     <string name="no_result">Нет результатов</string>
     <string name="search">Поиск</string>
@@ -86,12 +87,15 @@
     <string name="news">Новости</string>
     <string name="all_news">Все новости</string>
     <string name="map">Карта</string>
+    <string name="report">Обращение</string>
     <string name="reports">Обращения</string>
+    <string name="report_count">Обращений:</string>
     <string name="error_happened">Произошла ошибка</string>
     <string name="reload">Перезагрузить</string>
     <string name="loading">Загрузка</string>
     <string name="comments">Комментарии</string>
     <string name="comment">Комментарий</string>
+    <string name="comment_count">Комментарии:</string>
     <string name="add_comment">Добавить комментарий</string>
     <string name="add">Добавить</string>
     <string name="no_comments">Нет комментариев</string>
@@ -130,6 +134,8 @@
     <string name="lang_ru">Русский</string>
     <string name="lang_ky">Кыргызча</string>
     <string name="lang_en">English</string>
+    <string name="social_login">Войти с через соц. сети:</string>
+    <string name="edit">изменить</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 

@@ -21,5 +21,8 @@
         <item name="colorControlNormal">@color/gray</item>
         <item name="colorControlActivated">@color/colorAccent</item>
     </style>
-
+    <style name="CustomTabText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
 </resources>

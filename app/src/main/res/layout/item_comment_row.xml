@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="6dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    >
+
+    <TextView
+        android:id="@+id/id_tv_model"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:textColor="@color/gray5"
+        android:text="News"
+        android:layout_alignParentTop="true"/>
+    <TextView
+        android:id="@+id/id_tv_model_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:paddingLeft="4dp"
+        android:text="Model title, can be long, i mean very very loooong. So what you do here?"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="@color/gray5"
+        android:layout_toEndOf="@+id/id_tv_model"/>
+
+    <TextView
+        android:id="@+id/id_tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:text="The comment here"
+        android:textColor="@color/black"
+        android:layout_below="@+id/id_tv_model_title"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:textSize="12sp"
+        android:text="12.13.1998 12:45"
+        android:id="@+id/textView_date"
+        android:layout_below="@+id/id_tv_title" />
+
+</RelativeLayout>

@@ -10,15 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="kg.prosoft.anticorruption.LoginActivity">
 
-    <!-- Login progress -->
-    <ProgressBar
-        android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
-
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -69,7 +60,7 @@
                 android:textColor="@drawable/link"
                 android:padding="6dp"
                 android:gravity="center"
-                android:layout_marginTop="5dp" />
+                android:layout_marginTop="10dp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -81,34 +72,61 @@
                 android:gravity="center"
                 android:layout_marginTop="5dp" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/social_login"
+                android:gravity="center"
+                android:layout_marginTop="11dp"
+                android:layout_marginBottom="5dp" />
+
+        <LinearLayout
+            android:id="@+id/id_ll_social"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <com.google.android.gms.common.SignInButton
+                android:id="@+id/google_login_button"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp" />
+            <Button
+                android:id="@+id/id_btn_fb"
+                android:background="@drawable/fb_button"
+                android:layout_marginRight="10dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+            <Button
+                android:id="@+id/id_btn_twi"
+                android:background="@drawable/twi_button"
+                android:layout_marginRight="10dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+            <Button
+                android:id="@+id/ok_login_button"
+                android:background="@drawable/ok_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+            </LinearLayout>
 
             <com.facebook.login.widget.LoginButton
                 android:id="@+id/fb_login_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:visibility="gone"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="15dp" />
 
             <com.twitter.sdk.android.core.identity.TwitterLoginButton
                 android:id="@+id/twi_login_button"
                 android:layout_gravity="center_horizontal"
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
-            <com.google.android.gms.common.SignInButton
-                android:id="@+id/google_login_button"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp" />
-
-            <Button
-                android:id="@+id/ok_login_button"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/login" />
 
         </LinearLayout>
     </ScrollView>

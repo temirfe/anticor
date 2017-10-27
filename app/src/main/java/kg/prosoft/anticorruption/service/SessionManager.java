@@ -37,7 +37,6 @@ public class SessionManager {
     // All Shared Preferences Keys
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_USER_NAME = "user_name";
-    private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_NOTIFICATIONS = "notifications";
     public static final String KEY_TEST= "test";
     public static final String KEY_CTG_DEPEND= "ctg_depend";
@@ -74,7 +73,7 @@ public class SessionManager {
     /*public void storeUser(User user) {
         editor.putString(KEY_USER_ID, user.getId());
         editor.putString(KEY_USER_NAME, user.getName());
-        editor.putString(KEY_USER_EMAIL, user.getEmail());
+        editor.putString(KEY_EMAIL, user.getEmail());
         editor.commit();
 
         Log.e(TAG, "User is stored in shared preferences. " + user.getName() + ", " + user.getEmail());
@@ -95,7 +94,7 @@ public class SessionManager {
             String id, name, email;
             id = pref.getString(KEY_USER_ID, null);
             name = pref.getString(KEY_USER_NAME, null);
-            email = pref.getString(KEY_USER_EMAIL, null);
+            email = pref.getString(KEY_EMAIL, null);
 
             User user = new User(id, name, email);
             return user;
@@ -224,7 +223,7 @@ public class SessionManager {
 
         // Storing name in pref
         editor.putString(KEY_USER_NAME, name);
-        editor.putString(KEY_USER_EMAIL, email);
+        editor.putString(KEY_EMAIL, email);
         editor.putInt(KEY_USER_ID, user_id);
         editor.putString(ACCESS_TOKEN, access_token);
 
@@ -315,9 +314,6 @@ public class SessionManager {
     public String getAccessToken() {
         return pref.getString(ACCESS_TOKEN,"");
     }
-    public String getUserEmail() {
-        return pref.getString(KEY_USER_EMAIL,"");
-    }
     public String getEmail() {
         return pref.getString(KEY_EMAIL,"");
     }
@@ -339,7 +335,7 @@ public class SessionManager {
         editor.commit();
     }
     public void setEmail(String email) {
-        editor.putString(KEY_USER_EMAIL,email);
+        editor.putString(KEY_EMAIL,email);
         editor.commit();
     }
     public String getPhone() {

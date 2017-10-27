@@ -17,4 +17,9 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"/>
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapViewFalse"
+        android:visibility="gone"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
 </android.support.constraint.ConstraintLayout>

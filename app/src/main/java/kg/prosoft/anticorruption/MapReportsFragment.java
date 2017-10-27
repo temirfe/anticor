@@ -182,7 +182,7 @@ public class MapReportsFragment extends Fragment implements
             public void onResponse(JSONArray response) {
                 try{
                     Log.e("MapFrag response",response.toString());
-                    mMap.clear();
+                    if(mMap!=null){mMap.clear();}
                     reportSparse.clear();
                     mClusterManager.clearItems();
                     int leng=response.length();

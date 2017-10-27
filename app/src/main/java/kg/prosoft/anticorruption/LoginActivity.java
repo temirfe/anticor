@@ -96,8 +96,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     // UI references.
     private AutoCompleteTextView mUsernameOrEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
     Context context;
     LoginButton fbLoginButton;
     CallbackManager callbackManager;
@@ -113,6 +111,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     protected static final String OK_REDIRECT_URL = "okauth://ok1256974336";
 
     String provider, provider_data, puid, provider_email, provider_username,provider_name;
+    Button btn_fb, btn_twi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,12 +147,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
         TextView tv_register = (TextView)findViewById(R.id.id_tv_register);
         tv_register.setOnClickListener(onClickGoToRegister);
         TextView tv_forgot = (TextView)findViewById(R.id.id_tv_forgot);
         tv_forgot.setOnClickListener(onClickForgot);
+        btn_fb=(Button)findViewById(R.id.id_btn_fb);
+        btn_twi=(Button)findViewById(R.id.id_btn_twi);
+        btn_fb.setOnClickListener(fbLoginClick);
+        btn_twi.setOnClickListener(twiLoginClick);
 
         //--- facebook login start --//
         fbLoginButton = (LoginButton) findViewById(R.id.fb_login_button);
@@ -257,7 +258,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         provider_username=username;
                         if(puid!=null && !puid.isEmpty()){
                             Log.e("twi",provider_data+" id:"+id);
-                            //postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
+                            postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
                         }
                     }
 
@@ -321,6 +322,23 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         });*/
         //--- ok login end --//
     }
+
+    //my custom button click performs on facebook button click which is hidden
+    //i needed custom buttons because i want them to have same size
+    View.OnClickListener fbLoginClick = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            fbLoginButton.performClick();
+        }
+    };
+
+    //the same with twi
+    View.OnClickListener twiLoginClick = new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            twiLoginButton.performClick();
+        }
+    };
 
     View.OnClickListener googleLoginClick = new View.OnClickListener() {
         @Override
@@ -558,7 +576,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            showProgressDialog();
             requestLogin(username_or_email, password);
         }
     }
@@ -573,42 +591,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         return password.length() > 4;
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
     public void requestLogin(final String username_or_email, final String password){
 
         Response.Listener<String> responseListener = new Response.Listener<String>(){
@@ -617,12 +599,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 Log.i("LOGIN ACT", "response:"+response);
                 try {
                     if(response.contains("not_username")){
-                        showProgress(false);
+                        hideProgressDialog();
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                         builder.setMessage(R.string.user_not_found).setNegativeButton(R.string.close,null).create().show();
                     }
                     else if(response.contains("not_password")){
-                        showProgress(false);
+                        hideProgressDialog();
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                         builder.setMessage(R.string.password_error).setNegativeButton(R.string.close,null).create().show();
                     }
@@ -637,6 +619,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                             session.createLoginSession(name,email, user_id, access_token);
 
+                            hideProgressDialog();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("from","login");
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -679,7 +662,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     public void postSocial(final String provider, final String provider_data, final String puid,
                            final String provider_email, final String provider_username, final String provider_name){
-        showProgress(true);
+        showProgressDialog();
         Response.Listener<String> responseListener = new Response.Listener<String>(){
             @Override
             public void onResponse(String response) {
@@ -689,12 +672,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         askEmail();
                     }
                     else if(response.contains("error")){
-                        showProgress(false);
+                        hideProgressDialog();
                         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                         builder.setMessage(R.string.login_fail).setNegativeButton(R.string.close,null).create().show();
                     }
                     else{
-                        showProgress(false);
+                        hideProgressDialog();
                         JSONObject jsonResponse = new JSONObject(response);
                         int user_id = jsonResponse.getInt("id");
                         if(user_id!=0){
@@ -770,7 +753,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         });
         builder.setNegativeButton(R.string.close,new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                showProgress(false);
+                hideProgressDialog();
             }
         });
         builder.show();
@@ -822,8 +805,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
+            mProgressDialog.dismiss();
         }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        hideProgressDialog();
     }
 
     //later if needed
@@ -831,7 +820,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public void onStart() {
         super.onStart();
 
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        /*OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (opr.isDone()) {
             // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
             // and the GoogleSignInResult will be available instantly.
@@ -850,7 +839,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     //handleGoogleSignInResult(googleSignInResult);
                 }
             });
-        }
+        }*/
     }
 
     private void signOutGoogle() {

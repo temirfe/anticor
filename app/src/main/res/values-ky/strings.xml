@@ -46,6 +46,7 @@
     <string name="news">Жаңылыктар</string>
     <string name="title_activity_login">Кирүү</string>
     <string name="close">Жабуу</string>
+    <string name="show">көрсөт</string>
     <string name="logout">Чыгуу</string>
     <string name="app_error">Ката кетти</string>
     <string name="date_time">Дата жана убакыт:</string>
@@ -104,7 +105,7 @@
     <string name="address">Адрес</string>
     <string name="note">Эскертүү</string>
     <string name="login">Кирүү</string>
-    <string name="myAccount">Жеке бөлмө</string>
+    <string name="myAccount">Колдонуучу</string>
     <string name="connectionError">Байланыш жок</string>
     <string name="search">Издөө</string>
     <string name="searchNoResult">Эч нерсе табылган жок</string>
@@ -124,7 +125,7 @@
     <string name="report_description">Кененирээк баяндоо</string>
     <string name="select_authority">Мамлекеттик органды тандаңыз</string>
     <string name="select_city">Шаарды же регионду тандаңыз</string>
-    <string name="select_type">Билдирүүнү түрүн тандаңыз</string>
+    <string name="select_type">Кайрылуунун түрүн тандаңыз</string>
     <string name="wannabe_anonym">Аноним түрүндө</string>
     <string name="contact">Телефон</string>
     <string name="title_activity_maps">Карта</string>
@@ -135,8 +136,11 @@
     <string name="title_activity_tab">TabActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="all_news">Баардык жаңылыктар</string>
-    <string name="reports">Билдирүүлөр</string>
+    <string name="report">Кайрылуу</string>
+    <string name="reports">Кайрылуулар</string>
+    <string name="report_count">Кайрылуулар:</string>
     <string name="comment">Комментарий</string>
+    <string name="comment_count">Комментарийлер:</string>
     <string name="no_comments">Комментарий жок</string>
     <string name="comment_moder">Сиздин комментарийиңиз текшерүүдөн өткөндөн кийин чыгат, рахмат.</string>
     <string name="rate_authority">Мамлекеттик органды баалоо</string>
@@ -144,7 +148,7 @@
     <string name="city">Шаар</string>
     <string name="authority">Мамлекеттик орган</string>
     <string name="category">Коррупция сектору</string>
-    <string name="type_header">Билдирүүнүн түрү</string>
+    <string name="type_header">Кайрылуунун түрү</string>
     <string name="filter">Фильтр</string>
     <string name="anonymous">Аноним</string>
     <string name="forgot_password">Сырсөз эсимде жок</string>
@@ -154,7 +158,7 @@
     <string name="corruption_report">Коррупция жөнүндө билдирүү</string>
     <string name="corruption_scheme_report">Коррупциялык схеманы айтып берүү</string>
     <string name="wanna_know">Билгим келет! Кайдан…?</string>
-    <string name="all_applications">Баардык билдирүүлөр</string>
+    <string name="all_applications">Баардык кайрылуулар</string>
     <string name="corruption_rating">Коррупциялык рейтинг</string>
     <string name="share">Бөлүшүү</string>
     <string name="send">Жиберүү</string>
@@ -168,6 +172,8 @@
     <string name="lang_ru">Русский</string>
     <string name="lang_ky">Кыргызча</string>
     <string name="lang_en">English</string>
+    <string name="social_login">Башка аккаунт менен кирүү:</string>
+    <string name="edit">өзгөртүү</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

@@ -44,13 +44,14 @@ import kg.prosoft.anticorruption.service.MyVolley;
 
 public class ReportViewActivity extends AppCompatActivity {
     TextView tv_author, tv_title, tv_date, tv_text, tv_zero_comment, tv_city,tv_category,tv_authority,tv_type;
-    public double lat,lng;
-    public RelativeLayout rl_map;
+    public double lat=0,lng=0;
+    public RelativeLayout rl_map, rl_pb;
     public LinearLayout ll_comments,ll_thumb_holder;
     int id,cat_id, authority_id,city_id,type_id;
     ArrayList<String> imageList = new ArrayList<>();
     Activity activity;
     Context context;
+    boolean loadAll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,42 +78,51 @@ public class ReportViewActivity extends AppCompatActivity {
         ll_comments=(LinearLayout) findViewById(R.id.id_ll_comments);
         ll_thumb_holder=(LinearLayout) findViewById(R.id.id_ll_thumb_holder);
         rl_map=(RelativeLayout)findViewById(R.id.id_rl_map);
+        rl_pb=(RelativeLayout)findViewById(R.id.id_rl_pb);
 
         Intent intent = getIntent();
         id=intent.getIntExtra("id",0);
-        if(intent.hasExtra("from")){
-            String from=intent.getStringExtra("from");
-            Log.e("RepView","from: "+from);
-        }
-        String title=intent.getStringExtra("title");
-        String text=intent.getStringExtra("text");
-        String date=intent.getStringExtra("date");
-        String city_title=intent.getStringExtra("city");
-        lat=intent.getDoubleExtra("lat",0);
-        lng=intent.getDoubleExtra("lng",0);
+        if(intent.hasExtra("title")) //if opened from commentActivity then intent has only id
+        {
+            if(intent.hasExtra("from")){
+                String from=intent.getStringExtra("from");
+                Log.e("RepView","from: "+from);
+            }
+            String title=intent.getStringExtra("title");
+            String text=intent.getStringExtra("text");
+            String date=intent.getStringExtra("date");
+            String city_title=intent.getStringExtra("city");
+            lat=intent.getDoubleExtra("lat",0);
+            lng=intent.getDoubleExtra("lng",0);
 
-        tv_title.setText(title);
-        tv_date.setText(date);
-        tv_city.setText(city_title);
+            tv_title.setText(title);
+            tv_date.setText(date);
+            tv_city.setText(city_title);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            tv_text.setText(Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            tv_text.setText(Html.fromHtml(text));
-        }
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                tv_text.setText(Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY));
+            } else {
+                tv_text.setText(Html.fromHtml(text));
+            }
 
 
-        if(lat>0 && lng>0){
-            new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            showMapFrame();
-                        }
-                    },
-                    1000);
+            if(lat>0 && lng>0){
+                new android.os.Handler().postDelayed(
+                        new Runnable() {
+                            public void run() {
+                                showMapFrame();
+                            }
+                        },
+                        1000);
+            }
+            else{
+                rl_map.setVisibility(View.GONE);
+            }
+            loadAll=false;
         }
         else{
-            rl_map.setVisibility(View.GONE);
+            loadAll=true;
+            rl_pb.setVisibility(View.VISIBLE);
         }
 
         //although we have info from intent, we make a request to get comments and
@@ -127,6 +137,7 @@ public class ReportViewActivity extends AppCompatActivity {
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
+                rl_pb.setVisibility(View.GONE);
                 try{
                     if(jsonObject.has("comments")){
                         JSONArray comments = jsonObject.getJSONArray("comments");
@@ -179,6 +190,7 @@ public class ReportViewActivity extends AppCompatActivity {
                     if(jsonObject.has("city")){
                         JSONObject myObj = jsonObject.getJSONObject("city");
                         city_id=myObj.getInt("id");
+                        tv_city.setText(myObj.getString("value"));
                     }
                     if(jsonObject.has("images")){
                         JSONArray images = jsonObject.getJSONArray("images");
@@ -199,6 +211,35 @@ public class ReportViewActivity extends AppCompatActivity {
                             imageViewPreview.setTag(i);
                             ll_thumb_holder.addView(imageViewPreview);
                             imageList.add(Endpoints.REPORT_IMG+id+"/"+img);
+                        }
+                    }
+                    if(loadAll){
+                        String title=jsonObject.getString("title");
+                        String text=jsonObject.getString("text");
+                        String date=jsonObject.getString("date");
+                        lat=jsonObject.getDouble("lat");
+                        lng=jsonObject.getDouble("lon");
+
+                        tv_title.setText(title);
+                        tv_date.setText(getDate(date));
+
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            tv_text.setText(Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY));
+                        } else {
+                            tv_text.setText(Html.fromHtml(text));
+                        }
+
+                        if(lat>0 && lng>0){
+                            new android.os.Handler().postDelayed(
+                                    new Runnable() {
+                                        public void run() {
+                                            showMapFrame();
+                                        }
+                                    },
+                                    1000);
+                        }
+                        else{
+                            rl_map.setVisibility(View.GONE);
                         }
                     }
 
