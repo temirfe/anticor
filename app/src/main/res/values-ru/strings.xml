@@ -24,6 +24,7 @@
     <string name="show">показать</string>
     <string name="name">Имя</string>
     <string name="username">Имя пользователья (Логин)</string>
+    <string name="user">Пользователь</string>
     <string name="phone">Телефон</string>
     <string name="address">Адрес</string>
     <string name="note">Примечание</string>

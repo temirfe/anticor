@@ -58,12 +58,12 @@ public class FilterActivity extends BaseActivity implements SectorDialog.SectorD
     private LinkedHashMap<Integer, Authority> parentMapAuth,childMapAuth;
     private HashMap<Integer, HashMap<Integer, Vocabulary>> parentChildMap;
     private HashMap<Integer, HashMap<Integer, Authority>> parentChildMapAuth;
-    TextView tv_sector, tv_city, tv_authority, tv_type;
-    ImageView iv_clear_city,iv_clear_sector,iv_clear_authority,iv_clear_type, iv_clear_search;
+    TextView tv_sector, tv_city, tv_authority, tv_type,tv_user;
+    ImageView iv_clear_city,iv_clear_sector,iv_clear_authority,iv_clear_type, iv_clear_search,iv_clear_user;
     EditText et_search;
     Intent received_intent;
-    String query;
-    int selected_sector_id,selected_city_id,selected_authority_id,selected_type_id;
+    String query, username;
+    int selected_sector_id,selected_city_id,selected_authority_id,selected_type_id, selected_user_id;
     boolean empty=true;
 
     @Override
@@ -90,20 +90,33 @@ public class FilterActivity extends BaseActivity implements SectorDialog.SectorD
         tv_city=(TextView)findViewById(R.id.id_tv_city);
         tv_authority=(TextView)findViewById(R.id.id_tv_authority);
         tv_type=(TextView)findViewById(R.id.id_tv_type);
+        tv_type=(TextView)findViewById(R.id.id_tv_type);
+        tv_user=(TextView)findViewById(R.id.id_tv_user);
         id_btn_apply=(Button)findViewById(R.id.id_btn_apply);
         iv_clear_city=(ImageView)findViewById(R.id.id_iv_clear_city);
         iv_clear_sector=(ImageView)findViewById(R.id.id_iv_clear_sector);
         iv_clear_authority=(ImageView)findViewById(R.id.id_iv_clear_authority);
         iv_clear_type=(ImageView)findViewById(R.id.id_iv_clear_type);
         iv_clear_search=(ImageView)findViewById(R.id.id_iv_clear_search);
+        iv_clear_user=(ImageView)findViewById(R.id.id_iv_clear_user);
         et_search=(EditText)findViewById(R.id.id_et_search);
 
         received_intent=getIntent();
         query=received_intent.getStringExtra("query");
+        username=received_intent.getStringExtra("username");
         selected_sector_id=received_intent.getIntExtra("sector_id",0);
         selected_authority_id=received_intent.getIntExtra("authority_id",0);
         selected_type_id=received_intent.getIntExtra("type_id",0);
         selected_city_id=received_intent.getIntExtra("city_id",0);
+        selected_user_id=received_intent.getIntExtra("user_id",0);
+
+        if(selected_user_id!=0){
+            String user=getResources().getString(R.string.user);
+            user=user+": "+username;
+            tv_user.setText(user);
+            tv_user.setVisibility(View.VISIBLE);
+            iv_clear_user.setVisibility(View.VISIBLE);
+        }
 
         et_search.addTextChangedListener(new TextWatcher() {
 
@@ -131,6 +144,14 @@ public class FilterActivity extends BaseActivity implements SectorDialog.SectorD
         new VocabularyTask().execute();
 
         restoreFilter();
+    }
+
+
+    public void clearUser(View v){
+        selected_user_id=0;
+        tv_user.setVisibility(View.GONE);
+        v.setVisibility(View.GONE);
+        id_btn_apply.setVisibility(View.VISIBLE);
     }
 
     public void clearSearch(View v){
@@ -246,12 +267,15 @@ public class FilterActivity extends BaseActivity implements SectorDialog.SectorD
         tv_city.setText(R.string.select_city);
         selected_type_id=0;
         tv_type.setText(R.string.select_type);
+        selected_user_id=0;
 
         iv_clear_sector.setVisibility(View.GONE);
         iv_clear_authority.setVisibility(View.GONE);
         iv_clear_city.setVisibility(View.GONE);
         iv_clear_type.setVisibility(View.GONE);
         iv_clear_search.setVisibility(View.GONE);
+        tv_user.setVisibility(View.GONE);
+        iv_clear_user.setVisibility(View.GONE);
     }
 
     public void applyFilter(View v){
@@ -263,8 +287,9 @@ public class FilterActivity extends BaseActivity implements SectorDialog.SectorD
         intent.putExtra("authority_id", selected_authority_id);
         intent.putExtra("type_id", selected_type_id);
         intent.putExtra("city_id", selected_city_id);
+        intent.putExtra("user_id", selected_user_id);
         if(query!=null && !query.isEmpty() || selected_sector_id!=0 || selected_authority_id!=0
-                || selected_type_id!=0 || selected_city_id!=0){emptyFilter=false;}
+                || selected_type_id!=0 || selected_city_id!=0 || selected_user_id!=0){emptyFilter=false;}
         intent.putExtra("empty", emptyFilter);
         setResult(RESULT_OK, intent);
         finish();

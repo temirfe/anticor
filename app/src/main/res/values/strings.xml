@@ -23,6 +23,7 @@
     <string name="close">Close</string>
     <string name="show">show</string>
     <string name="name">Name</string>
+    <string name="user">User</string>
     <string name="username">Username</string>
     <string name="phone">Phone</string>
     <string name="address">Address</string>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -143,7 +144,8 @@ public class NewsViewActivity extends BaseActivity {
                             String com_name=comObj.getString("name");
                             String com_text=comObj.getString("text");
                             String com_date=comObj.getString("date");
-                            showCommentItem(com_name,com_text,com_date);
+                            int com_user_id=comObj.getInt("user_id");
+                            showCommentItem(com_user_id, com_name,com_text,com_date);
                         }
                         if(comments.length()==0){tv_zero_comment.setVisibility(View.VISIBLE);}
                     }
@@ -186,16 +188,21 @@ public class NewsViewActivity extends BaseActivity {
         MyVolley.getInstance(this).addToRequestQueue(volReq);
     }
 
-    public void showCommentItem(String name, String comment, String cdate){
+    public void showCommentItem(int user_id, String name, String comment, String cdate){
         TextView nameTv=new TextView(this);
+        nameTv.setPadding(0,5,10,5);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            nameTv.setTextColor(getResources().getColorStateList(R.color.gray_link, context.getTheme()));
+        } else {
+            nameTv.setTextColor(getResources().getColorStateList(R.color.gray_link));
+        }
+        nameTv.setTag(user_id);
+        nameTv.setOnClickListener(clickCommentUser);
         nameTv.setText(name);
         nameTv.setTypeface(null, Typeface.BOLD);
 
         TextView commentTv=new TextView(this);
         commentTv.setText(comment);
-        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        llp.setMargins(0, 2, 0, 2); // llp.setMargins(left, top, right, bottom);
-        commentTv.setLayoutParams(llp);
 
         TextView dateTv=new TextView(this);
         dateTv.setText(getDate(cdate));
@@ -224,6 +231,20 @@ public class NewsViewActivity extends BaseActivity {
         }
         return date;
     }
+
+    View.OnClickListener clickCommentUser= new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id=(int)view.getTag();
+            TextView tv_name=(TextView)view;
+            String name=tv_name.getText().toString();
+            Intent intent = new Intent(NewsViewActivity.this, AccountActivity.class);
+            intent.putExtra("user_id",id);
+            intent.putExtra("username",name);
+            Log.e("NewsView","id:"+id+" name:"+name);
+            startActivity(intent);
+        }
+    };
 
     public void addComment(View v){
         Intent intent = new Intent(v.getContext(), AddCommentActivity.class);

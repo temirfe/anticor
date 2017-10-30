@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity
     public MapReportsFragment mapFrag;
     public DocMenuFragment docMenuFrag;
     String filter_query;
-    int filter_authority_id,filter_sector_id, filter_type_id, filter_city_id;
+    int filter_authority_id,filter_sector_id, filter_type_id, filter_city_id, filter_user_id;
     static int FILTER_FLAG=123;
     Intent gotIntent;
     Menu myMenu;
@@ -181,10 +181,6 @@ public class MainActivity extends BaseActivity
         showFilteredReport=gotIntent.getBooleanExtra("showReport",false);
         if(showFilteredReport){
             showFilterBadge=true;
-            if(gotIntent.hasExtra("authority_id")){
-                filter_authority_id=gotIntent.getIntExtra("authority_id",0);
-            }
-
             showReportFrag(1);
             //Log.e("MainAct","showReport fired");
         }
@@ -242,6 +238,7 @@ public class MainActivity extends BaseActivity
             Intent intent = new Intent(MainActivity.this, AccountActivity.class);
             int id=(int)view.getTag();
             intent.putExtra("user_id",id);
+            intent.putExtra("username",session.getUserName());
             startActivity(intent);
         }
     };
@@ -598,7 +595,7 @@ public class MainActivity extends BaseActivity
     }
 
     public void applyFilter(Intent data){
-        //Log.e("MainAct"," onActRes filterflag fired");
+        Log.e("MainAct","applyFilter "+data);
         if(myMenu!=null){
             boolean empty=data.getBooleanExtra("empty",true);
             boolean clean=true, badged=false;
@@ -614,6 +611,7 @@ public class MainActivity extends BaseActivity
         filter_authority_id=data.getIntExtra("authority_id",0);
         filter_type_id=data.getIntExtra("type_id",0);
         filter_city_id=data.getIntExtra("city_id",0);
+        filter_user_id=data.getIntExtra("user_id",0);
 
         Uri.Builder builder = new Uri.Builder();
         builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("reports");
@@ -631,6 +629,13 @@ public class MainActivity extends BaseActivity
         }
         if(filter_city_id!=0){
             builder.appendQueryParameter("city_id", Integer.toString(filter_city_id));
+        }
+        if(filter_user_id!=0){
+            builder.appendQueryParameter("user_id", Integer.toString(filter_user_id));
+            if(!session.getAccessToken().isEmpty())
+            {
+                builder.appendQueryParameter("auth_key", session.getAccessToken());
+            }
         }
         if(listFrag!=null){listFrag.populateList(1,builder,true,false);}
         if(mapFrag!=null){
@@ -656,6 +661,8 @@ public class MainActivity extends BaseActivity
         filter_intent.putExtra("authority_id",filter_authority_id);
         filter_intent.putExtra("type_id",filter_type_id);
         filter_intent.putExtra("city_id",filter_city_id);
+        filter_intent.putExtra("user_id",filter_user_id);
+        filter_intent.putExtra("username",session.getUserName());
         startActivityForResult(filter_intent, FILTER_FLAG);
     }
 

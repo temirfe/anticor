@@ -30,7 +30,7 @@
 
             <EditText
                 android:visibility="gone"
-                android:text="asdf"
+                android:text=""
                 android:textSize="13sp"
                 android:inputType="textPersonName"
                 android:paddingLeft="11dp"
@@ -42,7 +42,7 @@
 
             <TextView
                 android:id="@+id/id_tv_username"
-                android:text="asdf"
+                android:text=""
                 android:layout_width="wrap_content"
                 android:paddingLeft="10dp"
                 android:paddingTop="2dp"

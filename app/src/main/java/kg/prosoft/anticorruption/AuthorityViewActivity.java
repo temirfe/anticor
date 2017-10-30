@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -140,7 +141,8 @@ public class AuthorityViewActivity extends AppCompatActivity {
                             String com_name=comObj.getString("name");
                             String com_text=comObj.getString("text");
                             String com_date=comObj.getString("date");
-                            showCommentItem(com_name,com_text,com_date);
+                            int com_user_id=comObj.getInt("user_id");
+                            showCommentItem(com_user_id, com_name,com_text,com_date);
                         }
                         if(comments.length()==0){tv_zero_comment.setVisibility(View.VISIBLE);}
                     }
@@ -182,8 +184,16 @@ public class AuthorityViewActivity extends AppCompatActivity {
         MyVolley.getInstance(context).addToRequestQueue(volReq);
     }
 
-    public void showCommentItem(String name, String comment, String cdate){
+    public void showCommentItem(int user_id, String name, String comment, String cdate){
         TextView nameTv=new TextView(this);
+        nameTv.setPadding(0,5,10,5);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            nameTv.setTextColor(getResources().getColorStateList(R.color.gray_link, context.getTheme()));
+        } else {
+            nameTv.setTextColor(getResources().getColorStateList(R.color.gray_link));
+        }
+        nameTv.setTag(user_id);
+        nameTv.setOnClickListener(clickCommentUser);
         nameTv.setText(name);
         nameTv.setTypeface(null, Typeface.BOLD);
 
@@ -206,6 +216,20 @@ public class AuthorityViewActivity extends AppCompatActivity {
         ll_comments.addView(dateTv);
         ll_comments.setPadding(0,15,0,10);
     }
+
+    View.OnClickListener clickCommentUser= new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id=(int)view.getTag();
+            TextView tv_name=(TextView)view;
+            String name=tv_name.getText().toString();
+            Intent intent = new Intent(AuthorityViewActivity.this, AccountActivity.class);
+            intent.putExtra("user_id",id);
+            intent.putExtra("username",name);
+            Log.e("NewsView","id:"+id+" name:"+name);
+            startActivity(intent);
+        }
+    };
 
     public String getDate(String date) {
         Locale locale = new Locale("ru");

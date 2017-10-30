@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,15 +44,17 @@ import kg.prosoft.anticorruption.service.GlideApp;
 import kg.prosoft.anticorruption.service.MyVolley;
 
 public class ReportViewActivity extends AppCompatActivity {
-    TextView tv_author, tv_title, tv_date, tv_text, tv_zero_comment, tv_city,tv_category,tv_authority,tv_type;
+    TextView tv_author, tv_title, tv_date, tv_text, tv_zero_comment, tv_city,tv_category,
+            tv_authority,tv_type, tv_anonym;
     public double lat=0,lng=0;
     public RelativeLayout rl_map, rl_pb;
     public LinearLayout ll_comments,ll_thumb_holder;
-    int id,cat_id, authority_id,city_id,type_id;
+    int id,cat_id, authority_id,city_id,type_id, user_id;
     ArrayList<String> imageList = new ArrayList<>();
     Activity activity;
     Context context;
     boolean loadAll;
+    String author;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class ReportViewActivity extends AppCompatActivity {
         context=getApplicationContext();
 
         tv_author=(TextView)findViewById(R.id.id_tv_author);
+        tv_anonym=(TextView)findViewById(R.id.id_tv_anonym);
         tv_title=(TextView)findViewById(R.id.id_tv_title);
         tv_date=(TextView)findViewById(R.id.id_tv_date);
         tv_text=(TextView)findViewById(R.id.id_tv_text);
@@ -139,6 +143,8 @@ public class ReportViewActivity extends AppCompatActivity {
             public void onResponse(JSONObject jsonObject) {
                 rl_pb.setVisibility(View.GONE);
                 try{
+                    user_id=jsonObject.getInt("user_id");
+
                     if(jsonObject.has("comments")){
                         JSONArray comments = jsonObject.getJSONArray("comments");
                         for(int i=0; i < comments.length(); i++){
@@ -146,22 +152,27 @@ public class ReportViewActivity extends AppCompatActivity {
                             String com_name=comObj.getString("name");
                             String com_text=comObj.getString("text");
                             String com_date=comObj.getString("date");
-                            showCommentItem(com_name,com_text,com_date);
+                            int com_user_id=comObj.getInt("user_id");
+                            showCommentItem(com_user_id, com_name,com_text,com_date);
                         }
                         if(comments.length()==0){tv_zero_comment.setVisibility(View.VISIBLE);}
                     }
                     if(jsonObject.has("author")){
                         int anonymous=0;
-                        String author=jsonObject.getString("author");
+                        author=jsonObject.getString("author");
                         if(jsonObject.has("anonymous")){
                             anonymous=jsonObject.getInt("anonymous");
                         }
                         if(anonymous==1 || author.length()==0){
-                            author=getResources().getString(R.string.anonymous);
+                            tv_anonym.setVisibility(View.VISIBLE);
+                            tv_anonym.setText(getResources().getString(R.string.anonymous));
                         }
-                        author=author+":";
-                        tv_author.setVisibility(View.VISIBLE);
-                        tv_author.setText(author);
+                        else{
+                            tv_author.setVisibility(View.VISIBLE);
+                            tv_author.setText(author);
+                            tv_author.setTag(user_id);
+                            tv_author.setOnClickListener(clickAuthor);
+                        }
                     }
                     if(jsonObject.has("authority")){
                         JSONObject authObj = jsonObject.getJSONObject("authority");
@@ -262,6 +273,31 @@ public class ReportViewActivity extends AppCompatActivity {
         MyVolley.getInstance(this).addToRequestQueue(volReq);
     }
 
+    View.OnClickListener clickCommentUser= new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id=(int)view.getTag();
+            TextView tv_name=(TextView)view;
+            String name=tv_name.getText().toString();
+            openAccount(id,name);
+        }
+    };
+    View.OnClickListener clickAuthor= new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int id=(int)view.getTag();
+            openAccount(id,author);
+        }
+    };
+
+    public void openAccount(int id, String user){
+        Intent intent = new Intent(ReportViewActivity.this, AccountActivity.class);
+        intent.putExtra("user_id",id);
+        intent.putExtra("username",user);
+        Log.e("RepView","id:"+id+" name:"+user);
+        startActivity(intent);
+    }
+
 
     View.OnClickListener thumbClick = new View.OnClickListener(){
         public void onClick(View v){
@@ -273,16 +309,21 @@ public class ReportViewActivity extends AppCompatActivity {
         }
     };
 
-    public void showCommentItem(String name, String comment, String cdate){
+    public void showCommentItem(int user_id, String name, String comment, String cdate){
         TextView nameTv=new TextView(this);
         nameTv.setText(name);
+        nameTv.setPadding(0,5,10,5);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            nameTv.setTextColor(getResources().getColorStateList(R.color.gray_link, context.getTheme()));
+        } else {
+            nameTv.setTextColor(getResources().getColorStateList(R.color.gray_link));
+        }
+        nameTv.setTag(user_id);
+        nameTv.setOnClickListener(clickCommentUser);
         nameTv.setTypeface(null, Typeface.BOLD);
 
         TextView commentTv=new TextView(this);
         commentTv.setText(comment);
-        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        llp.setMargins(0, 2, 0, 2); // llp.setMargins(left, top, right, bottom);
-        commentTv.setLayoutParams(llp);
 
         TextView dateTv=new TextView(this);
         dateTv.setText(getDate(cdate));
