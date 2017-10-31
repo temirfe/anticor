@@ -214,6 +214,7 @@ public class AuthorityListActivity extends AppCompatActivity {
     }
 
     public void prepareAuthList(){
+        authList.clear();
         HashMap<Integer,Authority> cMap;
         TreeMap<Integer,Integer> parentTreeMap=new TreeMap<>();
         TreeMap<Integer,Integer> childTreeMap=new TreeMap<>();

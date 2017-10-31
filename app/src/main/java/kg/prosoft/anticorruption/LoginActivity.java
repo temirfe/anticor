@@ -620,10 +620,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             session.createLoginSession(name,email, user_id, access_token);
 
                             hideProgressDialog();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("from","login");
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+                            startActivity(intent);*/
                             finish();
                         }
                         else{
@@ -688,10 +688,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                             session.createLoginSession(name,email, user_id, access_token);
 
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("from","login");
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+                            startActivity(intent);*/
                             finish();
                         }
                         else{

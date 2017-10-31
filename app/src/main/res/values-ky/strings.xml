@@ -175,6 +175,20 @@
     <string name="lang_en">English</string>
     <string name="social_login">Башка аккаунт менен кирүү:</string>
     <string name="edit">өзгөртүү</string>
+    <string name="rate">Рейтинг берүү</string>
+    <string name="login_to_rate">Рейтинг бериш үчүн кириңиз</string>
+    <string name="rating">Рейтинг:</string>
+    <string name="rating_count">Добушчулар саны:</string>
+    <string name="rate1">Толугу менен ачык-айкын жана жогорку эффективдүү</string>
+    <string name="rate2">Таза жана эффективдүү</string>
+    <string name="rate3">Таза</string>
+    <string name="rate4">Таза десе болот</string>
+    <string name="rate5">Бираз бузулган</string>
+    <string name="rate6">Бузулган десе болот</string>
+    <string name="rate7">Бузулган</string>
+    <string name="rate8">Көп бузулган</string>
+    <string name="rate9">Өтө көп бузулган</string>
+    <string name="rate10">Тоолугу менен бузулган</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

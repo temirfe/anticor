@@ -66,7 +66,6 @@ public class AuthorityAdapter extends BaseAdapter {
         int comment_count=authority.getCommentCount();
         int report_count=authority.getReportCount();
         int rating=authority.getRating();
-        float f_rating=(float)rating/2;
 
         LinearLayout ll_stats=(LinearLayout)convertView.findViewById(R.id.id_ll_stats);
         TextView tv_title=(TextView) convertView.findViewById(R.id.id_tv_title);
@@ -90,7 +89,7 @@ public class AuthorityAdapter extends BaseAdapter {
             tv_title.setTextColor(Color.BLACK);
             ratingBar.setVisibility(View.VISIBLE);
             ll_stats.setVisibility(View.VISIBLE);
-            ratingBar.setRating(f_rating);
+            ratingBar.setRating(rating);
         }
         return convertView;
     }

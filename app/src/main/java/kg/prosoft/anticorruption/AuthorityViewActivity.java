@@ -13,10 +13,13 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,7 +58,8 @@ import kg.prosoft.anticorruption.service.MyVolley;
 import kg.prosoft.anticorruption.service.SessionManager;
 
 public class AuthorityViewActivity extends AppCompatActivity {
-    TextView tv_title, tv_text, tv_zero_comment, tv_report_count, tv_report_link;
+    TextView tv_title, tv_text, tv_zero_comment, tv_report_count, tv_report_link,
+            tv_login, tv_rating_rate, tv_rating_count,tv_dialog_rate;
     RatingBar ratingBar;
     ImageView iv_image;
     Activity activity;
@@ -67,6 +71,9 @@ public class AuthorityViewActivity extends AppCompatActivity {
     int user_rating=0;
     boolean loadAll;
     public RelativeLayout rl_pb;
+    Button btn_rate;
+    String votes;
+    ProgressBar pb_rating, pb_count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +93,16 @@ public class AuthorityViewActivity extends AppCompatActivity {
         tv_zero_comment=(TextView)findViewById(R.id.id_tv_comments_zero);
         tv_report_count=(TextView)findViewById(R.id.id_tv_report_count);
         tv_report_link=(TextView)findViewById(R.id.id_tv_report_link);
+        tv_login=(TextView)findViewById(R.id.id_tv_login);
+        tv_rating_rate=(TextView)findViewById(R.id.id_tv_rating_rate);
+        tv_rating_count=(TextView)findViewById(R.id.id_tv_rating_count);
         ll_comments=(LinearLayout) findViewById(R.id.id_ll_comments);
         rl_pb=(RelativeLayout)findViewById(R.id.id_rl_pb);
+        btn_rate=(Button)findViewById(R.id.id_btn_rate);
+        if(session.isLoggedIn()){btn_rate.setVisibility(View.VISIBLE);}
+        else{tv_login.setVisibility(View.VISIBLE);}
+        pb_rating=(ProgressBar)findViewById(R.id.id_pb_rating);
+        pb_count=(ProgressBar)findViewById(R.id.id_pb_count);
 
         Intent intent = getIntent();
         id=intent.getIntExtra("id",0);
@@ -100,6 +115,9 @@ public class AuthorityViewActivity extends AppCompatActivity {
 
             tv_title.setText(title);
             tv_text.setText(text);
+            /*String ratingDesc=getRatingDesc(rating);
+            String rating_text=rating+ratingDesc;
+            tv_rating_rate.setText(rating_text);*/
 
             if(!image.isEmpty()){
                 GlideApp.with(this)
@@ -110,8 +128,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
             ratingBar = (RatingBar) findViewById(R.id.id_rating);
             ratingBar.setOnTouchListener(showRatingDialog);
             if(rating>0){
-                float f_rating=(float)rating/2;
-                ratingBar.setRating(f_rating);
+                ratingBar.setRating(rating);
             }
             loadAll=false;
         }
@@ -124,6 +141,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
         requestAuthority(id);
         if(session.isLoggedIn()){
             requestUserRate();
+            Log.e("Session", "auth_key "+session.getAccessToken());
         }
     }
     public void requestAuthority(final int id){
@@ -133,6 +151,8 @@ public class AuthorityViewActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 rl_pb.setVisibility(View.GONE);
+                pb_rating.setVisibility(View.GONE);
+                pb_count.setVisibility(View.GONE);
                 try{
                     if(jsonObject.has("comments")){
                         JSONArray comments = jsonObject.getJSONArray("comments");
@@ -151,12 +171,22 @@ public class AuthorityViewActivity extends AppCompatActivity {
                         tv_report_count.setText(Integer.toString(rep_count));
                         tv_report_link.setVisibility(View.VISIBLE);
                     }
+                    votes=jsonObject.getString("votes");
+                    tv_rating_count.setText(votes);
+                    tv_rating_count.setVisibility(View.VISIBLE);
+
+                    rating=jsonObject.getInt("rating");
+                    String ratingDesc=getRatingDesc(rating);
+                    String rating_text=rating+ratingDesc;
+                    tv_rating_rate.setText(rating_text);
+                    tv_rating_rate.setVisibility(View.VISIBLE);
+                    if(rating>0){
+                        ratingBar.setRating(rating);
+                    }
                     if(loadAll){
                         String title=jsonObject.getString("title");
                         String text=jsonObject.getString("text");
                         String image=jsonObject.getString("img");
-                        rating=jsonObject.getInt("rating");
-
                         tv_title.setText(title);
                         tv_text.setText(text);
 
@@ -164,13 +194,6 @@ public class AuthorityViewActivity extends AppCompatActivity {
                             GlideApp.with(activity)
                                     .load(Endpoints.AUTHORITY_IMG+"/"+image)        // optional
                                     .into(iv_image);
-                        }
-
-                        ratingBar = (RatingBar) findViewById(R.id.id_rating);
-                        ratingBar.setOnTouchListener(showRatingDialog);
-                        if(rating>0){
-                            float f_rating=(float)rating/2;
-                            ratingBar.setRating(f_rating);
                         }
                     }
 
@@ -231,6 +254,23 @@ public class AuthorityViewActivity extends AppCompatActivity {
         }
     };
 
+    public String getRatingDesc(int rate){
+        String desc="";
+        switch(rate){
+            case 1:desc=" ("+getResources().getString(R.string.rate1)+")"; break;
+            case 2:desc=" ("+getResources().getString(R.string.rate2)+")"; break;
+            case 3:desc=" ("+getResources().getString(R.string.rate3)+")"; break;
+            case 4:desc=" ("+getResources().getString(R.string.rate4)+")"; break;
+            case 5:desc=" ("+getResources().getString(R.string.rate5)+")"; break;
+            case 6:desc=" ("+getResources().getString(R.string.rate6)+")"; break;
+            case 7:desc=" ("+getResources().getString(R.string.rate7)+")"; break;
+            case 8:desc=" ("+getResources().getString(R.string.rate8)+")"; break;
+            case 9:desc=" ("+getResources().getString(R.string.rate9)+")"; break;
+            case 10:desc=" ("+getResources().getString(R.string.rate10)+")"; break;
+        }
+        return desc;
+    }
+
     public String getDate(String date) {
         Locale locale = new Locale("ru");
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",locale);
@@ -263,43 +303,82 @@ public class AuthorityViewActivity extends AppCompatActivity {
         public boolean onTouch(View v, MotionEvent event) {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 session.checkLogin();
-                final AlertDialog.Builder ratingdialog = new AlertDialog.Builder(activity);
-                ratingdialog.setTitle(R.string.rate_authority);
-
-                View linearlayout = getLayoutInflater().inflate(R.layout.rating_dialog, null);
-                ratingdialog.setView(linearlayout);
-
-                final RatingBar rateMe = (RatingBar)linearlayout.findViewById(R.id.ratingbar);
-                if(user_rating>0){
-                    float f_rating=(float)user_rating/2;
-                    rateMe.setRating(f_rating);
-                }
-
-                ratingdialog.setPositiveButton(R.string.done,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                float user_rate=rateMe.getRating();
-                                user_rate=user_rate*2; //since it's only 5 star system here, but 10 star in server
-                                sendRating(id,user_rate);
-                                dialog.dismiss();
-                            }
-                        })
-
-                        .setNegativeButton(R.string.cancel,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        dialog.cancel();
-                                    }
-                                });
-
-                ratingdialog.create();
-                ratingdialog.show();
+                openDialog();
             }
             return true;
         }
     };
 
+    public void onClickOpenDialog(View v){
+        openDialog();
+    }
+    public void onClickLogin(View v){
+        Intent intent = new Intent(AuthorityViewActivity.this, LoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void openDialog(){
+        final AlertDialog.Builder ratingdialog = new AlertDialog.Builder(activity);
+
+        TextView title = new TextView(activity);
+        title.setText(R.string.rate_authority);
+        title.setPadding(10, 10, 10, 10);
+        title.setGravity(Gravity.CENTER);
+        title.setTextSize(20);
+        //ratingdialog.setTitle(R.string.rate_authority);
+        ratingdialog.setCustomTitle(title);
+
+        View linearlayout = getLayoutInflater().inflate(R.layout.rating_dialog, null);
+        ratingdialog.setView(linearlayout);
+
+        final RatingBar rateMe = (RatingBar)linearlayout.findViewById(R.id.ratingbar);
+        tv_dialog_rate=(TextView)linearlayout.findViewById(R.id.id_tv_dialog_rate);
+        rateMe.setOnRatingBarChangeListener(changeListener);
+        if(user_rating>0){
+            Log.e("Dialog","userRate: "+user_rating);
+            String ratingDesc=getRatingDesc(user_rating);
+            String rating_text=user_rating+ratingDesc;
+            tv_dialog_rate.setText(rating_text);
+            rateMe.setRating(user_rating);
+        }
+
+        ratingdialog.setPositiveButton(R.string.done,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        float user_rate=rateMe.getRating();
+                        sendRating(id,user_rate);
+                        dialog.dismiss();
+                    }
+                })
+
+                .setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        ratingdialog.create();
+        ratingdialog.show();
+    }
+
+    RatingBar.OnRatingBarChangeListener changeListener= new RatingBar.OnRatingBarChangeListener() {
+        @Override
+        public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+            int drate=(int)v;
+            String ratingDesc=getRatingDesc(drate);
+            String rating_text=drate+ratingDesc;
+            tv_dialog_rate.setText(rating_text);
+        }
+    };
+
     public void sendRating(final int authority_id, final float value){
+        tv_rating_rate.setVisibility(View.INVISIBLE);
+        tv_rating_count.setVisibility(View.GONE);
+        pb_rating.setVisibility(View.VISIBLE);
+        pb_count.setVisibility(View.VISIBLE);
+
+        Log.e("Send","auth_id:"+authority_id+" value:"+value);
         String url= Endpoints.AUTHORITY_RATE;
         Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
@@ -309,8 +388,29 @@ public class AuthorityViewActivity extends AppCompatActivity {
                     try{
                         if(obj.has("new_rating")){
                             int new_rating = obj.getInt("new_rating");
-                            float f_rating=new_rating/2;
-                            ratingBar.setRating(f_rating);
+                            Log.e("Send","new "+new_rating);
+                            ratingBar.setRating(new_rating);
+                            String ratingDesc=getRatingDesc(new_rating);
+                            String rating_text=new_rating+ratingDesc;
+                            tv_rating_rate.setText(rating_text);
+                            if(user_rating==0){ //if user hasn't voted then increase vote count
+                                user_rating=new_rating;
+                                int voteCount=0;
+                                if(votes!=null && !votes.isEmpty()){
+                                    voteCount=Integer.parseInt(votes);
+                                }
+                                voteCount++;
+                                tv_rating_count.setText(Integer.toString(voteCount));
+                            }
+
+                            tv_rating_rate.setVisibility(View.VISIBLE);
+                            tv_rating_count.setVisibility(View.VISIBLE);
+                            pb_rating.setVisibility(View.GONE);
+                            pb_count.setVisibility(View.GONE);
+                        }
+                        if(obj.has("msg")){
+                            String msg = obj.getString("msg");
+                            Log.e("Send","msg "+msg);
                         }
 
                     }catch(JSONException e){e.printStackTrace();}
@@ -346,16 +446,16 @@ public class AuthorityViewActivity extends AppCompatActivity {
 
 
     public void requestUserRate(){
-
+        Log.e("USERRATE", "request send");
         String uri = Endpoints.AUTHORITY_USER_RATE+"?authority_id="+id;
 
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
-
                 Log.e("USERRATE", "response: " + jsonObject);
                 try{
                     if(jsonObject.has("rate")){
+                        Log.e("USERRATE", "user_rating: " + jsonObject.getInt("rate"));
                         user_rating=jsonObject.getInt("rate");
                     }
 

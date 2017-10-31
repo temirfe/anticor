@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="2dp"
         android:paddingLeft="4dp"
-        android:text="Model title, can be long, i mean very very loooong. So what you do here?"
+        android:text=""
         android:maxLines="1"
         android:ellipsize="end"
         android:textColor="@color/gray5"

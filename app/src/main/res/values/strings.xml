@@ -137,6 +137,20 @@
     <string name="lang_en">English</string>
     <string name="social_login">Login with social account:</string>
     <string name="edit">edit</string>
+    <string name="rating">Rating:</string>
+    <string name="rating_count">Rating count:</string>
+    <string name="rate">Rate authority</string>
+    <string name="login_to_rate">You should be logged in to rate authority</string>
+    <string name="rate1">Fully transparent and highly effective</string>
+    <string name="rate2">Uncorrupted and effective</string>
+    <string name="rate3">Uncorrupted</string>
+    <string name="rate4">More likely to be uncorrupted</string>
+    <string name="rate5">Slightly corrupted</string>
+    <string name="rate6">Very corrupted</string>
+    <string name="rate7">Corrupted</string>
+    <string name="rate8">Strongly corrupted</string>
+    <string name="rate9">Extremely corrupted</string>
+    <string name="rate10">Fully corrupted</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="facebook_app_id" translatable="false">2026864364212005</string>

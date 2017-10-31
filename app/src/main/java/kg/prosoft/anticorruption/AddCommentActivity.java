@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -22,6 +24,12 @@ import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.safetynet.SafetyNet;
+import com.google.android.gms.safetynet.SafetyNetApi;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,8 +37,14 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.UnsupportedEncodingException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 import kg.prosoft.anticorruption.service.Endpoints;
 import kg.prosoft.anticorruption.service.MyVolley;
@@ -38,11 +52,12 @@ import kg.prosoft.anticorruption.service.SessionManager;
 
 public class AddCommentActivity extends AppCompatActivity {
     EditText et_name, et_email, et_comment;
-    String model;
+    String model, name, email, comment;
     int id;
     Activity activity;
     SessionManager session;
     boolean saveCredentials;
+    String TAG="AddComment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,12 +111,12 @@ public class AddCommentActivity extends AppCompatActivity {
     }
 
     public void submitComment(View v){
-        String comment = et_comment.getText().toString();
+        comment = et_comment.getText().toString();
         if(comment.length()>0){
-            String name = et_name.getText().toString();
+            name = et_name.getText().toString();
             if(name.length()>0){
                 boolean okToSend=true;
-                String email = et_email.getText().toString();
+                email = et_email.getText().toString();
                 if(email.length()>0){
                     if(!isEmailValid(email)){
                         et_email.setError(getResources().getString(R.string.error_invalid_email));
@@ -112,7 +127,7 @@ public class AddCommentActivity extends AppCompatActivity {
                     if(saveCredentials){
                         session.saveNameEmail(name,email);
                     }
-                    sendComment(name,email,comment);
+                    doCaptcha();
                 }
             }
             else {
@@ -212,6 +227,97 @@ public class AddCommentActivity extends AppCompatActivity {
         MyVolley.getInstance(activity).addToRequestQueue(req);
     }
 
+    public void doCaptcha(){
+        SafetyNet.getClient(this).verifyWithRecaptcha("6Lc3jTYUAAAAADtTzPDTmL6eJciK4Sv87Rz4Tl-2")
+                .addOnSuccessListener(this,
+                        new OnSuccessListener<SafetyNetApi.RecaptchaTokenResponse>() {
+                            @Override
+                            public void onSuccess(SafetyNetApi.RecaptchaTokenResponse response) {
+                                // Indicates communication with reCAPTCHA service was
+                                // successful.
+                                String userResponseToken = response.getTokenResult();
+                                if (!userResponseToken.isEmpty()) {
+                                    // Validate the user response token using the
+                                    // reCAPTCHA siteverify API.
+                                    handleSiteVerify(userResponseToken);
+                                }
+                            }
+                        })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        if (e instanceof ApiException) {
+                            // An error occurred when communicating with the
+                            // reCAPTCHA service. Refer to the status code to
+                            // handle the error appropriately.
+                            ApiException apiException = (ApiException) e;
+                            int statusCode = apiException.getStatusCode();
+                            Log.d(TAG, "Error: " + CommonStatusCodes
+                                    .getStatusCodeString(statusCode));
+                        } else {
+                            // A different, unknown type of error occurred.
+                            Log.d(TAG, "Error: " + e.getMessage());
+                        }
+                    }
+                });
+    }
+
+    public void handleSiteVerify(final String token){
+        final String ip=getLocalIpAddress();
+        Log.e(TAG,"captcha "+token);
+        Log.e(TAG,"ip "+ip);
+
+        String url= "https://www.google.com/recaptcha/api/siteverify";
+        Response.Listener<String> listener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.e(TAG, "String resp: "+response);
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    try{
+                        boolean success=obj.getBoolean("success");
+                        if(success){
+                            sendComment(name,email,comment);
+                        }
+
+                    }catch(JSONException e){e.printStackTrace();}
+
+                } catch (Throwable t) {
+                    Log.e("siteVerify", "Could not parse malformed JSON: \"" + response + "\"");
+                }
+            }
+        };
+
+        StringRequest req = new StringRequest(Request.Method.POST, url, listener, null){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("secret","6Lc3jTYUAAAAACjBfmZHeX5gKzKLoT7o9E7fq7pc");
+                params.put("response",token);
+                params.put("remoteip",ip);
+
+                return params;
+            }
+        };
+        MyVolley.getInstance(activity).addToRequestQueue(req);
+    }
+
+    public String getLocalIpAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            //
+        }
+        return null;
+    }
 
     private boolean isEmailValid(String email) {
         boolean valid=true;

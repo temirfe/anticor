@@ -137,6 +137,19 @@
     <string name="lang_en">English</string>
     <string name="social_login">Войти с через соц. сети:</string>
     <string name="edit">изменить</string>
+    <string name="rate">Добавить оценку</string>
+    <string name="rating">Рейтинг:</string>
+    <string name="rating_count">Количество голосов:</string>
+    <string name="rate1">Полностью прозрачный и высокоэффективный</string>
+    <string name="rate2">Некоррумпированный и эффективный</string>
+    <string name="rate3">Некоррумпированный</string>
+    <string name="rate4">Скорее некоррумпированный</string>
+    <string name="rate5">Слегка коррумпированный</string>
+    <string name="rate6">Весьма коррумпированный</string>
+    <string name="rate7">Коррумпированный</string>
+    <string name="rate8">Сильно коррумпированный</string>
+    <string name="rate9">Очень сильно коррумпированный</string>
+    <string name="rate10">Полностью коррумпированный</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 
