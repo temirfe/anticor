@@ -318,4 +318,37 @@ public class MyHelper {
         }
     }
 
+
+    /** Page **/
+    public void addPageList(ArrayList<Page> list){
+        doClearPageTask();//delete previous ones and add new ones
+        for(int i=0; i<list.size();i++){
+            new AddPageTask().execute(list.get(i));
+        }
+    }
+
+    private class AddPageTask extends AsyncTask<Page, Void, Void> {
+        protected Void doInBackground(Page... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context);}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
+            dbHandler.addPageItem(params[0], db);
+            return null;
+        }
+    }
+
+    public void doClearPageTask(){
+        new ClearPageTask().execute();
+    }
+
+    private class ClearPageTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context);}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
+
+            dbHandler.clearPage(db);
+
+            return null;
+        }
+    }
+
 }

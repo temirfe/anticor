@@ -52,5 +52,11 @@ public class MyDbContract {
         public static final String COLUMN_REPORT_DESC = "report_desc";
         public static final String COLUMN_REPORT_TEXT = "report_text";
         public static final String COLUMN_REPORT_DATE = "report_date";
+
+        public static final String TABLE_PAGE = "pages";
+        public static final String COLUMN_PAGE_ID = "page_id";
+        public static final String COLUMN_PAGE_TITLE = "page_title";
+        public static final String COLUMN_PAGE_TEXT = "page_text";
+        public static final String COLUMN_PAGE_DESC = "page_desc";
     }
 }

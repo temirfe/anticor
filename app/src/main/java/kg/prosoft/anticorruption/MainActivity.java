@@ -89,7 +89,8 @@ public class MainActivity extends BaseActivity
     private HashMap<String, Integer> idMap;
     FloatingActionButton fab;
     int news_ctg_id=0;
-    int ACTIVE_FRAME=0, NEWS_FRAME=1, RESEARCH_FRAME=2, MAPMENU_FRAME=3, MAIN_FRAME=4, REPORT_FRAME=5;
+    int ACTIVE_FRAME=0, NEWS_FRAME=1, RESEARCH_FRAME=2, MAPMENU_FRAME=3, MAIN_FRAME=4,
+            REPORT_FRAME=5, FIGHT_FRAME=6, ABOUT_FRAME=7;
     int PREV_FRAME=0;
     FragmentManager fm;
     NavigationView navigationView;
@@ -285,6 +286,9 @@ public class MainActivity extends BaseActivity
         else if (id == R.id.nav_research ){
             showResearchFrag();
         }
+        else if (id == R.id.nav_fight ){
+            showFightFrag();
+        }
         else if (id == R.id.nav_map ){
             showMapMenuFrag();
         }
@@ -300,9 +304,9 @@ public class MainActivity extends BaseActivity
         else if (id == R.id.nav_anticor_politics ){
         }
         else if (id == R.id.nav_about ){
+            showAboutFrag();
         }
-        else if (id == R.id.nav_contacts ){
-        } else if (id == R.id.nav_logout) {
+        else if (id == R.id.nav_logout) {
             session.logoutUser();
         } else if (id == R.id.nav_settings) {
             clickSettings();
@@ -400,6 +404,13 @@ public class MainActivity extends BaseActivity
         if(fm.findFragmentByTag("mapmenu") != null){
             fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
         }
+        if(fm.findFragmentByTag("fight") != null){
+            fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
+        }
+        if(fm.findFragmentByTag("about") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
+        }
     }
 
     public void hideFragContainer(){
@@ -483,6 +494,89 @@ public class MainActivity extends BaseActivity
             //if the other fragment is visible, hide it.
             fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
         }
+        if(fm.findFragmentByTag("fight") != null){
+            fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
+        }
+        if(fm.findFragmentByTag("about") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
+        }
+    }
+
+    public void showFightFrag(){
+        if(PREV_FRAME==FIGHT_FRAME){PREV_FRAME=0;}
+        else{PREV_FRAME=ACTIVE_FRAME;}
+        ACTIVE_FRAME=FIGHT_FRAME;
+        hideFragContainer();
+        hideReportFrag();
+        fragCont.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.GONE);
+        /*if (savedIS != null) {
+            Log.e(TAG, "savedIS returns");
+            return;
+        }*/
+
+        if(fm.findFragmentByTag("fight") != null) {
+            //if the fragment exists, show it.
+            fm.beginTransaction().show(getSupportFragmentManager().findFragmentByTag("fight")).commit();
+        } else {
+            //if the fragment does not exist, add it to fragment manager.
+            fm.beginTransaction().add(R.id.fragment_container, new FightFragment(), "fight").addToBackStack(null).commit();
+        }
+        if(fm.findFragmentByTag("news") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("news")).commit();
+        }
+        if(fm.findFragmentByTag("research") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
+        }
+        if(fm.findFragmentByTag("mapmenu") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
+        }
+        if(fm.findFragmentByTag("about") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
+        }
+    }
+
+    public void showAboutFrag(){
+        if(PREV_FRAME==ABOUT_FRAME){PREV_FRAME=0;}
+        else{PREV_FRAME=ACTIVE_FRAME;}
+        ACTIVE_FRAME=ABOUT_FRAME;
+        hideFragContainer();
+        hideReportFrag();
+        fragCont.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.GONE);
+        /*if (savedIS != null) {
+            Log.e(TAG, "savedIS returns");
+            return;
+        }*/
+
+        if(fm.findFragmentByTag("about") != null) {
+            //if the fragment exists, show it.
+            fm.beginTransaction().show(getSupportFragmentManager().findFragmentByTag("about")).commit();
+        } else {
+            //if the fragment does not exist, add it to fragment manager.
+            fm.beginTransaction().add(R.id.fragment_container, new AboutFragment(), "about").addToBackStack(null).commit();
+        }
+        if(fm.findFragmentByTag("news") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("news")).commit();
+        }
+        if(fm.findFragmentByTag("research") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
+        }
+        if(fm.findFragmentByTag("mapmenu") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
+        }
+        if(fm.findFragmentByTag("fight") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
+        }
     }
 
     public void showMapMenuFrag(){
@@ -512,6 +606,13 @@ public class MainActivity extends BaseActivity
         }
         if(fm.findFragmentByTag("research") != null){
             fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
+        }
+        if(fm.findFragmentByTag("fight") != null){
+            fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
+        }
+        if(fm.findFragmentByTag("about") != null){
+            //if the other fragment is visible, hide it.
+            fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
         }
     }
 
@@ -740,7 +841,11 @@ public class MainActivity extends BaseActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if (fm.getBackStackEntryCount() > 0 && PREV_FRAME!=0) {
+            if (mViewPager.getCurrentItem() != 0) {
+                Log.e(TAG,"viewPager switch ");
+                mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1,false);
+            }
+            else if (fm.getBackStackEntryCount() > 0 && PREV_FRAME!=0) {
                 Log.e(TAG,"nav main prev: "+PREV_FRAME +" active: "+ACTIVE_FRAME);
                 fm.popBackStack();
                 showPrevFrame();
@@ -755,6 +860,8 @@ public class MainActivity extends BaseActivity
     public void showPrevFrame(){
         if(PREV_FRAME==NEWS_FRAME && ACTIVE_FRAME!=NEWS_FRAME){showNewsFrag(); navigationView.setCheckedItem(R.id.nav_news);}
         else if(PREV_FRAME==RESEARCH_FRAME && ACTIVE_FRAME!=RESEARCH_FRAME){showResearchFrag(); navigationView.setCheckedItem(R.id.nav_research);}
+        else if(PREV_FRAME==FIGHT_FRAME && ACTIVE_FRAME!=FIGHT_FRAME){showFightFrag(); navigationView.setCheckedItem(R.id.nav_fight);}
+        else if(PREV_FRAME==ABOUT_FRAME && ACTIVE_FRAME!=ABOUT_FRAME){showAboutFrag(); navigationView.setCheckedItem(R.id.nav_about);}
         else if(PREV_FRAME==MAPMENU_FRAME && ACTIVE_FRAME!=MAPMENU_FRAME){
             Log.e(TAG,"Back press says to showMapMenuFrag");
             showMapMenuFrag();
@@ -791,6 +898,5 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-    }
+    public void onMapReady(GoogleMap googleMap) {}
 }

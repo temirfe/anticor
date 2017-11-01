@@ -151,6 +151,7 @@
     <string name="rate8">Strongly corrupted</string>
     <string name="rate9">Extremely corrupted</string>
     <string name="rate10">Fully corrupted</string>
+    <string name="version">Version:</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="facebook_app_id" translatable="false">2026864364212005</string>
@@ -158,5 +159,8 @@
 
     <string name="com.twitter.sdk.android.CONSUMER_KEY" translatable="false">AIw8j1pjMcH2QXUAPLaQQJ3SL</string>
     <string name="com.twitter.sdk.android.CONSUMER_SECRET" translatable="false">72HJCEZjjNU77TgrELQoskYpxhSuQslXciMolHrF9AW4lfnwbt</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

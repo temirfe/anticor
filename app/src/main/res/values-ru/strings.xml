@@ -138,6 +138,7 @@
     <string name="social_login">Войти с через соц. сети:</string>
     <string name="edit">изменить</string>
     <string name="rate">Добавить оценку</string>
+    <string name="login_to_rate">Войдите, чтобы добавить оценку</string>
     <string name="rating">Рейтинг:</string>
     <string name="rating_count">Количество голосов:</string>
     <string name="rate1">Полностью прозрачный и высокоэффективный</string>
@@ -150,6 +151,7 @@
     <string name="rate8">Сильно коррумпированный</string>
     <string name="rate9">Очень сильно коррумпированный</string>
     <string name="rate10">Полностью коррумпированный</string>
+    <string name="version">Версия:</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 

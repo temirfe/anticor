@@ -15,7 +15,7 @@ import java.util.List;
 
 public class MyDbHandler extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 18;
+    public static final int DATABASE_VERSION = 19;
     public static final String DATABASE_NAME = "anticor.db";
     public static final String KEY_ID=MyDbContract.DbEntry._ID;
 
@@ -60,6 +60,13 @@ public class MyDbHandler extends SQLiteOpenHelper {
     public static final String COLUMN_REPORT_USER_ID=MyDbContract.DbEntry.COLUMN_REPORT_USER_ID;
     public static final String COLUMN_REPORT_LAT=MyDbContract.DbEntry.COLUMN_REPORT_LAT;
     public static final String COLUMN_REPORT_LNG=MyDbContract.DbEntry.COLUMN_REPORT_LNG;
+
+
+    public static final String TABLE_PAGE=MyDbContract.DbEntry.TABLE_PAGE;
+    public static final String COLUMN_PAGE_ID=MyDbContract.DbEntry.COLUMN_PAGE_ID;
+    public static final String COLUMN_PAGE_TITLE=MyDbContract.DbEntry.COLUMN_PAGE_TITLE;
+    public static final String COLUMN_PAGE_TEXT=MyDbContract.DbEntry.COLUMN_PAGE_TEXT;
+    public static final String COLUMN_PAGE_DESC=MyDbContract.DbEntry.COLUMN_PAGE_DESC;
 
     public MyDbHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -115,20 +122,33 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 COLUMN_REPORT_LAT + " REAL," +
                 COLUMN_REPORT_LNG + " REAL" +
                 ")");
+
+        db.execSQL("CREATE TABLE " + TABLE_PAGE + " (" +
+                MyDbContract.DbEntry._ID + " INTEGER PRIMARY KEY," +
+                COLUMN_PAGE_ID + " INTEGER," +
+                COLUMN_PAGE_TITLE + " TEXT," +
+                COLUMN_PAGE_TEXT + " TEXT," +
+                COLUMN_PAGE_DESC + " TEXT" +
+                ")");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_VOC);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_AUTH);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEWS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REPORT);
-        onCreate(db);
+        clearDb(db);
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+    
+    public void clearDb(SQLiteDatabase db){
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_VOC);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_AUTH);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NEWS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_REPORT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PAGE);
+        onCreate(db);
     }
 
     /**Vocabulary**/
@@ -370,6 +390,50 @@ public class MyDbHandler extends SQLiteOpenHelper {
                 report.setLng(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_REPORT_LNG)));
                 // Adding contact to list
                 mList.add(report);
+            } while (cursor.moveToNext());
+        }
+        return mList;
+    }
+
+    /**Pages**/
+    public void clearPage(SQLiteDatabase db) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_PAGE, null,null);
+        //db.close();
+    }
+
+    public void addPageItem(Page page,SQLiteDatabase db) {
+        //SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PAGE_ID, page.getId());
+        values.put(COLUMN_PAGE_TITLE, page.getTitle());
+        values.put(COLUMN_PAGE_TEXT, page.getText());
+        values.put(COLUMN_PAGE_DESC, page.getDescription());
+
+        // Inserting Row
+        db.insert(TABLE_PAGE, null, values);
+        //db.close(); // Closing database connection
+    }
+
+    public ArrayList<Page> getPageContents(SQLiteDatabase db) {
+        ArrayList<Page> mList = new ArrayList<>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM "+TABLE_PAGE;
+
+        //SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Page page = new Page();
+                page.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_PAGE_ID)));
+                page.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAGE_TITLE)));
+                page.setText(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAGE_TEXT)));
+                page.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PAGE_DESC)));
+                // Adding contact to list
+                mList.add(page);
             } while (cursor.moveToNext());
         }
         return mList;

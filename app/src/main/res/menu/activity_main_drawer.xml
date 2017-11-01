@@ -40,10 +40,6 @@
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_info_black_24dp"
             android:title="@string/about" />
-        <item
-            android:id="@+id/nav_contacts"
-            android:icon="@drawable/ic_mail_black_24dp"
-            android:title="@string/contacts" />
     </group>
 
     <group android:id="@+id/menu_4" android:checkableBehavior="single">

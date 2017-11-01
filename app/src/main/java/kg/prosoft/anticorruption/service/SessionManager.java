@@ -44,6 +44,7 @@ public class SessionManager {
     public static final String KEY_VOCABULARY_DEPEND= "authority_depend";
     public static final String KEY_NEWS_DEPEND= "news_depend";
     public static final String KEY_REPORT_DEPEND= "report_depend";
+    public static final String KEY_PAGE_DEPEND= "page_depend";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String KEY_PHONE = "phone";
     public static final String KEY_ADMIN_PHONE = "admin_phone";
@@ -178,6 +179,15 @@ public class SessionManager {
     }
     public String getReportDepend() {
         return pref.getString(KEY_REPORT_DEPEND,"");
+    }
+
+    /** Page depend **/
+    public void setPageDepend(String text){
+        editor.putString(KEY_PAGE_DEPEND, text);
+        editor.commit();
+    }
+    public String getPageDepend() {
+        return pref.getString(KEY_PAGE_DEPEND,"");
     }
 
     /**Authority depend**/

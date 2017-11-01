@@ -124,7 +124,8 @@
                     android:scheme="okauth" />
             </intent-filter>
         </activity>
-        <activity android:name=".CommentActivity"></activity>
+        <activity android:name=".CommentActivity" />
+        <activity android:name=".PageViewActivity"></activity>
     </application>
 
 </manifest>

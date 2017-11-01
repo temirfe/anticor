@@ -189,6 +189,7 @@
     <string name="rate8">Көп бузулган</string>
     <string name="rate9">Өтө көп бузулган</string>
     <string name="rate10">Тоолугу менен бузулган</string>
+    <string name="version">Версия:</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 </resources>
