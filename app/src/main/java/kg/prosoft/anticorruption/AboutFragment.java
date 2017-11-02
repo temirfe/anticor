@@ -132,6 +132,10 @@ public class AboutFragment extends Fragment {
 
     public void requestPages(){
         String uri = Endpoints.PAGES;
+        String lang=session.getLanguage();
+        if(lang!=null && !lang.isEmpty()){
+            uri=uri+"?lang="+lang;
+        }
         Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
@@ -147,7 +151,7 @@ public class AboutFragment extends Fragment {
                         Page page =new Page(id,title, text, desc);
                         infoList.add(page);
                         if(desc.equals("about")){
-                            tv_title.setText(page.getTitle());
+                            tv_title.setText(title);
 
                             CharSequence html_text;
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

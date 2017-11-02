@@ -1,15 +1,19 @@
 package kg.prosoft.anticorruption;
 
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.widget.SearchView;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -32,47 +36,60 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import kg.prosoft.anticorruption.service.Analytics;
-import kg.prosoft.anticorruption.service.AnalyticsAdapter;
+import kg.prosoft.anticorruption.service.Education;
+import kg.prosoft.anticorruption.service.EducationAdapter;
 import kg.prosoft.anticorruption.service.Endpoints;
+import kg.prosoft.anticorruption.service.MyDbHandler;
+import kg.prosoft.anticorruption.service.MyHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
+import kg.prosoft.anticorruption.service.SessionManager;
 
-public class AnalyticsListActivity extends BaseActivity {
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class EducationFragment extends Fragment {
 
     ListView listView;
-    AnalyticsAdapter adapter;
-    ArrayList<Analytics> analyticsList;
+    EducationAdapter adapter;
+    ArrayList<Education> newsList;
     private int page = 1, current_page = 1, total_pages;
     Uri.Builder uriB;
     ProgressBar pb;
     ProgressDialog progress;
     Button btn_reload;
     LinearLayout ll_reload;
-    String TAG = "AnalyticsList";
+    String TAG = "EduFrag";
     String query;
 
+    Context context;
+    Activity activity;
+
+    public EducationFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_analytics_list);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View layout = inflater.inflate(R.layout.fragment_education, container, false);
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-            getSupportActionBar().setTitle(R.string.analytics);
-        }
+        activity=getActivity();
+        context=activity.getApplicationContext();
 
-        listView = (ListView) findViewById(R.id.id_lv_news);
+        listView = (ListView) layout.findViewById(R.id.id_lv_news);
         listView.setOnScrollListener(onScrollDo);
-        ll_reload = (LinearLayout) findViewById(R.id.id_ll_reload);
-        btn_reload = (Button) findViewById(R.id.id_btn_reload);
+        ll_reload = (LinearLayout) layout.findViewById(R.id.id_ll_reload);
+        btn_reload = (Button) layout.findViewById(R.id.id_btn_reload);
         btn_reload.setOnClickListener(reloadClickListener);
 
 
-        pb = (ProgressBar) findViewById(R.id.progressBar1);
+        pb = (ProgressBar) layout.findViewById(R.id.progressBar1);
 
-        analyticsList = new ArrayList<>();
-        adapter = new AnalyticsAdapter(context, analyticsList);
+        newsList = new ArrayList<>();
+        adapter = new EducationAdapter(context, newsList);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(itemClickListener);
@@ -80,12 +97,13 @@ public class AnalyticsListActivity extends BaseActivity {
         //query=intent.getStringExtra("query");
         if (query != null) {
             Uri.Builder builder = new Uri.Builder();
-            builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("analytics");
+            builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
             builder.appendQueryParameter("text", query);
             populateList(page, builder, false, false);
         } else {
             populateList(page, null, false, false);
         }
+        return layout;
     }
 
     View.OnClickListener reloadClickListener = new View.OnClickListener() {
@@ -101,14 +119,13 @@ public class AnalyticsListActivity extends BaseActivity {
                                 View itemView,
                                 int position,
                                 long id) {
-            Analytics item = analyticsList.get(position);
-            Intent intent = new Intent(context, AnalyticsViewActivity.class);
+            Education item = newsList.get(position);
+            Intent intent = new Intent(context, EducationViewActivity.class);
             intent.putExtra("id", item.getId());
             intent.putExtra("title", item.getTitle());
             intent.putExtra("text", item.getText());
             intent.putExtra("date", item.getDate());
-            intent.putExtra("author_id", item.getAuthorId());
-            intent.putExtra("author_name", item.getAuthorName());
+            intent.putExtra("image", item.getImage());
             startActivity(intent);
         }
     };
@@ -173,7 +190,7 @@ public class AnalyticsListActivity extends BaseActivity {
 
         if (uriB == null) {
             uriB = new Uri.Builder();
-            uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("analytics");
+            uriB.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
         }
         Uri.Builder otherBuilder = Uri.parse(uriB.build().toString()).buildUpon();
 
@@ -190,7 +207,7 @@ public class AnalyticsListActivity extends BaseActivity {
                         progress.dismiss();
                     }
                     if (applyNewFilter || newlist) {
-                        analyticsList.clear();
+                        newsList.clear();
                     }
                     int leng = response.length();
                     if (leng > 0) {
@@ -200,11 +217,10 @@ public class AnalyticsListActivity extends BaseActivity {
                             String title = jsonObject.getString("title");
                             String text = jsonObject.getString("text");
                             String date = jsonObject.getString("date");
-                            String author_name = jsonObject.getString("author_name");
-                            int author_id = jsonObject.getInt("author_id");
+                            String image = jsonObject.getString("img");
 
-                            Analytics anal = new Analytics(id, title, text, date, author_name, author_id);
-                            analyticsList.add(anal);
+                            Education news = new Education(id, title, text, date, image);
+                            newsList.add(news);
                         }
                     } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -217,7 +233,7 @@ public class AnalyticsListActivity extends BaseActivity {
                 }
 
                 if (applyNewFilter || newlist) {
-                    adapter = new AnalyticsAdapter(context, analyticsList);
+                    adapter = new EducationAdapter(context, newsList);
                     listView.setAdapter(adapter);
                 } else {
                     adapter.notifyDataSetChanged();
@@ -257,41 +273,5 @@ public class AnalyticsListActivity extends BaseActivity {
         };
 
         MyVolley.getInstance(context).addToRequestQueue(volReq);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
-        //search
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Uri.Builder builder = new Uri.Builder();
-                builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("analytics");
-                builder.appendQueryParameter("text", query);
-                searchView.clearFocus();
-                populateList(1, builder, true, false);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

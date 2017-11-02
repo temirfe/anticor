@@ -42,6 +42,7 @@ public class AccountActivity extends BaseActivity {
     int user_id;
     String auth_key, username;
     ProgressBar pb_report, pb_comment;
+    InputMethodManager imm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +52,8 @@ public class AccountActivity extends BaseActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setTitle(R.string.myAccount);
         }
+
+        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         Intent gotIntent=getIntent();
         user_id=gotIntent.getIntExtra("user_id",0);
@@ -114,7 +117,6 @@ public class AccountActivity extends BaseActivity {
         et_username.requestFocus();
         et_username.setSelection(et_username.getText().length());
         //et_username.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(et_username, InputMethodManager.SHOW_IMPLICIT);
 
         tv_username.setVisibility(View.GONE);
@@ -142,6 +144,9 @@ public class AccountActivity extends BaseActivity {
                             tv_username.setText(username);
                             et_username.setText(username);
                         }
+                        else{
+                            session.setUserName(new_username);
+                        }
 
                     }catch(JSONException e){e.printStackTrace();}
                 }
@@ -164,6 +169,10 @@ public class AccountActivity extends BaseActivity {
             };
 
             MyVolley.getInstance(context).addToRequestQueue(volReq);
+        }
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
         tv_username.setText(new_username);
         tv_username.setVisibility(View.VISIBLE);

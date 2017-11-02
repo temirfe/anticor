@@ -351,4 +351,22 @@ public class MyHelper {
         }
     }
 
+    //clear db
+
+
+    public void doClearDbTask(){
+        new ClearDbTask().execute();
+    }
+
+    private class ClearDbTask extends AsyncTask<Void, Void, Void> {
+        protected Void doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context);}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
+
+            dbHandler.clearDb(db);
+
+            return null;
+        }
+    }
+
 }

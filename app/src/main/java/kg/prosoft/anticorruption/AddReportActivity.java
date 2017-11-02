@@ -26,6 +26,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -88,6 +89,7 @@ import kg.prosoft.anticorruption.service.Item;
 import kg.prosoft.anticorruption.service.MyDbHandler;
 import kg.prosoft.anticorruption.service.MyImageHelper;
 import kg.prosoft.anticorruption.service.MyVolley;
+import kg.prosoft.anticorruption.service.Page;
 import kg.prosoft.anticorruption.service.SectorDialog;
 import kg.prosoft.anticorruption.service.Vocabulary;
 
@@ -204,9 +206,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         date_form=dateFormatter.format(calendar.getTime());
         tv_time.setText(timeFormatter.format(calendar.getTime()));
         setDateTimeField();
-
-        //AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        //builder.setTitle("warning").setMessage("warning text").setNegativeButton(android.R.string.ok,null).create().show();
+        new PageTask().execute();
     }
 
     private void setDateTimeField() {
@@ -933,7 +933,6 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
 
         MyVolley.getInstance(context).addToRequestQueue(volReq);
     }
-
     public void prepareVocList(String type, boolean hasChildren){
         vocList=new ArrayList<>();
         HashMap<Integer,Vocabulary> cMap;
@@ -991,7 +990,6 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             }
         }
     }
-
     private class VocabularyTask extends AsyncTask<Void, Void, List<Vocabulary>> {
         protected List<Vocabulary> doInBackground(Void... params) {
             if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "VocabularyTask dbhandler was null");}
@@ -1035,7 +1033,6 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             }
         }
     }
-
     public void populateHelp(String key, String value){
 
         switch(key){
@@ -1129,7 +1126,6 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         JsonArrayRequest volReq = new JsonArrayRequest(Request.Method.GET, uri, null, listener,errorListener);
         MyVolley.getInstance(context).addToRequestQueue(volReq);
     }
-
     public void prepareAuthList(){
         authList=new ArrayList<>();
         HashMap<Integer,Authority> cMap;
@@ -1179,7 +1175,6 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
             }
         }
     }
-
     private class AuthorityTask extends AsyncTask<Void, Void, List<Authority>> {
         protected List<Authority> doInBackground(Void... params) {
             if(dbHandler==null){dbHandler = new MyDbHandler(context); Log.e(TAG, "AuthorityTask dbhandler was null");}
@@ -1216,6 +1211,129 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         }
     }
 
+    /** Page **/
+    public static CharSequence trimTrailingWhitespace(CharSequence source) {
+
+        if(source == null)
+            return "";
+
+        int i = source.length();
+
+        // loop back to the first non-whitespace character
+        while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
+        }
+
+        return source.subSequence(0, i+1);
+    }
+    private class PageTask extends AsyncTask<Void, Void, ArrayList<Page>> {
+        protected ArrayList<Page> doInBackground(Void... params) {
+            if(dbHandler==null){dbHandler = new MyDbHandler(context);}
+            if(db==null || !db.isOpen()){db = dbHandler.getWritableDatabase();}
+
+            return dbHandler.getPageContents(db);
+        }
+        protected void onPostExecute(ArrayList<Page> theList) {
+            if(theList.size()>0){
+                for(int i=0; i<theList.size(); i++){
+                    Page page=theList.get(i);
+                    String desc=page.getDescription();
+                    if(desc.equals("warning")){
+                        String title=page.getTitle();
+                        String text = page.getText();
+
+                        CharSequence html_text;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            html_text= Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
+                        } else {
+                            html_text=Html.fromHtml(text);
+                        }
+                        String html_text_string=trimTrailingWhitespace(html_text).toString();
+                        showWarning(title, html_text_string);
+                    }
+                }
+                Log.e(TAG, "page data has been taken from DB");
+                checkPageDepend();
+            }
+            else{
+                Log.e(TAG, "no content in db, requesting server");
+                requestPages(); //requesting server
+            }
+        }
+    }
+    public void requestPages(){
+        String uri = Endpoints.PAGES;
+        String lang=session.getLanguage();
+        if(lang!=null && !lang.isEmpty()){
+            uri=uri+"?lang="+lang;
+        }
+        Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray jsonArray) {
+                Log.e(TAG, "reqPage response: " + jsonArray);
+                ArrayList<Page> infoList=new ArrayList<>();
+                try{
+                    for(int s=0; s < jsonArray.length(); s++){
+                        JSONObject jsonObject = jsonArray.getJSONObject(s);
+                        int id=jsonObject.getInt("id");
+                        String title=jsonObject.getString("title");
+                        String text=jsonObject.getString("text");
+                        String desc=jsonObject.getString("description");
+                        Page page =new Page(id,title, text, desc);
+                        infoList.add(page);
+                        if(desc.equals("about")){
+                            CharSequence html_text;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                html_text= Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
+                            } else {
+                                html_text=Html.fromHtml(text);
+                            }
+                            String html_text_string=trimTrailingWhitespace(html_text).toString();
+                            showWarning(title, html_text_string);
+                        }
+
+                    }
+                    helper.addPageList(infoList);
+                }catch(JSONException e){e.printStackTrace();}
+            }
+        };
+
+        Response.ErrorListener errListener=new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                Log.e(TAG, "Volley error: " + error.getMessage() + ", code: " + networkResponse);
+            }
+        };
+
+        JsonArrayRequest volReq = new JsonArrayRequest(Request.Method.GET, uri, null, listener,errListener);
+
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+    public void checkPageDepend(){
+        String uri = Endpoints.PAGE_DEPEND;
+        StringRequest volReq = new StringRequest(Request.Method.GET, uri,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String depend=session.getPageDepend();
+                        response=response.replace("\"","");
+                        Log.e(TAG, "depend: "+depend+" response: "+response);
+                        if(!response.equals(depend)){
+                            //new maxId is different, that mean category table has been altered. send new request.
+                            requestPages(); //requesting server
+                            session.setPageDepend(response);
+                        }
+                        else{ Log.e(TAG, "depend matches");}
+                    }
+                }, null);
+
+        MyVolley.getInstance(context).addToRequestQueue(volReq);
+    }
+
+    public void showWarning(String title, String text){
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(title).setMessage(text).setNegativeButton(android.R.string.ok,null).create().show();
+    }
 
     public void onClickEmailWarn(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);

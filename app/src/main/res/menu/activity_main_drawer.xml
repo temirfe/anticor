@@ -28,7 +28,7 @@
             android:title="@string/anticor_edu" />
         <item
             android:id="@+id/nav_anticor_politics"
-            android:icon="@drawable/ic_mode_comment_black_24dp"
+            android:icon="@drawable/ic_folder_special_black_24dp"
             android:title="@string/anticor_politics" />
         <item
             android:id="@+id/nav_analytics"

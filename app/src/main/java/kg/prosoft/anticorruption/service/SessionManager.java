@@ -333,6 +333,10 @@ public class SessionManager {
     }
     public String getContact() {return pref.getString(KEY_CONTACT,"");}
 
+    public void setUserName(String s){
+        editor.putString(KEY_USER_NAME,s);
+        editor.commit();
+    }
     public String getUserName() {
         return pref.getString(KEY_USER_NAME,"");
     }

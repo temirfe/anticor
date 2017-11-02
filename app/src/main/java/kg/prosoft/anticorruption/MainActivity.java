@@ -83,6 +83,8 @@ public class MainActivity extends BaseActivity
     ViewPager mViewPager;
     FrameLayout fragCont;
     NewsFragment newsFrag;
+    EducationFragment eduFrag;
+    AnalyticsFragment analFrag;
     List<String> spinOptions;
     ArrayAdapter<String> spinnerDataAdapter;
     Spinner spinner;
@@ -90,7 +92,7 @@ public class MainActivity extends BaseActivity
     FloatingActionButton fab;
     int news_ctg_id=0;
     int ACTIVE_FRAME=0, NEWS_FRAME=1, RESEARCH_FRAME=2, MAPMENU_FRAME=3, MAIN_FRAME=4,
-            REPORT_FRAME=5, FIGHT_FRAME=6, ABOUT_FRAME=7;
+            REPORT_FRAME=5, FIGHT_FRAME=6, ABOUT_FRAME=7, EDU_FRAME=8, ANAL_FRAME=9;
     int PREV_FRAME=0;
     FragmentManager fm;
     NavigationView navigationView;
@@ -293,15 +295,17 @@ public class MainActivity extends BaseActivity
             showMapMenuFrag();
         }
         else if (id == R.id.nav_education ){
-            Intent intent= new Intent(MainActivity.this, EducationListActivity.class);
-            startActivity(intent);
+            /*Intent intent= new Intent(MainActivity.this, EducationListActivity.class);
+            startActivity(intent);*/
+            showEduFrag();
         }
-
         else if (id == R.id.nav_analytics ){
-            Intent intent= new Intent(MainActivity.this, AnalyticsListActivity.class);
-            startActivity(intent);
+            /*Intent intent= new Intent(MainActivity.this, AnalyticsListActivity.class);
+            startActivity(intent);*/
+            showAnalyticsFrag();
         }
         else if (id == R.id.nav_anticor_politics ){
+
         }
         else if (id == R.id.nav_about ){
             showAboutFrag();
@@ -398,19 +402,7 @@ public class MainActivity extends BaseActivity
             newsFrag = new NewsFragment();
             fm.beginTransaction().add(R.id.fragment_container, newsFrag, "news").addToBackStack(null).commit();
         }
-        if(fm.findFragmentByTag("research") != null){
-            fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
-        }
-        if(fm.findFragmentByTag("mapmenu") != null){
-            fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
-        }
-        if(fm.findFragmentByTag("fight") != null){
-            fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
-        }
-        if(fm.findFragmentByTag("about") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
-        }
+        hideFragments("news");
     }
 
     public void hideFragContainer(){
@@ -486,21 +478,7 @@ public class MainActivity extends BaseActivity
             //if the fragment does not exist, add it to fragment manager.
             fm.beginTransaction().add(R.id.fragment_container, new DocMenuFragment(), "research").addToBackStack(null).commit();
         }
-        if(fm.findFragmentByTag("news") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("news")).commit();
-        }
-        if(fm.findFragmentByTag("mapmenu") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
-        }
-        if(fm.findFragmentByTag("fight") != null){
-            fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
-        }
-        if(fm.findFragmentByTag("about") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
-        }
+        hideFragments("research");
     }
 
     public void showFightFrag(){
@@ -523,22 +501,7 @@ public class MainActivity extends BaseActivity
             //if the fragment does not exist, add it to fragment manager.
             fm.beginTransaction().add(R.id.fragment_container, new FightFragment(), "fight").addToBackStack(null).commit();
         }
-        if(fm.findFragmentByTag("news") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("news")).commit();
-        }
-        if(fm.findFragmentByTag("research") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
-        }
-        if(fm.findFragmentByTag("mapmenu") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
-        }
-        if(fm.findFragmentByTag("about") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
-        }
+        hideFragments("fight");
     }
 
     public void showAboutFrag(){
@@ -547,6 +510,9 @@ public class MainActivity extends BaseActivity
         ACTIVE_FRAME=ABOUT_FRAME;
         hideFragContainer();
         hideReportFrag();
+        if(myMenu!=null){
+            myMenu.findItem(R.id.action_search).setVisible(false);
+        }
         fragCont.setVisibility(View.VISIBLE);
         fab.setVisibility(View.GONE);
         /*if (savedIS != null) {
@@ -561,22 +527,56 @@ public class MainActivity extends BaseActivity
             //if the fragment does not exist, add it to fragment manager.
             fm.beginTransaction().add(R.id.fragment_container, new AboutFragment(), "about").addToBackStack(null).commit();
         }
-        if(fm.findFragmentByTag("news") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("news")).commit();
+
+        hideFragments("about");
+    }
+
+    public void showEduFrag(){
+        if(PREV_FRAME==EDU_FRAME){PREV_FRAME=0;}
+        else{PREV_FRAME=ACTIVE_FRAME;}
+        ACTIVE_FRAME=EDU_FRAME;
+        hideFragContainer();
+        hideReportFrag();
+        fragCont.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.GONE);
+        /*if (savedIS != null) {
+            Log.e(TAG, "savedIS returns");
+            return;
+        }*/
+
+        if(fm.findFragmentByTag("edu") != null) {
+            //if the fragment exists, show it.
+            fm.beginTransaction().show(getSupportFragmentManager().findFragmentByTag("edu")).commit();
+        } else {
+            //if the fragment does not exist, add it to fragment manager.
+            eduFrag=new EducationFragment();
+            fm.beginTransaction().add(R.id.fragment_container, eduFrag, "edu").addToBackStack(null).commit();
         }
-        if(fm.findFragmentByTag("research") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
+        hideFragments("edu");
+    }
+
+    public void showAnalyticsFrag(){
+        if(PREV_FRAME==ANAL_FRAME){PREV_FRAME=0;}
+        else{PREV_FRAME=ACTIVE_FRAME;}
+        ACTIVE_FRAME=ANAL_FRAME;
+        hideFragContainer();
+        hideReportFrag();
+        fragCont.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.GONE);
+        /*if (savedIS != null) {
+            Log.e(TAG, "savedIS returns");
+            return;
+        }*/
+
+        if(fm.findFragmentByTag("analytics") != null) {
+            //if the fragment exists, show it.
+            fm.beginTransaction().show(getSupportFragmentManager().findFragmentByTag("analytics")).commit();
+        } else {
+            //if the fragment does not exist, add it to fragment manager.
+            analFrag=new AnalyticsFragment();
+            fm.beginTransaction().add(R.id.fragment_container, analFrag, "analytics").addToBackStack(null).commit();
         }
-        if(fm.findFragmentByTag("mapmenu") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
-        }
-        if(fm.findFragmentByTag("fight") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
-        }
+        hideFragments("analytics");
     }
 
     public void showMapMenuFrag(){
@@ -600,19 +600,46 @@ public class MainActivity extends BaseActivity
             Log.e(TAG, "mapmenu new frag");
             fm.beginTransaction().add(R.id.fragment_container, new MapMenuFragment(), "mapmenu").addToBackStack(null).commit();
         }
+        hideFragments("mapmenu");
+    }
 
-        if(fm.findFragmentByTag("news") != null){
-            fm.beginTransaction().hide(fm.findFragmentByTag("news")).commit();
+    public void hideFragments(String except){
+
+        if(!except.equals("news")){
+            if(fm.findFragmentByTag("news") != null){
+                //if the other fragment is visible, hide it.
+                fm.beginTransaction().hide(fm.findFragmentByTag("news")).commit();
+            }
         }
-        if(fm.findFragmentByTag("research") != null){
-            fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
+        if(!except.equals("research")){
+            if(fm.findFragmentByTag("research") != null){
+                fm.beginTransaction().hide(fm.findFragmentByTag("research")).commit();
+            }
         }
-        if(fm.findFragmentByTag("fight") != null){
-            fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
+        if(!except.equals("mapmenu")){
+            if(fm.findFragmentByTag("mapmenu") != null){
+                fm.beginTransaction().hide(fm.findFragmentByTag("mapmenu")).commit();
+            }
         }
-        if(fm.findFragmentByTag("about") != null){
-            //if the other fragment is visible, hide it.
-            fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
+        if(!except.equals("fight")){
+            if(fm.findFragmentByTag("fight") != null){
+                fm.beginTransaction().hide(fm.findFragmentByTag("fight")).commit();
+            }
+        }
+        if(!except.equals("about")){
+            if(fm.findFragmentByTag("about") != null){
+                fm.beginTransaction().hide(fm.findFragmentByTag("about")).commit();
+            }
+        }
+        if(!except.equals("edu")){
+            if(fm.findFragmentByTag("edu") != null){
+                fm.beginTransaction().hide(fm.findFragmentByTag("edu")).commit();
+            }
+        }
+        if(!except.equals("analytics")){
+            if(fm.findFragmentByTag("analytics") != null){
+                fm.beginTransaction().hide(fm.findFragmentByTag("analytics")).commit();
+            }
         }
     }
 
@@ -641,12 +668,11 @@ public class MainActivity extends BaseActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                Uri.Builder builder = new Uri.Builder();
                 if( ACTIVE_FRAME==NEWS_FRAME){
-                    spinOptions.add(0, "Поиск: "+query);
+                    /*spinOptions.add(0, "Поиск: "+query);
                     idMap.put(getResources().getString(R.string.all_news),0);
-                    spinnerDataAdapter.notifyDataSetChanged();
-
-                    Uri.Builder builder = new Uri.Builder();
+                    spinnerDataAdapter.notifyDataSetChanged();*/
                     builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("news");
                     if(news_ctg_id!=0){
                         builder.appendQueryParameter("category_id", ""+news_ctg_id);
@@ -663,12 +689,50 @@ public class MainActivity extends BaseActivity
                     intent.putExtra("query",query);
                     startActivity(intent);
                 }
+                else if( ACTIVE_FRAME==EDU_FRAME){
+                    builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
+                    builder.appendQueryParameter("text", query);
+                    searchView.clearFocus();
+                    eduFrag.populateList(1, builder, true, false);
+                }
+                else if( ACTIVE_FRAME==ANAL_FRAME){
+                    builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("analytics");
+                    builder.appendQueryParameter("text", query);
+                    searchView.clearFocus();
+                    analFrag.populateList(1, builder, true, false);
+                }
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
+            }
+        });
+
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {return true;}
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Uri.Builder builder = new Uri.Builder();
+                if( ACTIVE_FRAME==EDU_FRAME){
+                    builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
+                    eduFrag.populateList(1, builder, true, false);
+                }
+                else if( ACTIVE_FRAME==NEWS_FRAME){
+                    builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("news");
+                    if(news_ctg_id!=0){
+                        builder.appendQueryParameter("category_id", ""+news_ctg_id);
+                    }
+                    newsFrag.populateList(1,builder,true,false);
+                }
+                else if( ACTIVE_FRAME==ANAL_FRAME){
+                    builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("analytics");
+                    analFrag.populateList(1, builder, true, false);
+                }
+                return true;
             }
         });
 
@@ -688,6 +752,7 @@ public class MainActivity extends BaseActivity
             Log.e(TAG,"result "+lang);
             LocaleHelper.setLocale(context, lang);
             session.setLanguage(lang);
+            helper.doClearDbTask();
             Intent myIntent = getIntent();
             myIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             finish();
@@ -862,6 +927,8 @@ public class MainActivity extends BaseActivity
         else if(PREV_FRAME==RESEARCH_FRAME && ACTIVE_FRAME!=RESEARCH_FRAME){showResearchFrag(); navigationView.setCheckedItem(R.id.nav_research);}
         else if(PREV_FRAME==FIGHT_FRAME && ACTIVE_FRAME!=FIGHT_FRAME){showFightFrag(); navigationView.setCheckedItem(R.id.nav_fight);}
         else if(PREV_FRAME==ABOUT_FRAME && ACTIVE_FRAME!=ABOUT_FRAME){showAboutFrag(); navigationView.setCheckedItem(R.id.nav_about);}
+        else if(PREV_FRAME==EDU_FRAME && ACTIVE_FRAME!=EDU_FRAME){showEduFrag(); navigationView.setCheckedItem(R.id.nav_education);}
+        else if(PREV_FRAME==ANAL_FRAME && ACTIVE_FRAME!=ANAL_FRAME){showAnalyticsFrag(); navigationView.setCheckedItem(R.id.nav_analytics);}
         else if(PREV_FRAME==MAPMENU_FRAME && ACTIVE_FRAME!=MAPMENU_FRAME){
             Log.e(TAG,"Back press says to showMapMenuFrag");
             showMapMenuFrag();
