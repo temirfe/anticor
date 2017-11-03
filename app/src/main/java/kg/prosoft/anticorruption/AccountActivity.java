@@ -43,6 +43,7 @@ public class AccountActivity extends BaseActivity {
     String auth_key, username;
     ProgressBar pb_report, pb_comment;
     InputMethodManager imm;
+    String new_username_global;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +147,7 @@ public class AccountActivity extends BaseActivity {
                         }
                         else{
                             session.setUserName(new_username);
+                            new_username_global=new_username;
                         }
 
                     }catch(JSONException e){e.printStackTrace();}
@@ -203,10 +205,19 @@ public class AccountActivity extends BaseActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent= new Intent();
+        intent.putExtra("name", new_username_global);
+        setResult(RESULT_OK, intent);
+        super.onBackPressed();
+        finish();
     }
 
     public void requestUser(){

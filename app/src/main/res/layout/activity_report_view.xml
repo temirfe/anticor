@@ -13,12 +13,25 @@
         android:paddingBottom="16dp"
         >
         <TextView
+            android:id="@+id/id_tv_status"
+            android:visibility="gone"
+            android:layout_width="0dp"
+            android:text="@string/under_moderation"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:background="@color/colorAccent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:padding="8dp"/>
+        <TextView
             android:id="@+id/id_tv_anonym"
             android:visibility="gone"
             android:layout_width="0dp"
             android:text="@string/anonymous"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_tv_status"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginLeft="8dp" />
@@ -30,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="@drawable/gray_link"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_tv_status"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginLeft="8dp" />
@@ -42,7 +55,7 @@
             android:text="TextView"
             android:textColor="@color/black"
             android:textSize="18sp"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/id_tv_status"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginTop="20dp"

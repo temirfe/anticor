@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Anti Corruption</string>
     <string name="app_name_abbr">АКП КР</string>
+    <string name="app_name_abbr_lang">ACP KR</string>
     <string name="project_title">ANTI-CORRUPTION PORTAL OF THE KYRGYZ REPUBLIC</string>
 
     <string name="navigation_drawer_open">Open menu</string>
@@ -75,6 +76,7 @@
     <string name="title_activity_maps">Map</string>
     <string name="set_location">Point on the map</string>
     <string name="done">Done</string>
+    <string name="done_send">Done</string>
     <string name="only_kg">You can point only within Kyrgyz Republic!</string>
     <string name="grant_location_permission">Please give your location permission</string>
     <string name="grant_location_permission_en">Please, give permission to locate your location</string>
@@ -103,6 +105,7 @@
     <string name="comment_moder">Your comment will be added after passing moderation, thank you.</string>
     <string name="rate_authority">Rate state authority</string>
     <string name="cancel">Cancel</string>
+    <string name="cancel_close">Cancel</string>
     <string name="city">City</string>
     <string name="authority">State authority</string>
     <string name="category">Corruption sector</string>
@@ -152,6 +155,7 @@
     <string name="rate9">Extremely corrupted</string>
     <string name="rate10">Fully corrupted</string>
     <string name="version">Version:</string>
+    <string name="under_moderation">Your application is under moderation. Only you can see this now.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="facebook_app_id" translatable="false">2026864364212005</string>
@@ -159,8 +163,5 @@
 
     <string name="com.twitter.sdk.android.CONSUMER_KEY" translatable="false">AIw8j1pjMcH2QXUAPLaQQJ3SL</string>
     <string name="com.twitter.sdk.android.CONSUMER_SECRET" translatable="false">72HJCEZjjNU77TgrELQoskYpxhSuQslXciMolHrF9AW4lfnwbt</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

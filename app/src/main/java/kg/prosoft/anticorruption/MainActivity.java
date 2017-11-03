@@ -92,7 +92,7 @@ public class MainActivity extends BaseActivity
     FragmentManager fm;
     NavigationView navigationView;
     int visible_tab=1;
-    static int SETTINGS_FLAG=31;
+    static int SETTINGS_FLAG=31, ACCOUNT_FLAG=32;
     String lang="";
     MapView mMapView;
     OnMapReadyCallback mcback;
@@ -238,7 +238,7 @@ public class MainActivity extends BaseActivity
             int id=(int)view.getTag();
             intent.putExtra("user_id",id);
             intent.putExtra("username",session.getUserName());
-            startActivity(intent);
+            startActivityForResult(intent, ACCOUNT_FLAG);
         }
     };
 
@@ -320,7 +320,9 @@ public class MainActivity extends BaseActivity
     public void showMainFrag(){
         PREV_FRAME=0;
         ACTIVE_FRAME=MAIN_FRAME;
-        Log.e(TAG, "showMainFrag");
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(R.string.app_name_abbr_lang);
+        }
         hideFragContainer();
         navigationView.setCheckedItem(R.id.nav_main);
         if(myMenu!=null){
@@ -462,6 +464,9 @@ public class MainActivity extends BaseActivity
         hideReportFrag();
         fragCont.setVisibility(View.VISIBLE);
         fab.setVisibility(View.GONE);
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(R.string.research_and_report);
+        }
         /*if (savedIS != null) {
             Log.e(TAG, "savedIS returns");
             return;
@@ -485,6 +490,9 @@ public class MainActivity extends BaseActivity
         hideReportFrag();
         fragCont.setVisibility(View.VISIBLE);
         fab.setVisibility(View.GONE);
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(R.string.corruption_fight);
+        }
         /*if (savedIS != null) {
             Log.e(TAG, "savedIS returns");
             return;
@@ -511,6 +519,9 @@ public class MainActivity extends BaseActivity
         }
         fragCont.setVisibility(View.VISIBLE);
         fab.setVisibility(View.GONE);
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(R.string.about);
+        }
         /*if (savedIS != null) {
             Log.e(TAG, "savedIS returns");
             return;
@@ -535,6 +546,9 @@ public class MainActivity extends BaseActivity
         hideReportFrag();
         fragCont.setVisibility(View.VISIBLE);
         fab.setVisibility(View.GONE);
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(R.string.anticorruption_edu);
+        }
         /*if (savedIS != null) {
             Log.e(TAG, "savedIS returns");
             return;
@@ -559,6 +573,9 @@ public class MainActivity extends BaseActivity
         hideReportFrag();
         fragCont.setVisibility(View.VISIBLE);
         fab.setVisibility(View.GONE);
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(R.string.analytics);
+        }
         /*if (savedIS != null) {
             Log.e(TAG, "savedIS returns");
             return;
@@ -581,6 +598,9 @@ public class MainActivity extends BaseActivity
         ACTIVE_FRAME=MAPMENU_FRAME;
         hideFragContainer();
         hideReportFrag();
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(R.string.corruption_map);
+        }
         fragCont.setVisibility(View.VISIBLE);
         fab.setVisibility(View.GONE);
         /*if (savedIS != null) {
@@ -630,6 +650,11 @@ public class MainActivity extends BaseActivity
         if(!except.equals("edu")){
             if(fm.findFragmentByTag("edu") != null){
                 fm.beginTransaction().hide(fm.findFragmentByTag("edu")).commit();
+            }
+        }
+        if(!except.equals("analytics")){
+            if(fm.findFragmentByTag("analytics") != null){
+                fm.beginTransaction().hide(fm.findFragmentByTag("analytics")).commit();
             }
         }
         if(!except.equals("analytics")){
@@ -758,6 +783,13 @@ public class MainActivity extends BaseActivity
             myIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             finish();
             startActivity(myIntent);
+        }
+        else if(requestCode==ACCOUNT_FLAG){
+            String name=data.getStringExtra("name");
+            Log.e(TAG,"account result "+name);
+            if(name!=null && !name.isEmpty()){
+                tv_name.setText(name);
+            }
         }
     }
 

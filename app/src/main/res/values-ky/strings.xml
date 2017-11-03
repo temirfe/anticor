@@ -33,6 +33,7 @@
     <string name="your_location">Жайгашкан ордун тактаңыз (адрес)</string>-->
 
     <string name="done">Даяр</string>
+    <string name="done_send">Жибер</string>
     <string name="add">Кошуу</string>
     <string name="submit">Жөнөтүү</string>
     <string name="required">Талааны толтуруңуз</string>
@@ -86,6 +87,7 @@
 
     <string name="app_name">Anti Corruption</string>
     <string name="app_name_abbr">АКП КР</string>
+    <string name="app_name_abbr_lang">КР АКП</string>
     <string name="project_title">КЫРГЫЗ РЕСПУБЛИКАСЫНЫН АНТИКОРРУПЦИЯЛЫК ПОРТАЛЫ</string>
 
     <string name="navigation_drawer_open">Менюну ачуу</string>
@@ -146,6 +148,7 @@
     <string name="comment_moder">Сиздин комментарийиңиз текшерүүдөн өткөндөн кийин чыгат, рахмат.</string>
     <string name="rate_authority">Мамлекеттик органды баалоо</string>
     <string name="cancel">Жокко чыгаруу</string>
+    <string name="cancel_close">Артка</string>
     <string name="city">Шаар</string>
     <string name="authority">Мамлекеттик орган</string>
     <string name="category">Коррупция сектору</string>
@@ -190,6 +193,7 @@
     <string name="rate9">Өтө көп бузулган</string>
     <string name="rate10">Тоолугу менен бузулган</string>
     <string name="version">Версия:</string>
+    <string name="under_moderation">Сиздин кайрылууңуз модерациядан өткөндөн кийин жеткиликтүү болот.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

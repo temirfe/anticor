@@ -45,7 +45,7 @@ import kg.prosoft.anticorruption.service.MyVolley;
 
 public class ReportViewActivity extends AppCompatActivity {
     TextView tv_author, tv_title, tv_date, tv_text, tv_zero_comment, tv_city,tv_category,
-            tv_authority,tv_type, tv_anonym;
+            tv_authority,tv_type, tv_anonym, tv_status;
     public double lat=0,lng=0;
     public RelativeLayout rl_map, rl_pb;
     public LinearLayout ll_comments,ll_thumb_holder;
@@ -54,7 +54,7 @@ public class ReportViewActivity extends AppCompatActivity {
     Activity activity;
     Context context;
     boolean loadAll;
-    String author;
+    String author, status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +78,7 @@ public class ReportViewActivity extends AppCompatActivity {
         tv_category=(TextView)findViewById(R.id.id_tv_category);
         tv_authority=(TextView)findViewById(R.id.id_tv_authority);
         tv_type=(TextView)findViewById(R.id.id_tv_type);
+        tv_status=(TextView)findViewById(R.id.id_tv_status);
         //iv_image=(ImageView)findViewById(R.id.id_iv_img);
         ll_comments=(LinearLayout) findViewById(R.id.id_ll_comments);
         ll_thumb_holder=(LinearLayout) findViewById(R.id.id_ll_thumb_holder);
@@ -129,6 +130,14 @@ public class ReportViewActivity extends AppCompatActivity {
             rl_pb.setVisibility(View.VISIBLE);
         }
 
+        if(intent.hasExtra("status")) //if opened from commentActivity then intent has only id
+        {
+            status=intent.getStringExtra("status");
+            if(status.equals("0")){
+                tv_status.setVisibility(View.VISIBLE);
+            }
+        }
+
         //although we have info from intent, we make a request to get comments and
         //other info like authority title, etc.
         requestReport(id);
@@ -144,6 +153,11 @@ public class ReportViewActivity extends AppCompatActivity {
                 rl_pb.setVisibility(View.GONE);
                 try{
                     user_id=jsonObject.getInt("user_id");
+
+                    status=jsonObject.getString("status");
+                    if(status.equals("0")){
+                        tv_status.setVisibility(View.VISIBLE);
+                    }
 
                     if(jsonObject.has("comments")){
                         JSONArray comments = jsonObject.getJSONArray("comments");

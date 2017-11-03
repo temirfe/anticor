@@ -31,15 +31,15 @@
 
         <ImageView
             android:id="@+id/id_iv_img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
             android:adjustViewBounds="true"
             android:src="@drawable/herb"
             app:layout_constraintTop_toBottomOf="@+id/id_tv_title"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:paddingLeft="50dp"
-            android:paddingRight="50dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
             android:layout_marginTop="16dp" />
 
         <RatingBar

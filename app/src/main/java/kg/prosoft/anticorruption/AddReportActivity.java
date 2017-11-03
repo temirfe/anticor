@@ -207,6 +207,14 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
         tv_time.setText(timeFormatter.format(calendar.getTime()));
         setDateTimeField();
         new PageTask().execute();
+        String session_email=session.getEmail();
+        String session_name=session.getName();
+        String session_username=session.getUserName();
+        String session_phone=session.getContact();
+        if(!session_email.isEmpty()){et_email.setText(session_email);}
+        if(!session_name.isEmpty()){et_name.setText(session_name);}
+        else if(!session_username.isEmpty()){et_name.setText(session_username);}
+        if(!session_phone.isEmpty()){et_contact.setText(session_phone);}
     }
 
     private void setDateTimeField() {
@@ -757,6 +765,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                                 intent.putExtra("lat",Double.parseDouble(latitude));
                                 intent.putExtra("lng",Double.parseDouble(longitude));
                                 intent.putExtra("city",titleMap.get(selected_city_id));
+                                intent.putExtra("status","0");
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             }
@@ -1279,7 +1288,7 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
                         String desc=jsonObject.getString("description");
                         Page page =new Page(id,title, text, desc);
                         infoList.add(page);
-                        if(desc.equals("about")){
+                        if(desc.equals("warning")){
                             CharSequence html_text;
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                                 html_text= Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY);
@@ -1331,24 +1340,49 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
 
     public void showWarning(String title, String text){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle(title).setMessage(text).setNegativeButton(android.R.string.ok,null).create().show();
+        builder.setTitle(title).setMessage(text).setNegativeButton(R.string.close,null);
+        AlertDialog alert = builder.create();
+        alert.show();
+        alert.getWindow().getAttributes();
+        TextView textView = (TextView) alert.findViewById(android.R.id.message);
+        textView.setTextSize(15);
     }
 
     public void onClickEmailWarn(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(email_help).setNegativeButton(R.string.close,null).create().show();
+        builder.setMessage(email_help).setNegativeButton(R.string.close,null);
+        AlertDialog alert = builder.create();
+        alert.show();
+        alert.getWindow().getAttributes();
+        TextView textView = (TextView) alert.findViewById(android.R.id.message);
+        textView.setTextSize(14);
     }
     public void onClickNameHelp(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(name_help).setNegativeButton(R.string.close,null).create().show();
+        builder.setMessage(name_help).setNegativeButton(R.string.close,null);
+        AlertDialog alert = builder.create();
+        alert.show();
+        alert.getWindow().getAttributes();
+        TextView textView = (TextView) alert.findViewById(android.R.id.message);
+        textView.setTextSize(14);
     }
     public void onClickAnonWarn(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(anon_help).setNegativeButton(R.string.close,null).create().show();
+        builder.setMessage(anon_help).setNegativeButton(R.string.close,null);
+        AlertDialog alert = builder.create();
+        alert.show();
+        alert.getWindow().getAttributes();
+        TextView textView = (TextView) alert.findViewById(android.R.id.message);
+        textView.setTextSize(14);
     }
     public void onClickContactHelp(View v){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(contact_help).setNegativeButton(R.string.close,null).create().show();
+        builder.setMessage(contact_help).setNegativeButton(R.string.close,null);
+        AlertDialog alert = builder.create();
+        alert.show();
+        alert.getWindow().getAttributes();
+        TextView textView = (TextView) alert.findViewById(android.R.id.message);
+        textView.setTextSize(14);
     }
 
     @Override

@@ -344,7 +344,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
             rateMe.setRating(user_rating);
         }
 
-        ratingdialog.setPositiveButton(R.string.done,
+        ratingdialog.setPositiveButton(R.string.done_send,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         float user_rate=rateMe.getRating();
@@ -353,7 +353,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
                     }
                 })
 
-                .setNegativeButton(R.string.cancel,
+                .setNegativeButton(R.string.cancel_close,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();

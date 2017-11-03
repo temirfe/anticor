@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Anti Corruption</string>
     <string name="app_name_abbr">АКП КР</string>
+    <string name="app_name_abbr_lang">АКП КР</string>
     <string name="project_title">АНТИКОРРУПЦИОННЫЙ ПОРТАЛ КЫРГЫЗСКОЙ РЕСПУБЛИКИ</string>
 
     <string name="navigation_drawer_open">Открыть меню</string>
@@ -75,6 +76,7 @@
     <string name="title_activity_maps">Map</string>
     <string name="set_location">Укажите на карте</string>
     <string name="done">Готово</string>
+    <string name="done_send">Готово</string>
     <string name="only_kg">Нужно указать только внутри Кыргызской Республики!</string>
     <string name="grant_location_permission">Пожалуйста, дайте разрешение на ваше местоположения</string>
     <string name="grant_location_permission_en">Please, give permission to locate your location</string>
@@ -103,6 +105,7 @@
     <string name="comment_moder">Ваш комментарий будет добавлен после прохождения модерации, спасибо.</string>
     <string name="rate_authority">Оцени госорган</string>
     <string name="cancel">Отмена</string>
+    <string name="cancel_close">Отмена</string>
     <string name="city">Город</string>
     <string name="authority">Госорган</string>
     <string name="category">Сектор коррупции</string>
@@ -152,6 +155,7 @@
     <string name="rate9">Очень сильно коррумпированный</string>
     <string name="rate10">Полностью коррумпированный</string>
     <string name="version">Версия:</string>
+    <string name="under_moderation">Ваше обращение будет доступно после прохождения модерации.</string>
 
     <!-- TODO: Remove or change this placeholder text -->
 
