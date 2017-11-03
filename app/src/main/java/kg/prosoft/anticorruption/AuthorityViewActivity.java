@@ -72,7 +72,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
     boolean loadAll;
     public RelativeLayout rl_pb;
     Button btn_rate;
-    String votes;
+    String votes, lang;
     ProgressBar pb_rating, pb_count;
 
     @Override
@@ -87,6 +87,8 @@ public class AuthorityViewActivity extends AppCompatActivity {
         activity=this;
         context=getApplicationContext();
         session=new SessionManager(context);
+        lang=session.getLanguage();
+        if(lang.isEmpty()){lang="ky";}
         tv_title=(TextView)findViewById(R.id.id_tv_title);
         tv_text=(TextView)findViewById(R.id.id_tv_text);
         iv_image=(ImageView)findViewById(R.id.id_iv_img);
@@ -145,7 +147,7 @@ public class AuthorityViewActivity extends AppCompatActivity {
         }
     }
     public void requestAuthority(final int id){
-        String uri = Endpoints.AUTHORITIES+"/"+id;
+        String uri = Endpoints.AUTHORITIES+"/"+id+"?lang="+lang;
 
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override

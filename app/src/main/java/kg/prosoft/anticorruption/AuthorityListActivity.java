@@ -62,6 +62,7 @@ public class AuthorityListActivity extends AppCompatActivity {
     public SQLiteDatabase db;
     public MyDbHandler dbHandler;
     MyHelper helper;
+    String lang;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,8 @@ public class AuthorityListActivity extends AppCompatActivity {
         dbHandler = new MyDbHandler(context);
         db = dbHandler.getWritableDatabase();
         helper = new MyHelper(activity, dbHandler, db, session);
+        lang=session.getLanguage();
+        if(lang.isEmpty()){lang="ky";}
 
         listView = (ListView) findViewById(R.id.id_lv_authorities);
         ll_reload=(LinearLayout)findViewById(R.id.id_ll_reload);
@@ -148,7 +151,7 @@ public class AuthorityListActivity extends AppCompatActivity {
 
     public void populateList(){
         pb.setVisibility(ProgressBar.VISIBLE);
-        String uri = Endpoints.AUTHORITIES;
+        String uri = Endpoints.AUTHORITIES+"?lang="+lang;
 
         Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
             @Override

@@ -54,6 +54,7 @@ public class DocMenuFragment extends Fragment {
     MyHelper helper;
     String TAG="DocMenuFrag";
     ProgressBar pbar;
+    String lang;
 
     public DocMenuFragment() {
         // Required empty public constructor
@@ -72,6 +73,9 @@ public class DocMenuFragment extends Fragment {
         db = dbHandler.getWritableDatabase();
         helper = new MyHelper(activity, dbHandler, db, session);
         pbar=(ProgressBar)view.findViewById(R.id.id_pbar);
+
+        lang=session.getLanguage();
+        if(lang.isEmpty()){lang="ky";}
 
         infoList=new ArrayList<>();
 
@@ -114,7 +118,7 @@ public class DocMenuFragment extends Fragment {
     }
 
     public void requestVocabularies(){
-        String uri = Endpoints.VOCABULARIES;
+        String uri = Endpoints.VOCABULARIES+"?lang="+lang;
         Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {

@@ -1263,9 +1263,8 @@ public class AddReportActivity extends BaseActivity implements SectorDialog.Sect
     public void requestPages(){
         String uri = Endpoints.PAGES;
         String lang=session.getLanguage();
-        if(lang!=null && !lang.isEmpty()){
-            uri=uri+"?lang="+lang;
-        }
+        if(lang.isEmpty()){lang="ky";}
+        uri=uri+"?lang="+lang;
         Response.Listener<JSONArray> listener = new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {

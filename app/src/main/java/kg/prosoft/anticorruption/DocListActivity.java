@@ -58,7 +58,7 @@ public class DocListActivity extends BaseActivity {
     LinearLayout ll_reload;
     String TAG="DocList";
     int ctg_id=0;
-    String ctg_title, query;
+    String ctg_title, query, lang;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +75,9 @@ public class DocListActivity extends BaseActivity {
                 getSupportActionBar().setTitle(ctg_title);
             }
         }
+
+        lang=session.getLanguage();
+        if(lang.isEmpty()){lang="ky";}
 
         listView = (ListView) findViewById(R.id.id_lv_news);
         listView.setOnScrollListener(onScrollDo);
@@ -196,6 +199,7 @@ public class DocListActivity extends BaseActivity {
         if(ctg_id!=0){
             otherBuilder.appendQueryParameter("category_id", Integer.toString(ctg_id));
         }
+        otherBuilder.appendQueryParameter("lang", lang);
 
         String uri = otherBuilder.build().toString();
 

@@ -45,6 +45,7 @@ public class NewsViewActivity extends BaseActivity {
     String TAG ="NewsViewAc";
     boolean loadAll;
     ProgressBar pb;
+    String lang;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,10 @@ public class NewsViewActivity extends BaseActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+
+        lang=session.getLanguage();
+        if(lang.isEmpty()){lang="ky";}
+
         pb=(ProgressBar)findViewById(R.id.progressBar1);
         tv_category=(TextView)findViewById(R.id.id_tv_category);
         //tv_category.setOnClickListener(onCtgClick);
@@ -130,7 +135,7 @@ public class NewsViewActivity extends BaseActivity {
     };*/
 
     public void requestNews(final int id){
-        String uri = Endpoints.NEWS+"/"+id;
+        String uri = Endpoints.NEWS+"/"+id+"?lang="+lang;
 
         Response.Listener<JSONObject> listener = new Response.Listener<JSONObject>() {
             @Override

@@ -78,6 +78,7 @@ public class NewsFragment extends Fragment {
     MyHelper helper;
     String TAG="NewsFrag";
     boolean shownFromDb=false;
+    String lang;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -94,6 +95,8 @@ public class NewsFragment extends Fragment {
         dbHandler = new MyDbHandler(context);
         db = dbHandler.getWritableDatabase();
         helper = new MyHelper(activity, dbHandler, db, session);
+        lang=session.getLanguage();
+        if(lang.isEmpty()){lang="ky";}
 
         listView = (ListView) layout.findViewById(R.id.id_lv_news);
         listView.setOnScrollListener(onScrollDo);
@@ -208,6 +211,7 @@ public class NewsFragment extends Fragment {
         Uri.Builder otherBuilder = Uri.parse(uriB.build().toString()).buildUpon();
 
         otherBuilder.appendQueryParameter("page", Integer.toString(page));
+        otherBuilder.appendQueryParameter("lang", lang);
 
         String uri = otherBuilder.build().toString();
         Log.e(TAG, "uri: "+uri);

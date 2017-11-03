@@ -1,6 +1,5 @@
 package kg.prosoft.anticorruption;
 
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,8 +8,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -25,7 +22,6 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -50,7 +46,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import kg.prosoft.anticorruption.service.Endpoints;
 import kg.prosoft.anticorruption.service.LocaleHelper;
@@ -228,6 +223,7 @@ public class MainActivity extends BaseActivity
                 if(news_ctg_id!=0){
                     builder.appendQueryParameter("category_id", ""+news_ctg_id);
                 }
+                builder.appendQueryParameter("lang", lang);
                 newsFrag.populateList(1,builder,true,false);
             }
         }
@@ -678,6 +674,7 @@ public class MainActivity extends BaseActivity
                         builder.appendQueryParameter("category_id", ""+news_ctg_id);
                     }
                     builder.appendQueryParameter("text", query);
+                    builder.appendQueryParameter("lang", lang);
                     searchView.clearFocus();
                     newsFrag.populateList(1,builder,true,false);
                 }
@@ -687,11 +684,13 @@ public class MainActivity extends BaseActivity
                     MenuItemCompat.collapseActionView(searchItem);
                     Intent intent = new Intent(MainActivity.this, DocListActivity.class);
                     intent.putExtra("query",query);
+                    builder.appendQueryParameter("lang", lang);
                     startActivity(intent);
                 }
                 else if( ACTIVE_FRAME==EDU_FRAME){
                     builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
                     builder.appendQueryParameter("text", query);
+                    builder.appendQueryParameter("lang", lang);
                     searchView.clearFocus();
                     eduFrag.populateList(1, builder, true, false);
                 }
@@ -719,10 +718,12 @@ public class MainActivity extends BaseActivity
                 Uri.Builder builder = new Uri.Builder();
                 if( ACTIVE_FRAME==EDU_FRAME){
                     builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("educations");
+                    builder.appendQueryParameter("lang", lang);
                     eduFrag.populateList(1, builder, true, false);
                 }
                 else if( ACTIVE_FRAME==NEWS_FRAME){
                     builder.scheme(Endpoints.SCHEME).authority(Endpoints.AUTHORITY).appendPath(Endpoints.API).appendPath("news");
+                    builder.appendQueryParameter("lang", lang);
                     if(news_ctg_id!=0){
                         builder.appendQueryParameter("category_id", ""+news_ctg_id);
                     }

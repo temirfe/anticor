@@ -60,10 +60,11 @@ public class EducationFragment extends Fragment {
     Button btn_reload;
     LinearLayout ll_reload;
     String TAG = "EduFrag";
-    String query;
+    String query, lang;
 
     Context context;
     Activity activity;
+    SessionManager session;
 
     public EducationFragment() {
         // Required empty public constructor
@@ -78,6 +79,10 @@ public class EducationFragment extends Fragment {
 
         activity=getActivity();
         context=activity.getApplicationContext();
+        session = new SessionManager(context);
+
+        lang=session.getLanguage();
+        if(lang.isEmpty()){lang="ky";}
 
         listView = (ListView) layout.findViewById(R.id.id_lv_news);
         listView.setOnScrollListener(onScrollDo);
@@ -195,6 +200,7 @@ public class EducationFragment extends Fragment {
         Uri.Builder otherBuilder = Uri.parse(uriB.build().toString()).buildUpon();
 
         otherBuilder.appendQueryParameter("page", Integer.toString(page));
+        otherBuilder.appendQueryParameter("lang", lang);
 
         String uri = otherBuilder.build().toString();
 
