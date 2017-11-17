@@ -425,9 +425,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     provider="odnoklassniki";
                     provider_data=json.toString();
                     provider_email="";
+                    if(json.has("email")){provider_email=json.getString("email");}
                     provider_username="";
                     if(puid!=null && !puid.isEmpty()){
-                        postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
+                        //postSocial(provider, provider_data, puid, provider_email, provider_username,provider_name);
                     }
 
                 } catch (JSONException e) {
@@ -485,7 +486,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         @Override
         public void onClick(final View view) {
-            odnoklassniki.requestAuthorization(LoginActivity.this, OK_REDIRECT_URL, authType, OkScope.VALUABLE_ACCESS);
+            odnoklassniki.requestAuthorization(LoginActivity.this, OK_REDIRECT_URL, authType, OkScope.VALUABLE_ACCESS, OkScope.LONG_ACCESS_TOKEN);
         }
     }
 

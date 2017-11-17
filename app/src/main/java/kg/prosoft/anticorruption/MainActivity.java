@@ -87,7 +87,7 @@ public class MainActivity extends BaseActivity
     FloatingActionButton fab;
     int news_ctg_id=0;
     int ACTIVE_FRAME=0, NEWS_FRAME=1, RESEARCH_FRAME=2, MAPMENU_FRAME=3, MAIN_FRAME=4,
-            REPORT_FRAME=5, FIGHT_FRAME=6, ABOUT_FRAME=7, EDU_FRAME=8, ANAL_FRAME=9;
+            REPORT_FRAME=5, FIGHT_FRAME=6, ABOUT_FRAME=7, EDU_FRAME=8, ANAL_FRAME=9, POLIT_FRAME=10;
     int PREV_FRAME=0;
     FragmentManager fm;
     NavigationView navigationView;
@@ -301,7 +301,7 @@ public class MainActivity extends BaseActivity
             showAnalyticsFrag();
         }
         else if (id == R.id.nav_anticor_politics ){
-
+            showPolitFrag();
         }
         else if (id == R.id.nav_about ){
             showAboutFrag();
@@ -565,6 +565,32 @@ public class MainActivity extends BaseActivity
         hideFragments("edu");
     }
 
+    public void showPolitFrag(){
+        if(PREV_FRAME==POLIT_FRAME){PREV_FRAME=0;}
+        else{PREV_FRAME=ACTIVE_FRAME;}
+        ACTIVE_FRAME=POLIT_FRAME;
+        hideFragContainer();
+        hideReportFrag();
+        fragCont.setVisibility(View.VISIBLE);
+        fab.setVisibility(View.GONE);
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setTitle(R.string.anticor_politics);
+        }
+        /*if (savedIS != null) {
+            Log.e(TAG, "savedIS returns");
+            return;
+        }*/
+
+        if(fm.findFragmentByTag("politics") != null) {
+            //if the fragment exists, show it.
+            fm.beginTransaction().show(getSupportFragmentManager().findFragmentByTag("politics")).commit();
+        } else {
+            //if the fragment does not exist, add it to fragment manager.
+            fm.beginTransaction().add(R.id.fragment_container, new PoliticsFragment(), "politics").addToBackStack(null).commit();
+        }
+        hideFragments("politics");
+    }
+
     public void showAnalyticsFrag(){
         if(PREV_FRAME==ANAL_FRAME){PREV_FRAME=0;}
         else{PREV_FRAME=ACTIVE_FRAME;}
@@ -660,6 +686,11 @@ public class MainActivity extends BaseActivity
         if(!except.equals("analytics")){
             if(fm.findFragmentByTag("analytics") != null){
                 fm.beginTransaction().hide(fm.findFragmentByTag("analytics")).commit();
+            }
+        }
+        if(!except.equals("politics")){
+            if(fm.findFragmentByTag("politics") != null){
+                fm.beginTransaction().hide(fm.findFragmentByTag("politics")).commit();
             }
         }
     }
@@ -961,6 +992,7 @@ public class MainActivity extends BaseActivity
         else if(PREV_FRAME==FIGHT_FRAME && ACTIVE_FRAME!=FIGHT_FRAME){showFightFrag(); navigationView.setCheckedItem(R.id.nav_fight);}
         else if(PREV_FRAME==ABOUT_FRAME && ACTIVE_FRAME!=ABOUT_FRAME){showAboutFrag(); navigationView.setCheckedItem(R.id.nav_about);}
         else if(PREV_FRAME==EDU_FRAME && ACTIVE_FRAME!=EDU_FRAME){showEduFrag(); navigationView.setCheckedItem(R.id.nav_education);}
+        else if(PREV_FRAME==POLIT_FRAME && ACTIVE_FRAME!=POLIT_FRAME){showPolitFrag(); navigationView.setCheckedItem(R.id.nav_anticor_politics);}
         else if(PREV_FRAME==ANAL_FRAME && ACTIVE_FRAME!=ANAL_FRAME){showAnalyticsFrag(); navigationView.setCheckedItem(R.id.nav_analytics);}
         else if(PREV_FRAME==MAPMENU_FRAME && ACTIVE_FRAME!=MAPMENU_FRAME){
             Log.e(TAG,"Back press says to showMapMenuFrag");

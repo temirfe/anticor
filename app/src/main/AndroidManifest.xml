@@ -125,7 +125,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".CommentActivity" />
-        <activity android:name=".PageViewActivity"></activity>
+        <activity android:name=".PageViewActivity" />
+        <activity android:name=".PolitListActivity"></activity>
     </application>
 
 </manifest>
