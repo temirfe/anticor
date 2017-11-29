@@ -39,6 +39,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
         android:textSize="12sp"
+        android:textColor="@color/gray8"
         android:id="@+id/textView_date"
         android:layout_below="@+id/id_tv_text" />
 

@@ -287,7 +287,7 @@ public class ListReportsFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 pb.setVisibility(ProgressBar.INVISIBLE);
-                progress.dismiss();
+                if(progress!=null){progress.dismiss();}
                 ll_reload.setVisibility(View.VISIBLE);
             }
         };

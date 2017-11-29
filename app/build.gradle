@@ -7,8 +7,8 @@ android {
         applicationId "kg.prosoft.anticorruption"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 104
-        versionName "1.0.4"
+        versionCode 105
+        versionName "1.0.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

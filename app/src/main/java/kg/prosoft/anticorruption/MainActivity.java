@@ -342,7 +342,7 @@ public class MainActivity extends BaseActivity
 
         if(listFrag==null){listFrag = new ListReportsFragment(); listFrag.setArguments(bundle);}
         if(mapFrag==null){mapFrag = new MapReportsFragment(); mapFrag.setArguments(bundle);}
-        if(newsFrag==null){newsFrag = new NewsFragment();}
+        newsFrag = new NewsFragment();
         //listFrag.setArguments(gotIntent.getExtras());
         //mapFrag.setArguments(gotIntent.getExtras());
         ReportsTabAdapter adapter = new ReportsTabAdapter(fm);
