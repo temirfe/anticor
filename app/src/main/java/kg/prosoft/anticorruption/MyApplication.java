@@ -2,6 +2,7 @@ package kg.prosoft.anticorruption;
 
 import android.app.Application;
 import android.content.res.Configuration;
+//import android.support.multidex.MultiDexApplication;
 
 import com.twitter.sdk.android.core.Twitter;
 

@@ -6,10 +6,12 @@ package kg.prosoft.anticorruption.service;
 
 public class Endpoints {
     public static final String SCHEME = "https";
-    public static final String AUTHORITY = "anticorruption.kg";
+    //public static final String AUTHORITY = "anticorruption.kg";
+    public static final String AUTHORITY = "anticor.ml";
     public static final String API = "api";
 
-    public static final String BASE_URL = "https://anticorruption.kg";
+    //public static final String BASE_URL = "https://anticorruption.kg";
+    public static final String BASE_URL = "https://anticor.ml";
     public static final String API_URL = BASE_URL +"/api";
     public static final String USERS = API_URL + "/accounts";
     public static final String LOGIN = USERS + "/login";
